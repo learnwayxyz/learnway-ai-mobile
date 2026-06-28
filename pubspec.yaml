@@ -104,12 +104,12 @@ dependencies:
   ai_mentor:
     git:
       url: https://github.com/learnwayxyz/Ai-tutor.git
-      path: packages/ai_mentor
+      path: ai_mentor
       ref: development
   core:
     git:
       url: https://github.com/learnwayxyz/Ai-tutor.git
-      path: packages/core
+      path: core
       ref: development
 
 dev_dependencies:
