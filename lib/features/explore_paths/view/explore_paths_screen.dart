@@ -1,5 +1,9 @@
+import 'package:ai_mentor/ai_mentor.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
+import 'package:learnwayv2/features/explore_paths/widgets/explore_paths_shimmer.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
+import 'package:learnwayv2/shared/widgets/back_button.dart';
+import 'package:learnwayv2/shared/widgets/buttons.dart';
 
 @RoutePage()
 class ExplorePathsScreen extends StatefulWidget {
@@ -20,17 +24,77 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    locator<LearningPathCubit>().fetchLearningPaths();
+  }
+
+  void _onPathTap(LearningPathModel path) {
+    locator<LearningPathCubit>().checkPathAccess(path.id);
+  }
+
+  void _showPaywall(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _LearningPathPaywallSheet(
+        onSubscribe: () {
+          Navigator.of(context).pop();
+          context.router.push(const PayWallRoute());
+        },
+        onDismiss: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
+  List<LearningPathModel> _filterPaths(
+    List<LearningPathModel> paths,
+    int tab,
+  ) {
+    switch (tab) {
+      case 1:
+        return paths.where((p) => p.access.userHasAccess).toList();
+      case 2:
+        return [...paths]
+          ..sort((a, b) => b.totalCourses.compareTo(a.totalCourses));
+      case 3:
+        return paths.where((p) => p.isFoundation).toList();
+      default:
+        return paths;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.gray50,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(context),
-            _buildTabBar(),
-            Expanded(child: _buildPathList()),
-          ],
+    return BlocListener<LearningPathCubit, LearningPathState>(
+      bloc: locator<LearningPathCubit>(),
+      listenWhen: (prev, curr) => prev.accessResult != curr.accessResult,
+      listener: (context, state) {
+        if (state.accessResult == PathAccessResult.granted &&
+            state.accessCheckedPath != null) {
+          final path = state.accessCheckedPath!;
+          context.router.push(
+            PathCoursesRoute(
+              learningPathId: path.id,
+              pathTitle: path.title,
+            ),
+          );
+        } else if (state.accessResult == PathAccessResult.denied) {
+          _showPaywall(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.gray50,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context),
+              _buildTabBar(),
+              Expanded(child: _buildPathList()),
+            ],
+          ),
         ),
       ),
     );
@@ -42,10 +106,7 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => context.router.maybePop(),
-            child: const Icon(Icons.arrow_back, size: 24),
-          ),
+          CustomBackButton(onPress: () => context.router.maybePop()),
           const SizedBox(height: 16),
           Text(
             'Explore Paths',
@@ -98,127 +159,73 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
   }
 
   Widget _buildPathList() {
-    final paths = _pathsForTab(_selectedTabIndex);
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-      itemCount: paths.length,
-      separatorBuilder: (context, i) => const SizedBox(height: 16),
-      itemBuilder: (_, i) => _PathCard(path: paths[i]),
-    );
-  }
+    return BlocBuilder<LearningPathCubit, LearningPathState>(
+      bloc: locator<LearningPathCubit>(),
+      builder: (context, state) {
+        if (state.status == LearningPathStatus.loading ||
+            state.status == LearningPathStatus.initial) {
+          return const ExplorePathsShimmer();
+        }
 
-  List<_PathItem> _pathsForTab(int tab) {
-    switch (tab) {
-      case 1:
-        return [
-          _PathItem(
-            fallbackAsset: Assets.images.codeImage.path,
-            bgColor: const Color(0xFFE8EAF6),
-            badgeLabel: 'Free',
-            badgeColor: const Color(0xFF16A34A),
-            title: 'Software Developer',
-            description:
-                'Build websites, apps and powerful software solutions from scratch.',
-            level: 'Beginner',
-            courseCount: 8,
-            isPremium: false,
+        if (state.status == LearningPathStatus.failure) {
+          return Center(
+            child: Text(
+              state.errorMessage ?? 'Failed to load paths',
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray500),
+            ),
+          );
+        }
+
+        final paths = _filterPaths(state.paths, _selectedTabIndex);
+
+        if (paths.isEmpty) {
+          return Center(
+            child: Text(
+              'No paths available',
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray500),
+            ),
+          );
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          itemCount: paths.length,
+          separatorBuilder: (context, i) => const SizedBox(height: 16),
+          itemBuilder: (_, i) => _PathCard(
+            path: paths[i],
+            isLoading: state.checkingPathId == paths[i].id,
+            onTap: () => _onPathTap(paths[i]),
           ),
-          _PathItem(
-            fallbackAsset: Assets.images.codeImage.path,
-            bgColor: const Color(0xFFE8EAF6),
-            badgeLabel: 'Free',
-            badgeColor: const Color(0xFF16A34A),
-            title: 'Software Developer',
-            description:
-                'Build websites, apps and powerful software solutions from scratch.',
-            level: 'Beginner',
-            courseCount: 8,
-            isPremium: false,
-          ),
-          _PathItem(
-            fallbackAsset: Assets.images.codeImage.path,
-            bgColor: const Color(0xFFE8EAF6),
-            badgeLabel: 'Free',
-            badgeColor: const Color(0xFF16A34A),
-            title: 'Software Developer',
-            description:
-                'Build websites, apps and powerful software solutions from scratch.',
-            level: 'Beginner',
-            courseCount: 8,
-            isPremium: false,
-          ),
-        ];
-      default:
-        return [
-          _PathItem(
-            fallbackAsset: Assets.images.botToMoonPng.path,
-            bgColor: const Color(0xFFE8EAF6),
-            badgeLabel: 'Free',
-            badgeColor: const Color(0xFF16A34A),
-            title: 'Digital Literacy',
-            description:
-                'Master AI tools and automation to solve problems, save time and boost productivity.',
-            level: 'Beginner',
-            courseCount: 2,
-            isPremium: false,
-          ),
-          _PathItem(
-            fallbackAsset: Assets.images.botToMoonPng.path,
-            bgColor: const Color(0xFFE8EAF6),
-            badgeLabel: 'Premium',
-            badgeColor: const Color(0xFFF97316),
-            title: 'AI & Automation',
-            description:
-                'Master AI tools and automation to solve problems, save time and boost productivity.',
-            level: 'Beginner',
-            courseCount: 2,
-            isPremium: true,
-          ),
-          _PathItem(
-            fallbackAsset: Assets.images.megaPhones.path,
-            bgColor: const Color(0xFFFFF9E6),
-            badgeLabel: 'Free',
-            badgeColor: const Color(0xFF16A34A),
-            title: 'Digital Marketing Professional',
-            description:
-                'Learn to grow brands, create content and run high-converting marketing campaigns.',
-            level: 'Beginner',
-            courseCount: 4,
-            isPremium: false,
-          ),
-          _PathItem(
-            fallbackAsset: Assets.images.megaPhones.path,
-            bgColor: const Color(0xFFE8EAF6),
-            badgeLabel: 'Free',
-            badgeColor: const Color(0xFF16A34A),
-            title: 'Data Analyst',
-            description:
-                'Turn data into insights and make smarter, data-driven decisions.',
-            level: 'Beginner',
-            courseCount: 2,
-            isPremium: false,
-          ),
-          _PathItem(
-            fallbackAsset: Assets.images.codeImage.path,
-            bgColor: const Color(0xFFE8EAF6),
-            badgeLabel: 'Free',
-            badgeColor: const Color(0xFF16A34A),
-            title: 'Software Developer',
-            description:
-                'Build websites, apps and powerful software solutions from scratch.',
-            level: 'Beginner',
-            courseCount: 8,
-            isPremium: false,
-          ),
-        ];
-    }
+        );
+      },
+    );
   }
 }
 
 class _PathCard extends StatelessWidget {
-  const _PathCard({required this.path});
+  const _PathCard({
+    required this.path,
+    required this.onTap,
+    this.isLoading = false,
+  });
 
-  final _PathItem path;
+  final LearningPathModel path;
+  final VoidCallback onTap;
+  final bool isLoading;
+
+  String _fallbackAsset(BuildContext context) {
+    if (path.isFoundation) return Assets.images.botToMoonPng.path;
+    return Assets.images.codeImage.path;
+  }
+
+  Color get _bgColor {
+    if (path.isFoundation) return const Color(0xFFFFF9E6);
+    return const Color(0xFFE8EAF6);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,22 +236,22 @@ class _PathCard extends StatelessWidget {
           width: 110,
           height: 110,
           decoration: BoxDecoration(
-            color: path.bgColor,
+            color: _bgColor,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: SizedBox.expand(
-              child: path.imageUrl != null
+              child: path.coverImageUrl != null
                   ? Image.network(
-                      path.imageUrl!,
+                      path.coverImageUrl!,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Image.asset(
-                        path.fallbackAsset,
+                      errorBuilder: (_, e, s) => Image.asset(
+                        _fallbackAsset(context),
                         fit: BoxFit.contain,
                       ),
                     )
-                  : Image.asset(path.fallbackAsset, fit: BoxFit.contain),
+                  : Image.asset(_fallbackAsset(context), fit: BoxFit.contain),
             ),
           ),
         ),
@@ -255,21 +262,37 @@ class _PathCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _Badge(label: path.badgeLabel, color: path.badgeColor),
+                  _Badge(
+                    label: path.isPremium ? 'Premium' : 'Free',
+                    color: path.isPremium
+                        ? const Color(0xFFF97316)
+                        : const Color(0xFF16A34A),
+                  ),
                   const Spacer(),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.gray950,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      path.isPremium
-                          ? Icons.lock_outline_rounded
-                          : Icons.arrow_outward_rounded,
-                      color: Colors.white,
-                      size: 18,
+                  GestureDetector(
+                    onTap: isLoading ? null : onTap,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.gray950,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: isLoading
+                          ? const Padding(
+                              padding: EdgeInsets.all(10),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Icon(
+                              path.isPremium
+                                  ? Icons.lock_outline_rounded
+                                  : Icons.arrow_outward_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
                     ),
                   ),
                 ],
@@ -301,7 +324,7 @@ class _PathCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    path.level,
+                    path.isFoundation ? 'Foundation' : 'Specialization',
                     style: AppTextStyles.xsRegular(
                       context,
                     ).copyWith(color: AppColors.gray500),
@@ -314,7 +337,7 @@ class _PathCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '${path.courseCount} Courses',
+                    '${path.totalCourses} Courses',
                     style: AppTextStyles.xsRegular(
                       context,
                     ).copyWith(color: AppColors.gray500),
@@ -351,28 +374,76 @@ class _Badge extends StatelessWidget {
   }
 }
 
-class _PathItem {
-  const _PathItem({
-    this.imageUrl,
-    required this.fallbackAsset,
-    required this.bgColor,
-    required this.badgeLabel,
-    required this.badgeColor,
-    required this.title,
-    required this.description,
-    required this.level,
-    required this.courseCount,
-    required this.isPremium,
+class _LearningPathPaywallSheet extends StatelessWidget {
+  const _LearningPathPaywallSheet({
+    required this.onSubscribe,
+    required this.onDismiss,
   });
 
-  final String? imageUrl;
-  final String fallbackAsset;
-  final Color bgColor;
-  final String badgeLabel;
-  final Color badgeColor;
-  final String title;
-  final String description;
-  final String level;
-  final int courseCount;
-  final bool isPremium;
+  final VoidCallback onSubscribe;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.gray300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Assets.images.lennyHi.image(width: 80, height: 80),
+          const SizedBox(height: 16),
+          Text(
+            'LearnWay Premium',
+            style: AppTextStyles.xlBold(
+              context,
+            ).copyWith(color: AppColors.gray950),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Upgrade to LearnWay Premium to unlock advanced career-focused learning paths, premium content, exclusive assessments, and certifications.',
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray600, height: 1.5),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 28),
+          SizedBox(
+            width: double.infinity,
+            child: ButtonFactory.blackButton(
+              mainAxisAlignment: MainAxisAlignment.center,
+              onPressed: onSubscribe,
+              text: 'Subscribe Now',
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: onDismiss,
+              child: Text(
+                'Maybe Later',
+                style: AppTextStyles.smMedium(
+                  context,
+                ).copyWith(color: AppColors.gray500),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
