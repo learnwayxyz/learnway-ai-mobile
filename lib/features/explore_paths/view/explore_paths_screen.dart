@@ -222,19 +222,29 @@ class _PathCard extends StatelessWidget {
                         : const Color(0xFF16A34A),
                   ),
                   const Spacer(),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.gray950,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      path.isPremium
-                          ? Icons.lock_outline_rounded
-                          : Icons.arrow_outward_rounded,
-                      color: Colors.white,
-                      size: 18,
+                  GestureDetector(
+                    onTap: path.isPremium
+                        ? null
+                        : () => context.router.push(
+                              PathCoursesRoute(
+                                learningPathId: path.id,
+                                pathTitle: path.title,
+                              ),
+                            ),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.gray950,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        path.isPremium
+                            ? Icons.lock_outline_rounded
+                            : Icons.arrow_outward_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],

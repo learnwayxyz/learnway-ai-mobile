@@ -170,6 +170,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: ContestRoute.page),
     AutoRoute(page: LearnAndEarnRoute.page),
     AutoRoute(page: BeginnerRoute.page),
+    AutoRoute(page: PathCoursesRoute.page),
     AutoRoute(page: LessonRoute.page),
     AutoRoute(page: LessonOnboardRoute.page),
     AutoRoute(page: ContentReaderRoute.page),

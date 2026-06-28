@@ -3851,6 +3851,71 @@ class PassphraseRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [PathCoursesScreen]
+class PathCoursesRoute extends PageRouteInfo<PathCoursesRouteArgs> {
+  PathCoursesRoute({
+    Key? key,
+    required String learningPathId,
+    required String pathTitle,
+    List<PageRouteInfo>? children,
+  }) : super(
+         PathCoursesRoute.name,
+         args: PathCoursesRouteArgs(
+           key: key,
+           learningPathId: learningPathId,
+           pathTitle: pathTitle,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'PathCoursesRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<PathCoursesRouteArgs>();
+      return PathCoursesScreen(
+        key: args.key,
+        learningPathId: args.learningPathId,
+        pathTitle: args.pathTitle,
+      );
+    },
+  );
+}
+
+class PathCoursesRouteArgs {
+  const PathCoursesRouteArgs({
+    this.key,
+    required this.learningPathId,
+    required this.pathTitle,
+  });
+
+  final Key? key;
+
+  final String learningPathId;
+
+  final String pathTitle;
+
+  @override
+  String toString() {
+    return 'PathCoursesRouteArgs{key: $key, learningPathId: $learningPathId, pathTitle: $pathTitle}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PathCoursesRouteArgs) return false;
+    return key == other.key &&
+        learningPathId == other.learningPathId &&
+        pathTitle == other.pathTitle;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^ learningPathId.hashCode ^ pathTitle.hashCode;
+}
+
+/// generated route for
 /// [PayWallScreen]
 class PayWallRoute extends PageRouteInfo<void> {
   const PayWallRoute({List<PageRouteInfo>? children})
