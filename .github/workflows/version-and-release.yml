@@ -1,0 +1,344 @@
+name: Version Bump and Release
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+      - development
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  version-bump:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+      build_number: ${{ steps.bump.outputs.build_number }}
+      tag: ${{ steps.bump.outputs.tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get current version
+        id: current_version
+        run: |
+          VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          echo "current_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+
+      - name: Determine version bump type
+        id: bump_type
+        run: |
+          # Use the merged PR title to determine bump type
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          echo "PR title: $PR_TITLE"
+
+          if echo "$PR_TITLE" | grep -qiE "^(breaking|feat!|fix!|BREAKING CHANGE)"; then
+            echo "bump_type=major" >> $GITHUB_OUTPUT
+            echo "Bump type: MAJOR"
+          elif echo "$PR_TITLE" | grep -qiE "^feat"; then
+            echo "bump_type=minor" >> $GITHUB_OUTPUT
+            echo "Bump type: MINOR"
+          else
+            echo "bump_type=patch" >> $GITHUB_OUTPUT
+            echo "Bump type: PATCH"
+          fi
+
+      - name: Bump version
+        id: bump
+        run: |
+          CURRENT="${{ steps.current_version.outputs.current_version }}"
+          BUMP_TYPE="${{ steps.bump_type.outputs.bump_type }}"
+
+          # Split version and build number
+          VERSION_PART=$(echo $CURRENT | cut -d'+' -f1)
+          BUILD_NUMBER=$(echo $CURRENT | cut -d'+' -f2)
+
+          # Split semantic version
+          MAJOR=$(echo $VERSION_PART | cut -d'.' -f1)
+          MINOR=$(echo $VERSION_PART | cut -d'.' -f2)
+          PATCH=$(echo $VERSION_PART | cut -d'.' -f3)
+
+          # Increment version based on bump type
+          if [ "$BUMP_TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$BUMP_TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          # Increment build number
+          NEW_BUILD=$((BUILD_NUMBER + 1))
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}+${NEW_BUILD}"
+          TAG="v${MAJOR}.${MINOR}.${PATCH}"
+
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "build_number=$NEW_BUILD" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+          echo "New version: $NEW_VERSION"
+          echo "New tag: $TAG"
+
+      - name: Update pubspec.yaml
+        run: |
+          NEW_VERSION="${{ steps.bump.outputs.version }}"
+          sed -i "s/^version:.*/version: $NEW_VERSION/" pubspec.yaml
+
+          echo "Updated pubspec.yaml:"
+          grep "^version:" pubspec.yaml
+
+      - name: Commit version bump
+        run: |
+          git add pubspec.yaml
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.version }} [skip ci]"
+          git tag ${{ steps.bump.outputs.tag }}
+
+      - name: Push changes
+        run: |
+          git push origin ${{ github.ref_name }}
+          git push origin ${{ steps.bump.outputs.tag }}
+
+  build-android:
+    needs: version-bump
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h  # prints available space so you can see the result
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install Android SDK components
+        run: |
+          echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            "ndk;27.0.12077973" \
+             "cmake;3.22.1" \
+            "platforms;android-31" \
+            "platforms;android-35" \
+            "platforms;android-36" \
+            "build-tools;35.0.0" \
+            "build-tools;36.0.0"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.3"
+          channel: "stable"
+
+      - name: Create env files
+        env:
+          ENV_PROD: ${{ secrets.ENV_PROD }}
+          ENV_DEV: ${{ secrets.ENV_DEV }}
+          ENV_STAGING: ${{ secrets.ENV_STAGING }}
+        run: |
+          printf '%s' "$ENV_PROD" > .env.prod
+          printf '%s' "$ENV_DEV" > .env.dev
+          printf '%s' "$ENV_STAGING" > .env.staging
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Get dependencies
+        run: flutter clean && flutter pub get
+      - name: Run build_runner
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Configure Gradle properties
+        run: |
+          mkdir -p ~/.gradle
+          cat >> ~/.gradle/gradle.properties << EOF
+          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError
+          org.gradle.parallel=false
+          org.gradle.configureondemand=false
+          android.enableR8.fullMode=false
+          EOF
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+      - name: Create key.properties
+        run: |
+          cat > android/key.properties << EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=upload-keystore.jks
+          EOF
+      - name: Build App Bundle
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false"
+          JAVA_OPTS: "-Xmx4g"
+        run: flutter build appbundle --flavor prod -t lib/main.dart --release
+
+      - name: Build APK (dev)
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false"
+          JAVA_OPTS: "-Xmx4g"
+        run: flutter build apk --flavor dev -t lib/main.dart --release
+
+      - name: Upload App Bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-appbundle-${{ needs.version-bump.outputs.tag }}
+          path: build/app/outputs/bundle/prodRelease/app-prod-release.aab
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-dev-${{ needs.version-bump.outputs.tag }}
+          path: build/app/outputs/flutter-apk/app-dev-release.apk
+
+  deploy-playstore:
+    needs: [version-bump, build-android]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download App Bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: android-appbundle-${{ needs.version-bump.outputs.tag }}
+          path: ./artifacts
+
+      - name: Upload to Play Store internal track
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: xyz.learnway.app
+          releaseFiles: ./artifacts/*.aab
+          track: internal
+          status: completed
+
+  create-release:
+    needs: [version-bump, build-android, deploy-playstore]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Download App Bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: android-appbundle-${{ needs.version-bump.outputs.tag }}
+          path: ./artifacts
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk-dev-${{ needs.version-bump.outputs.tag }}
+          path: ./artifacts
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" ${LAST_TAG}..HEAD)
+          fi
+
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update CHANGELOG.md
+        run: |
+          TAG="${{ needs.version-bump.outputs.tag }}"
+          DATE=$(date +"%Y-%m-%d")
+          CHANGELOG="${{ steps.changelog.outputs.changelog }}"
+
+          NEW_ENTRY="## [$TAG] - $DATE\n\n### Changes\n$CHANGELOG\n\n---"
+
+          if [ -f CHANGELOG.md ]; then
+            echo -e "# Changelog\n\n$NEW_ENTRY\n$(tail -n +3 CHANGELOG.md)" > CHANGELOG.md
+          else
+            echo -e "# Changelog\n\n$NEW_ENTRY" > CHANGELOG.md
+          fi
+
+          git add CHANGELOG.md
+          git commit -m "docs: update CHANGELOG.md for $TAG [skip ci]"
+          git push origin ${{ github.ref_name }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.version-bump.outputs.tag }}
+          name: Release ${{ needs.version-bump.outputs.tag }}
+          body: |
+            ## Version ${{ needs.version-bump.outputs.version }}
+
+            ### Changes
+            ${{ steps.changelog.outputs.changelog }}
+
+            ### Artifacts
+            - **Android App Bundle (AAB)**: For Google Play Store distribution (prod flavor)
+            - **Android APK**: Dev flavor build for immediate testing
+            - **iOS IPA**: Built and attached by Codemagic
+
+            Build number: ${{ needs.version-bump.outputs.build_number }}
+          files: |
+            ./artifacts/*.aab
+            ./artifacts/*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
