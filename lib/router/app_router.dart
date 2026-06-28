@@ -60,6 +60,7 @@ import 'package:learnwayv2/features/home/view/home_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/level_screens/advanced_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/level_screens/beginner_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/path_courses_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/content_reader_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/lesson_onboard_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/lesson_screen.dart';
