@@ -1,0 +1,22 @@
+# Flutter
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Local dependency overrides — never commit
+pubspec_overrides.yaml
+
+# Env files
+.env
+.env.*
+
+# Generated files
+lib/gen/
+lib/**/*.g.dart
+lib/**/*.freezed.dart
+
+# macOS/IDE
+.DS_Store
+.idea/
+*.iml
