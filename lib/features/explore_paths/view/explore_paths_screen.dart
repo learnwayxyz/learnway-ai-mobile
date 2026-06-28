@@ -13,7 +13,6 @@ class ExplorePathsScreen extends StatefulWidget {
 
 class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
   int _selectedTabIndex = 0;
-  String? _loadingPathId;
 
   static const _tabs = [
     'All Path',
@@ -28,33 +27,8 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
     locator<LearningPathCubit>().fetchLearningPaths();
   }
 
-  Future<void> _handlePathTap(LearningPathModel path) async {
-    setState(() => _loadingPathId = path.id);
-
-    final result = await locator<LearningPathRepository>().getLearningPathById(
-      path.id,
-    );
-
-    if (!mounted) return;
-    setState(() => _loadingPathId = null);
-
-    result.fold(
-      (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-      (freshPath) {
-        if (freshPath.access.userHasAccess) {
-          context.router.push(
-            PathCoursesRoute(
-              learningPathId: freshPath.id,
-              pathTitle: freshPath.title,
-            ),
-          );
-        } else {
-          _showPaywall(context);
-        }
-      },
-    );
+  void _onPathTap(LearningPathModel path) {
+    locator<LearningPathCubit>().checkPathAccess(path.id);
   }
 
   void _showPaywall(BuildContext context) {
@@ -91,16 +65,34 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.gray50,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(context),
-            _buildTabBar(),
-            Expanded(child: _buildPathList()),
-          ],
+    return BlocListener<LearningPathCubit, LearningPathState>(
+      bloc: locator<LearningPathCubit>(),
+      listenWhen: (prev, curr) => prev.accessResult != curr.accessResult,
+      listener: (context, state) {
+        if (state.accessResult == PathAccessResult.granted &&
+            state.accessCheckedPath != null) {
+          final path = state.accessCheckedPath!;
+          context.router.push(
+            PathCoursesRoute(
+              learningPathId: path.id,
+              pathTitle: path.title,
+            ),
+          );
+        } else if (state.accessResult == PathAccessResult.denied) {
+          _showPaywall(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.gray50,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context),
+              _buildTabBar(),
+              Expanded(child: _buildPathList()),
+            ],
+          ),
         ),
       ),
     );
@@ -206,8 +198,8 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
           separatorBuilder: (context, i) => const SizedBox(height: 16),
           itemBuilder: (_, i) => _PathCard(
             path: paths[i],
-            isLoading: _loadingPathId == paths[i].id,
-            onTap: () => _handlePathTap(paths[i]),
+            isLoading: state.checkingPathId == paths[i].id,
+            onTap: () => _onPathTap(paths[i]),
           ),
         );
       },
