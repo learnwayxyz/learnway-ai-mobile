@@ -264,4 +264,14 @@ Future<void> setupLocator() async {
       getUserId: () => LocalStorageService.getUserSync()?.id ?? '',
     ),
   );
+
+  locator.registerLazySingleton<LearningPathDataSource>(
+    () => LearningPathDataSource(locator<BaseApiClients>()),
+  );
+  locator.registerLazySingleton<LearningPathRepository>(
+    () => LearningPathRepository(locator()),
+  );
+  locator.registerLazySingleton<LearningPathCubit>(
+    () => LearningPathCubit(locator()),
+  );
 }
