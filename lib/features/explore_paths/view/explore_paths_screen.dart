@@ -1,6 +1,8 @@
 import 'package:ai_mentor/ai_mentor.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
+import 'package:learnwayv2/features/explore_paths/widgets/explore_paths_shimmer.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
+import 'package:learnwayv2/shared/widgets/back_button.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
 @RoutePage()
@@ -104,10 +106,7 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => context.router.maybePop(),
-            child: const Icon(Icons.arrow_back, size: 24),
-          ),
+          CustomBackButton(onPress: () => context.router.maybePop()),
           const SizedBox(height: 16),
           Text(
             'Explore Paths',
@@ -165,7 +164,7 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
       builder: (context, state) {
         if (state.status == LearningPathStatus.loading ||
             state.status == LearningPathStatus.initial) {
-          return const Center(child: CircularProgressIndicator());
+          return const ExplorePathsShimmer();
         }
 
         if (state.status == LearningPathStatus.failure) {
