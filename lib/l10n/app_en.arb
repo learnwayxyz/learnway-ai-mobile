@@ -1,0 +1,1473 @@
+{
+  "@@locale": "en",
+  "getStartedSubtitle": "Sign In with your Google account, Apple account or with your phone number.",
+  "@getStartedSubtitle": {
+    "description": "A subtitle for get started screen"
+  },
+  "joinJourney": "Join the Journey",
+  "@joinJourney": {
+    "description": "A title for go to registeration screen"
+  },
+  "account": "Account",
+  "@account": {
+    "description": "Account section title"
+  },
+  "ourSocial": "Our Social",
+  "@ourSocial": {
+    "description": "Social media section title"
+  },
+  "badges": "Badges",
+  "@badges": {
+    "description": "Badges section title"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme section title"
+  },
+  "bookmarks": "Bookmarks",
+  "@bookmarks": {
+    "description": "Bookmarks section title"
+  },
+  "statistics": "Statistics",
+  "@statistics": {
+    "description": "Statistics section title"
+  },
+  "inviteFriends": "Invite Friends",
+  "@inviteFriends": {
+    "description": "Invite friends section title"
+  },
+  "shareApp": "Share App",
+  "@shareApp": {
+    "description": "Share app section title"
+  },
+  "rateUs": "Rate Us",
+  "@rateUs": {
+    "description": "Rate us section title"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout section title"
+  },
+  "aboutUs": "About Us",
+  "@aboutUs": {
+    "description": "About us section title"
+  },
+  "deleteAccount": "Delete Account",
+  "@deleteAccount": {
+    "description": "Delete account section title"
+  },
+  "deletingAccount": "Deleting Account...",
+  "@deletingAccount": {
+    "description": "Deleting account loading text"
+  },
+  "accountDeletedSuccessfully": "Account deleted successfully",
+  "@accountDeletedSuccessfully": {
+    "description": "Account deletion success message"
+  },
+  "telegram": "Telegram",
+  "@telegram": {
+    "description": "Telegram platform name"
+  },
+  "twitterX": "Twitter/X",
+  "@twitterX": {
+    "description": "Twitter/X platform name"
+  },
+  "linkedin": "LinkedIn",
+  "@linkedin": {
+    "description": "LinkedIn platform name"
+  },
+  "doYouWantToViewOurTelegramChannel": "Do you want to view our Telegram channel?",
+  "@doYouWantToViewOurTelegramChannel": {
+    "description": "Telegram dialog title"
+  },
+  "doYouWantToViewOurTwitterProfile": "Do you want to view our Twitter/X profile?",
+  "@doYouWantToViewOurTwitterProfile": {
+    "description": "Twitter dialog title"
+  },
+  "doYouWantToViewOurLinkedinProfile": "Do you want to view our LinkedIn profile?",
+  "@doYouWantToViewOurLinkedinProfile": {
+    "description": "LinkedIn dialog title"
+  },
+  "stayInApp": "Stay in App",
+  "@stayInApp": {
+    "description": "Stay in app button text"
+  },
+  "proceed": "Proceed",
+  "@proceed": {
+    "description": "Proceed button text"
+  },
+  "socialDialogDescription": "At vero eos et accusamus et iusto odio dignissimos ducimus qui.",
+  "@socialDialogDescription": {
+    "description": "Social media dialog description text"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Get started button text"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "continueButton": "Continue",
+  "@continueButton": {
+    "description": "Continue button text"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next button text"
+  },
+  "previous": "Previous",
+  "@previous": {
+    "description": "Previous button text"
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Done button text"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button text"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes button text"
+  },
+  "no": "No",
+  "@no": {
+    "description": "No button text"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button text"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home navigation text"
+  },
+  "learnAndEarn": "Learn & Earn",
+  "@learnAndEarn": {
+    "description": "Learn and earn navigation text"
+  },
+  "quizBattle": "Quiz Battle",
+  "@quizBattle": {
+    "description": "Quiz Battle navigation text"
+  },
+  "play": "Play",
+  "@play": {
+    "description": "Play navigation text"
+  },
+  "wallet": "Wallet",
+  "@wallet": {
+    "description": "Wallet navigation text"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile navigation text"
+  },
+  "myWallet": "My Wallet",
+  "@myWallet": {
+    "description": "My wallet title"
+  },
+  "swapGems": "Swap Gems",
+  "@swapGems": {
+    "description": "Swap gems title"
+  },
+  "transferFunds": "Transfer Funds",
+  "@transferFunds": {
+    "description": "Transfer funds title"
+  },
+  "amount": "Amount",
+  "@amount": {
+    "description": "Amount label"
+  },
+  "noBookmarksYet": "No Bookmarks Yet",
+  "@noBookmarksYet": {
+    "description": "No bookmarks message"
+  },
+  "noResultsFound": "No Results Found",
+  "@noResultsFound": {
+    "description": "No results found message"
+  },
+  "playAndWinRewards": "Play and Win Rewards 🚀",
+  "@playAndWinRewards": {
+    "description": "Play and win rewards title"
+  },
+  "letsBringYouOnTechJourney": "Let's bring you on the tech journey.",
+  "@letsBringYouOnTechJourney": {
+    "description": "Tech journey subtitle"
+  },
+  "startLesson": "Start Learning",
+  "@startLesson": {
+    "description": "Start lesson button"
+  },
+  "chooseACourse": "Choose a course",
+  "@chooseACourse": {
+    "description": "Choose course title"
+  },
+  "letsBringYouOnWeb3Journey": "Let's bring you on the web3 journey.",
+  "@letsBringYouOnWeb3Journey": {
+    "description": "Web3 journey subtitle"
+  },
+  "beginner": "Beginner",
+  "@beginner": {
+    "description": "Beginner level"
+  },
+  "intermediate": "Intermediate",
+  "@intermediate": {
+    "description": "Intermediate level"
+  },
+  "advanced": "Advanced",
+  "@advanced": {
+    "description": "Advanced level"
+  },
+  "getReadyToTakeQuiz": "Get ready to take a Quiz?",
+  "@getReadyToTakeQuiz": {
+    "description": "Quiz onboarding title"
+  },
+  "quizDescription": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem.",
+  "@quizDescription": {
+    "description": "Quiz description text"
+  },
+  "learnWayToken": "LearnWay Token (LWT)",
+  "@learnWayToken": {
+    "description": "LearnWay token title"
+  },
+  "learnWayTokenDescription": "Convert your Gems into LWT or buy LWT. Send LWT to your wallet or exchange anytime, 24/7.",
+  "@learnWayTokenDescription": {
+    "description": "LearnWay token description"
+  },
+  "masterWeb3": "Master Web3",
+  "@masterWeb3": {
+    "description": "Onboarding tagline part 1"
+  },
+  "learnAndEarnTagline": "AI and Finance",
+  "@learnAndEarnTagline": {
+    "description": "Onboarding tagline part 2"
+  },
+  "onboardingDescription": "Learn future-ready digital skills through gamified lessons, quizzes, and rewards.",
+  "@onboardingDescription": {
+    "description": "Onboarding description"
+  },
+  "opening": "Opening",
+  "@opening": {
+    "description": "Opening text for bookmarks"
+  },
+  "balance": "Balance",
+  "@balance": {
+    "description": "Balance label"
+  },
+  "waitAMoment": "Wait a moment",
+  "@waitAMoment": {
+    "description": "Wait a moment text"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button text"
+  },
+  "takeQuizAgain": "Take Quiz Again",
+  "@takeQuizAgain": {
+    "description": "Take quiz again button text"
+  },
+  "question": "Question",
+  "@question": {
+    "description": "Question label"
+  },
+  "ofText": "of",
+  "@ofText": {
+    "description": "Of text for pagination"
+  },
+  "loading": "Loading",
+  "@loading": {
+    "description": "Loading text"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error text"
+  },
+  "success": "Success",
+  "@success": {
+    "description": "Success text"
+  },
+  "warning": "Warning",
+  "@warning": {
+    "description": "Warning text"
+  },
+  "info": "Info",
+  "@info": {
+    "description": "Info text"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search text"
+  },
+  "filter": "Filter",
+  "@filter": {
+    "description": "Filter text"
+  },
+  "sort": "Sort",
+  "@sort": {
+    "description": "Sort text"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh text"
+  },
+  "loadingMore": "Loading more...",
+  "@loadingMore": {
+    "description": "Loading more text"
+  },
+  "noMoreData": "No more data",
+  "@noMoreData": {
+    "description": "No more data text"
+  },
+  "pullToRefresh": "Pull to refresh",
+  "@pullToRefresh": {
+    "description": "Pull to refresh text"
+  },
+  "tapToRetry": "Tap to retry",
+  "@tapToRetry": {
+    "description": "Tap to retry text"
+  },
+  "networkError": "Network error",
+  "@networkError": {
+    "description": "Network error text"
+  },
+  "serverError": "Server error",
+  "@serverError": {
+    "description": "Server error text"
+  },
+  "unknownError": "Unknown error",
+  "@unknownError": {
+    "description": "Unknown error text"
+  },
+  "tryAgain": "Try again",
+  "@tryAgain": {
+    "description": "Try again text"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings text"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications text"
+  },
+  "privacy": "Privacy",
+  "@privacy": {
+    "description": "Privacy text"
+  },
+  "security": "Security",
+  "@security": {
+    "description": "Security text"
+  },
+  "help": "Help",
+  "@help": {
+    "description": "Help text"
+  },
+  "support": "Support",
+  "@support": {
+    "description": "Support text"
+  },
+  "feedback": "Feedback",
+  "@feedback": {
+    "description": "Feedback text"
+  },
+  "version": "Version",
+  "@version": {
+    "description": "Version text"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About text"
+  },
+  "termsOfService": "Terms of Service",
+  "@termsOfService": {
+    "description": "Terms of service text"
+  },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy text"
+  },
+  "createAccount_title": "Learn. Play. Earn",
+  "@createAccount_title": {
+    "description": "Create Account main title"
+  },
+  "createAccount_subtitle": "Sign In with your Google account, Apple account or with your Email Address.",
+  "@createAccount_subtitle": {
+    "description": "Create Account subtitle"
+  },
+"walkThrough_title1": "Earn Gems Daily",
+"@walkThrough_title1": {
+  "description": "Walk through title"
+},
+"walkThrough_description1": "Claim daily rewards, complete quizzes, and redeem Gems to unlock premium features or convert into USDT.",
+"@walkThrough_description1": {
+  "description": "Description part one"
+},
+
+"walkThrough_title2": "Earn Your Badges",
+"@walkThrough_title2": {
+  "description": "Walk through title"
+},
+"walkThrough_description2": "Collect unique badges for milestones and skills, showcase them proudly, and unlock extra rewards.",
+"@walkThrough_description2": {
+  "description": "Description part two"
+},
+"walkThrough_title3": "Level Up XP",
+"@walkThrough_title3": {
+  "description": "Walk through title"
+},
+"walkThrough_description3": "Earn XP from lessons and battles, climb weekly, monthly, all-time leaderboards, and unlock exclusive rewards.",
+"@walkThrough_description3": {
+  "description": "Description part three"
+},
+"orText": "OR",
+"@orText": { "description": "OR separator" },
+"byAgreeingText": "By continuing, you agree to our",
+"@byAgreeingText": { "description": "Terms agreement prefix text" },
+"andText": "and",
+"@andText": { "description": "Conjunction word 'and'" },
+"enterPlatform": "Enter Platform",
+"@enterPlatform": { "description": "Enter platform screen title" },
+"enterEmailInstruction": "Please input your Email account and make sure it's correct.",
+"@enterEmailInstruction": { "description": "Email input instruction" },
+"email": "Email",
+"@email": { "description": "Email label" },
+"enterEmailHint": "Enter an email",
+"@enterEmailHint": { "description": "Email field hint text" },
+"enterCode": "Enter Code",
+"@enterCode": { "description": "Enter OTP code screen title" },
+"activationCodeSentTo": "We've sent an activation code to your email",
+"@activationCodeSentTo": { "description": "Activation code sent message prefix" },
+"resendCodeIn": "Resend code in",
+"@resendCodeIn": { "description": "Resend code countdown prefix" },
+"verify": "Verify",
+"@verify": { "description": "Verify button text" },
+"stayPut": "Stay put",
+"@stayPut": { "description": "Loading wallet generation title" },
+"somethingGoodUnderway": "Something good underway",
+"@somethingGoodUnderway": { "description": "Loading wallet generation subtitle" },
+"emailVerifiedCompleteProfile": "Email verified! Please complete your profile.",
+"@emailVerifiedCompleteProfile": { "description": "Email verification success message" },
+"failedVerifyOtp": "Failed to verify OTP.",
+"@failedVerifyOtp": { "description": "OTP verification failure message" },
+"failedVerifyEmail": "Failed to verify email.",
+"@failedVerifyEmail": { "description": "Email verification failure message" },
+"verificationCodeSent": "Verification code sent successfully!",
+"@verificationCodeSent": { "description": "Verification code sent success message" },
+"failedSendVerificationCode": "Failed to send verification code. Please try again.",
+"@failedSendVerificationCode": { "description": "Verification code send failure message" },
+"getAccount": "Get Account",
+"@getAccount": { "description": "Get account button text on onboarding" },
+"welcomeToLearnWay": "Welcome to LearnWay",
+"@welcomeToLearnWay": { "description": "Welcome screen title" },
+"successfullySignedIn": "You've successfully signed in.",
+"@successfullySignedIn": { "description": "Welcome screen subtitle after sign in" },
+"setUpAccount": "Set up Account",
+"@setUpAccount": { "description": "Button text to proceed to account setup" },
+"setUpYourAccount": "Set up your account!",
+"@setUpYourAccount": { "description": "Account setup screen title" },
+"loadingUserEmail": "Loading user email...",
+"@loadingUserEmail": { "description": "Placeholder while email loads" },
+"username": "Username",
+"@username": { "description": "Username label" },
+"enterPreferredUsername": "Enter preferred username",
+"@enterPreferredUsername": { "description": "Username field hint" },
+"usernameAlreadyExists": "Username already exists",
+"@usernameAlreadyExists": { "description": "Username taken error message" },
+"usernameAvailable": "Username available",
+"@usernameAvailable": { "description": "Username available success message" },
+"country": "Country",
+"@country": { "description": "Country label" },
+"referralCodeOptional": "Referral Code (optional)",
+"@referralCodeOptional": { "description": "Referral code field label" },
+"referralCodeHint": "referral code",
+"@referralCodeHint": { "description": "Referral code field hint" },
+"selectAnAvatar": "Select an Avatar",
+"@selectAnAvatar": { "description": "Avatar selection screen title" },
+"selectYour": "Select your",
+"@selectYour": { "description": "First part of avatar subtitle" },
+"miniMe": "mini me",
+"@miniMe": { "description": "Second part of avatar subtitle (highlighted)" },
+"female": "Female",
+"@female": { "description": "Female avatar tab label" },
+"male": "Male",
+"@male": { "description": "Male avatar tab label" },
+"uploadPhoto": "Upload Photo",
+"@uploadPhoto": { "description": "Upload photo tab label" },
+"avatarSelected": "Avatar Selected",
+"@avatarSelected": { "description": "Avatar selected confirmation title" },
+"canChangeBelow": "You can change it below if needed",
+"@canChangeBelow": { "description": "Avatar selected confirmation subtitle" },
+"tapToChangePhoto": "Tap on the image to change photo",
+"@tapToChangePhoto": { "description": "Hint to tap image to change uploaded photo" },
+"tapToSelectPhoto": "Tap to select from camera or gallery\n(Max 5MB, JPG/PNG/WebP)",
+"@tapToSelectPhoto": { "description": "Hint to tap to upload a photo" },
+"invalidImageFile": "Invalid image file. Please select a valid JPG, PNG, or WebP image.",
+"@invalidImageFile": { "description": "Error when uploaded image is invalid" },
+"secureYourWallet": "Secure Your Wallet",
+"@secureYourWallet": { "description": "Passphrase screen title" },
+"createStrongPassphraseTo": "Create a strong passphrase to",
+"@createStrongPassphraseTo": { "description": "First part of passphrase subtitle" },
+"encryptAndProtect": "encrypt and protect",
+"@encryptAndProtect": { "description": "Highlighted part of passphrase subtitle" },
+"yourWallet": "your wallet",
+"@yourWallet": { "description": "Last part of passphrase subtitle" },
+"createPassphrase": "Create Passphrase",
+"@createPassphrase": { "description": "Create passphrase field label" },
+"enterYourPassphrase": "Enter your passphrase",
+"@enterYourPassphrase": { "description": "Passphrase field hint" },
+"confirmPassphrase": "Confirm Passphrase",
+"@confirmPassphrase": { "description": "Confirm passphrase field label" },
+"confirmYourPassphrase": "Confirm your passphrase",
+"@confirmYourPassphrase": { "description": "Confirm passphrase field hint" },
+"passphraseRequirements": "Passphrase Requirements",
+"@passphraseRequirements": { "description": "Passphrase requirements section label" },
+"passphrasesMatch": "Passphrases match",
+"@passphrasesMatch": { "description": "Passphrase match validation label" },
+"passphraseCreatedSuccessfully": "Passphrase Created Successfully",
+"@passphraseCreatedSuccessfully": { "description": "Passphrase success confirmation" },
+"whyWeNeedThis": "Why we need this",
+"@whyWeNeedThis": { "description": "Passphrase info box title" },
+"passphraseEncryptsWallet": "Your passphrase encrypts your wallet backup, ensuring only you can recover your funds. This passphrase never leaves your device.",
+"@passphraseEncryptsWallet": { "description": "Passphrase info box description" },
+"youreAllSet": "You're all set",
+"@youreAllSet": { "description": "Setup success message prefix (username appended after)" },
+"accountHasBeenCreated": "Your account has been created.",
+"@accountHasBeenCreated": { "description": "Setup success subtitle" },
+"settingUpAccount": "Setting Up Account",
+"@settingUpAccount": { "description": "Loader screen app bar title" },
+"preparingInformation": "We are preparing your information",
+"@preparingInformation": { "description": "Setup step: collecting info" },
+"uploadingImage": "We are uploading your image",
+"@uploadingImage": { "description": "Setup step: uploading image" },
+"creatingAccount": "We are creating your account",
+"@creatingAccount": { "description": "Setup step: creating account" },
+"generatingWallet": "We are generating your secure wallet",
+"@generatingWallet": { "description": "Setup step: generating wallet" },
+"generatingReferralCode": "We are generating your referral code",
+"@generatingReferralCode": { "description": "Setup step: generating referral code" },
+"settingUpSecurity": "We are setting up security features",
+"@settingUpSecurity": { "description": "Setup step: setting up security" },
+"finalizingSetup": "We are finalizing your setup",
+"@finalizingSetup": { "description": "Setup step: finalizing" },
+"accountIsReady": "Your account is ready!",
+"@accountIsReady": { "description": "Setup step: completed" },
+"setupFailed": "Setup Failed",
+"@setupFailed": { "description": "Setup error title" },
+"settingUpYourAccount": "We are setting up your Account",
+"@settingUpYourAccount": { "description": "Loader screen default title" },
+"somethingWentWrong": "Something went wrong",
+"@somethingWentWrong": { "description": "Generic error fallback message" },
+"preparingAccountSetup": "Preparing account setup...",
+"@preparingAccountSetup": { "description": "Loader initial status text" },
+"walletGenerationNote": "This process may take 30-60 seconds as we create your secure wallet with military-grade encryption.",
+"@walletGenerationNote": { "description": "Note shown during wallet generation step" },
+  "onboarding1Title": "Learn Through Play",
+  "@onboarding1Title": { "description": "Onboarding slide 1 title" },
+  "onboarding1Description": "Turn complex topics into fun, bite-sized challenges that keep you engaged and motivated every day.",
+  "@onboarding1Description": { "description": "Onboarding slide 1 body" },
+  "onboarding2Title": "Unlock Opportunities",
+  "@onboarding2Title": { "description": "Onboarding slide 2 title" },
+  "onboarding2Description": "Gain knowledge that opens doors to jobs, income, and financial freedom across Africa and beyond.",
+  "@onboarding2Description": { "description": "Onboarding slide 2 body" },
+  "onboarding3Title": "Your Global Wallet",
+  "@onboarding3Title": { "description": "Onboarding slide 3 title" },
+  "onboarding3Description": "Use your inbuilt wallet to receive funds, protect your savings from inflation, and enjoy borderless payments worldwide.",
+  "@onboarding3Description": { "description": "Onboarding slide 3 body" },
+  "onboarding4Title": "Join the Movement",
+  "@onboarding4Title": { "description": "Onboarding slide 4 title" },
+  "onboarding4Description": "Join Africa's first gamified learning platform, where mastering Web3, AI, and finance creates future opportunities.",
+  "@onboarding4Description": { "description": "Onboarding slide 4 body" },
+  "learnThroughShortLessons": "Learn through short lessons, take quizzes, and earn rewards.",
+  "@learnThroughShortLessons": { "description": "Subtitle for Learn & Earn card" },
+  "startLearning": "Start Learning",
+  "@startLearning": { "description": "Button text to start learning" },
+  "contestSubtitle": "Join themed contests, showcase knowledge, and earn rewards.",
+  "@contestSubtitle": { "description": "Subtitle for Contest card" },
+  "startContest": "Start Contest",
+  "@startContest": { "description": "Button text to start a contest" },
+  "quizBattleSubtitle": "Compete in real-time quiz battles and earn more rewards.",
+  "@quizBattleSubtitle": { "description": "Subtitle for Quiz Battle card" },
+  "comingSoon": "Coming Soon",
+  "@comingSoon": { "description": "Coming soon button/badge text" },
+  "certifiedCourses": "Micro-Skills Track",
+  "@certifiedCourses": { "description": "Title for Micro-Skills Track card" },
+  "certifiedCoursesSubtitle": "Practical lessons focused on high-demand, income-generating skills.",
+  "@certifiedCoursesSubtitle": { "description": "Subtitle for Micro-Skills Track card" },
+  "chooseYourSkillLevel": "Choose your skill level",
+  "@chooseYourSkillLevel": { "description": "Section title in Learn & Earn screen" },
+  "beginnerSubtitle": "Begin your adventure, learn core skills, and earn rewards.",
+  "@beginnerSubtitle": { "description": "Subtitle for Beginner level card" },
+  "intermediateSubtitle": "Upgrade your skills, explore new frontiers, and earn more.",
+  "@intermediateSubtitle": { "description": "Subtitle for Intermediate level card" },
+  "advancedSubtitle": "Master the game, complete elite missions, and unlock rewards.",
+  "@advancedSubtitle": { "description": "Subtitle for Advanced level card" },
+  "learnFutureReadySkills": "Learn future-ready digital skills",
+  "@learnFutureReadySkills": { "description": "Subtitle under Choose a course heading" },
+  "all": "All",
+  "@all": { "description": "All tab label" },
+  "currentTab": "Current",
+  "@currentTab": { "description": "Current tab label" },
+  "completedTab": "Completed",
+  "@completedTab": { "description": "Completed tab label" },
+  "dailyStreak": "Daily streak",
+  "@dailyStreak": { "description": "Streak counter label" },
+  "day": "day",
+  "@day": { "description": "Singular day" },
+  "days": "days",
+  "@days": { "description": "Plural days" },
+  "claimNow": "Claim Now",
+  "@claimNow": { "description": "Button to claim daily reward" },
+  "earnGemsTitle": "Earn 10 Gems",
+  "@earnGemsTitle": { "description": "Ad gate dialog title" },
+  "watchAdDescription": "Watch a quick ad to continue. Ads help fund LearnWay's mission or go premium for an ad-free experience.",
+  "@watchAdDescription": { "description": "Ad gate dialog description" },
+  "watchAndClaim": "Watch & Claim",
+  "@watchAndClaim": { "description": "Ad gate watch button" },
+  "sundayShort": "Sun",
+  "@sundayShort": { "description": "Abbreviated Sunday" },
+  "mondayShort": "Mon",
+  "@mondayShort": { "description": "Abbreviated Monday" },
+  "tuesdayShort": "Tue",
+  "@tuesdayShort": { "description": "Abbreviated Tuesday" },
+  "wednesdayShort": "Wed",
+  "@wednesdayShort": { "description": "Abbreviated Wednesday" },
+  "thursdayShort": "Thu",
+  "@thursdayShort": { "description": "Abbreviated Thursday" },
+  "fridayShort": "Fri",
+  "@fridayShort": { "description": "Abbreviated Friday" },
+  "saturdayShort": "Sat",
+  "@saturdayShort": { "description": "Abbreviated Saturday" },
+  "preparingYourLesson": "We are preparing your lesson for you",
+  "@preparingYourLesson": { "description": "Loader screen main message" },
+  "startingLesson": "Starting Lesson",
+  "@startingLesson": { "description": "Loader status: starting lesson" },
+  "lessonStarted": "Lesson started",
+  "@lessonStarted": { "description": "Loader status: lesson started" },
+  "fetchingLessonSlides": "Fetching Lesson slides",
+  "@fetchingLessonSlides": { "description": "Loader status: fetching slides" },
+  "lessonFetched": "Lesson Fetched",
+  "@lessonFetched": { "description": "Loader status: lesson fetched" },
+  "continueToRead": "Continue to read",
+  "@continueToRead": { "description": "Loader status: default" },
+  "preparingYourQuiz": "We are preparing your Quiz for you",
+  "@preparingYourQuiz": { "description": "Quiz loader main message" },
+  "letsTestYourKnowledge": "Let's test your knowledge bank",
+  "@letsTestYourKnowledge": { "description": "Quiz loader subtitle" },
+  "noInternetConnection": "No internet connection",
+  "@noInternetConnection": { "description": "Error when no network" },
+  "noLessonsYet": "No Lessons yet",
+  "@noLessonsYet": { "description": "Error when no lessons loaded" },
+  "lessons": "Lessons",
+  "@lessons": { "description": "Lessons section header" },
+  "takeALessonAndEarn": "Take a lesson and earn some gems after the lesson quiz.",
+  "@takeALessonAndEarn": { "description": "Lessons section subtitle" },
+  "browseCoursesToGetStarted": "Browse courses to get started",
+  "@browseCoursesToGetStarted": { "description": "Empty state hint" },
+  "noLessonsAvailable": "No Lessons Available",
+  "@noLessonsAvailable": { "description": "Empty lessons state title" },
+  "lessonsWillAppearHere": "Lessons will appear here once they are added to this course",
+  "@lessonsWillAppearHere": { "description": "Empty lessons state subtitle" },
+  "startQuiz": "Start Quiz",
+  "@startQuiz": { "description": "Button to start a quiz" },
+  "loadingImage": "Loading image...",
+  "@loadingImage": { "description": "Image loading placeholder text" },
+  "contentImage": "Content Image",
+  "@contentImage": { "description": "Fallback content image label" },
+  "noContentAvailable": "No content available",
+  "@noContentAvailable": { "description": "Empty content state" },
+  "readyToTakeLessons": "Ready to Take Lessons?",
+  "@readyToTakeLessons": { "description": "Lesson onboard screen title" },
+  "lessonOnboardDescription": "Dive in and learn with interactive lessons designed for your level.",
+  "@lessonOnboardDescription": { "description": "Lesson onboard screen description" },
+  "successfullyFetchedSlides": "Slides loaded — press Get Started to continue.",
+  "@successfullyFetchedSlides": { "description": "Success notification after slides load" },
+  "loadingLessons": "Loading Lessons...",
+  "@loadingLessons": { "description": "Button text while lessons load" },
+  "enrollInCourse": "Enroll in Course",
+  "@enrollInCourse": { "description": "Enrollment dialog title" },
+  "areYouReadyToStartCourse": "Are you ready to start this course?",
+  "@areYouReadyToStartCourse": { "description": "Enrollment confirmation message" },
+  "enrollNow": "Enroll Now",
+  "@enrollNow": { "description": "Enrollment confirm button" },
+  "deposit": "Deposit",
+  "@deposit": { "description": "Receive screen app bar title" },
+  "walletAddressNotAvailable": "Wallet address not available",
+  "@walletAddressNotAvailable": { "description": "Error message when wallet address is not available" },
+  "pleaseCompleteWalletSetup": "Please complete your wallet setup",
+  "@pleaseCompleteWalletSetup": { "description": "Instruction shown when wallet setup is incomplete" },
+  "scanQrCode": "Scan QR Code",
+  "@scanQrCode": { "description": "Receive screen QR code heading" },
+  "scanQrCodeToProcess": "Scan the QR code below to process the transaction",
+  "@scanQrCodeToProcess": { "description": "Receive screen QR code subtext" },
+  "sendOnlyUsdtOnLisk": "Send only USDT on the Lisk network",
+  "@sendOnlyUsdtOnLisk": { "description": "Warning label inside QR card" },
+  "copiedToClipboard": "Copied to clipboard",
+  "@copiedToClipboard": { "description": "Snackbar message after copying wallet address" },
+  "shareAddress": "Share Address",
+  "@shareAddress": { "description": "Button to share wallet address" },
+  "deleteFailed": "Delete failed",
+  "@deleteFailed": { "description": "Error message when account deletion fails" },
+  "anErrorOccurred": "An error occurred",
+  "@anErrorOccurred": { "description": "Generic error message" },
+  "errorLoadingUser": "Error loading user",
+  "@errorLoadingUser": { "description": "Error state placeholder username" },
+  "pleaseTryAgain": "Please try again",
+  "@pleaseTryAgain": { "description": "Error state placeholder email" },
+  "kycVerification": "KYC Verification",
+  "@kycVerification": { "description": "KYC verification tile title" },
+  "badgesAndAchievement": "Badges & Achievements",
+  "@badgesAndAchievement": { "description": "Badges and achievements tile title" },
+  "preferences": "Preferences",
+  "@preferences": { "description": "Preferences tile title" },
+  "referAndEarn": "Refer & Earn",
+  "@referAndEarn": { "description": "Refer and earn tile title" },
+  "supportAndLegal": "Support & Legal",
+  "@supportAndLegal": { "description": "Support and legal tile title" },
+  "loggingOutEllipsis": "Logging out...",
+  "@loggingOutEllipsis": { "description": "Logout tile text while logging out" },
+  "areYouLoggingOut": "Are you logging out?",
+  "@areYouLoggingOut": { "description": "Logout confirmation dialog title" },
+  "logoutDescription": "You will be logged out of your account.",
+  "@logoutDescription": { "description": "Logout confirmation dialog description" },
+  "rateLearnWay": "Rate LearnWay",
+  "@rateLearnWay": { "description": "Rate app dialog title" },
+  "rateAppDescription": "Enjoying LearnWay? Rate us on {storeName}:\n{storeUrl}",
+  "@rateAppDescription": {
+    "description": "Rate app dialog description",
+    "placeholders": {
+      "storeName": { "type": "String" },
+      "storeUrl": { "type": "String" }
+    }
+  },
+  "copyLink": "Copy Link",
+  "@copyLink": { "description": "Copy link button in rate app dialog" },
+  "storeUrlCopied": "Store URL copied!",
+  "@storeUrlCopied": { "description": "Snackbar after copying store URL" },
+  "checkingKycStatus": "Checking KYC status...",
+  "@checkingKycStatus": { "description": "Loading text while checking KYC status" },
+
+  "withdraw": "Withdraw",
+  "@withdraw": { "description": "Withdraw screen title" },
+  "withdrawFunds": "Withdraw Funds",
+  "@withdrawFunds": { "description": "Withdraw funds heading" },
+  "selectPaymentMethod": "Select Payment Method",
+  "@selectPaymentMethod": { "description": "Select payment method label" },
+  "selectNetworkProvider": "Select Network Provider",
+  "@selectNetworkProvider": { "description": "Select network provider label" },
+  "selectBank": "Select Bank",
+  "@selectBank": { "description": "Select bank label" },
+  "fullName": "Full Name",
+  "@fullName": { "description": "Full name field label" },
+  "enterFullName": "Enter full name",
+  "@enterFullName": { "description": "Full name field hint" },
+  "phoneNumber": "Phone Number",
+  "@phoneNumber": { "description": "Phone number field label" },
+  "enterPhoneNumber": "Enter phone number",
+  "@enterPhoneNumber": { "description": "Phone number field hint" },
+  "failedToLoadPaymentChannels": "Failed to load payment channels",
+  "@failedToLoadPaymentChannels": { "description": "Error when payment channels fail to load" },
+  "selectPaymentChannel": "Select Payment Channel",
+  "@selectPaymentChannel": { "description": "Select payment channel label" },
+  "momoNumber": "MoMo Number",
+  "@momoNumber": { "description": "Mobile money number field label" },
+  "airtimeNumber": "Airtime Number",
+  "@airtimeNumber": { "description": "Airtime number field label" },
+  "accountNumber": "Account Number",
+  "@accountNumber": { "description": "Bank account number field label" },
+  "airtime": "Airtime",
+  "@airtime": { "description": "Airtime payment channel" },
+  "bankTransfer": "Bank Transfer",
+  "@bankTransfer": { "description": "Bank transfer payment channel" },
+  "mobileMoney": "Mobile Money",
+  "@mobileMoney": { "description": "Mobile money payment channel" },
+  "pleaseEnterBankAccountNumber": "Please enter your bank account number",
+  "@pleaseEnterBankAccountNumber": { "description": "Validation message for bank account number" },
+  "pleaseEnterMobileNumber": "Please enter your mobile number",
+  "@pleaseEnterMobileNumber": { "description": "Validation message for mobile number" },
+  "pleaseEnterValidMobileMoneyNumber": "Please enter a valid mobile money number",
+  "@pleaseEnterValidMobileMoneyNumber": { "description": "Validation message for mobile money number" },
+  "pleaseEnterValidAirtimeNumber": "Please enter a valid airtime number",
+  "@pleaseEnterValidAirtimeNumber": { "description": "Validation message for airtime number" },
+  "pleaseEnterValidBankAccountNumber": "Please enter a valid bank account number",
+  "@pleaseEnterValidBankAccountNumber": { "description": "Validation message for bank account number format" },
+  "pleaseEnterYourFullName": "Please enter your full name",
+  "@pleaseEnterYourFullName": { "description": "Validation message for full name" },
+  "fullNameMinLength": "Full name must be at least 3 characters",
+  "@fullNameMinLength": { "description": "Validation message for full name minimum length" },
+
+  "enterAmountToWithdrawTo": "Enter amount to withdraw to",
+  "@enterAmountToWithdrawTo": { "description": "Amount screen heading" },
+  "amountToWithdrawCurrency": "Amount to withdraw ({currency})",
+  "@amountToWithdrawCurrency": {
+    "description": "Amount to withdraw label with currency",
+    "placeholders": { "currency": { "type": "String" } }
+  },
+  "amountInCurrency": "Amount in {currency}",
+  "@amountInCurrency": {
+    "description": "Amount in local currency label",
+    "placeholders": { "currency": { "type": "String" } }
+  },
+  "amountToWithdrawUsdt": "Amount to withdraw (USDT)",
+  "@amountToWithdrawUsdt": { "description": "Amount to withdraw in USDT label" },
+  "amountInUsd": "Amount in USD",
+  "@amountInUsd": { "description": "Amount in USD label" },
+  "confirmWithdrawal": "Confirm Withdrawal",
+  "@confirmWithdrawal": { "description": "Confirm withdrawal button" },
+  "failedToLoadExchangeRate": "Failed to load exchange rate",
+  "@failedToLoadExchangeRate": { "description": "Error when exchange rate fails to load" },
+  "exchangeRate": "Exchange Rate",
+  "@exchangeRate": { "description": "Exchange rate label" },
+  "insufficientBalance": "Insufficient balance. You have {balance} USDT but need {amountNeeded} USDT",
+  "@insufficientBalance": {
+    "description": "Insufficient balance error message",
+    "placeholders": {
+      "balance": { "type": "String" },
+      "amountNeeded": { "type": "String" }
+    }
+  },
+  "pleaseEnterAnAmount": "Please enter an amount",
+  "@pleaseEnterAnAmount": { "description": "Validation message for empty amount" },
+  "minimumAmount": "Minimum amount is {min}",
+  "@minimumAmount": {
+    "description": "Minimum amount validation message",
+    "placeholders": { "min": { "type": "String" } }
+  },
+  "maximumAmount": "Maximum amount is {max}",
+  "@maximumAmount": {
+    "description": "Maximum amount validation message",
+    "placeholders": { "max": { "type": "String" } }
+  },
+
+  "transferConfirmation": "Transfer Confirmation",
+  "@transferConfirmation": { "description": "Transfer confirmation screen title" },
+  "checkBeforeProceeding": "Please check the details before proceeding",
+  "@checkBeforeProceeding": { "description": "Subtitle on confirmation screen" },
+  "paymentDetails": "Payment Details",
+  "@paymentDetails": { "description": "Payment details section title" },
+  "recipientNumber": "Recipient Number",
+  "@recipientNumber": { "description": "Recipient number label" },
+  "paymentChannel": "Payment Channel",
+  "@paymentChannel": { "description": "Payment channel label" },
+  "carrier": "Carrier",
+  "@carrier": { "description": "Carrier label" },
+  "amountUsdt": "Amount (USDT)",
+  "@amountUsdt": { "description": "Amount in USDT label" },
+  "amountToReceive": "Amount to Receive",
+  "@amountToReceive": { "description": "Amount to receive label" },
+  "failedToSendVerificationCode": "Failed to send verification code",
+  "@failedToSendVerificationCode": { "description": "Error when sending verification code fails" },
+
+  "transactionFailed": "Transaction Failed",
+  "@transactionFailed": { "description": "Transaction failed title" },
+  "withdrawalSuccessfulTitle": "Withdrawal Successful",
+  "@withdrawalSuccessfulTitle": { "description": "Withdrawal successful screen title" },
+  "withdrawalSuccessful": "You have successfully withdrawn {amount} {currency}",
+  "@withdrawalSuccessful": {
+    "description": "Withdrawal successful message",
+    "placeholders": {
+      "amount": { "type": "String" },
+      "currency": { "type": "String" }
+    }
+  },
+  "transferConfirmed": "Transfer Confirmed",
+  "@transferConfirmed": { "description": "Transfer confirmed status" },
+  "onchainTransferComplete": "Onchain transfer complete",
+  "@onchainTransferComplete": { "description": "Onchain transfer complete status" },
+  "processingTransfer": "Processing Transfer",
+  "@processingTransfer": { "description": "Processing transfer status" },
+  "sendingFundsToWithdrawal": "Sending funds to withdrawal service",
+  "@sendingFundsToWithdrawal": { "description": "Sending funds status" },
+  "withdrawalOrderCreated": "Withdrawal order created",
+  "@withdrawalOrderCreated": { "description": "Withdrawal order created status" },
+  "withdrawalWillBeProcessed": "Your withdrawal will be processed shortly",
+  "@withdrawalWillBeProcessed": { "description": "Withdrawal processing notice" },
+
+  "failedToCreateWithdrawalOrder": "Failed to create withdrawal order",
+  "@failedToCreateWithdrawalOrder": { "description": "Error when creating withdrawal order fails" },
+  "creatingWithdrawalOrder": "Creating withdrawal order...",
+  "@creatingWithdrawalOrder": { "description": "Loading text when creating withdrawal order" },
+  "pleaseWaitDoNotClose": "Please wait and do not close the app",
+  "@pleaseWaitDoNotClose": { "description": "Warning not to close app during processing" },
+
+  "emailVerifiedSuccessfully": "Email verified successfully",
+  "@emailVerifiedSuccessfully": { "description": "Success message after email verification" },
+  "verifyTransaction": "Verify Transaction",
+  "@verifyTransaction": { "description": "Verify transaction screen title" },
+  "verificationCodeSentToEmail": "A verification code has been sent to your email",
+  "@verificationCodeSentToEmail": { "description": "Verification code sent to email message" },
+  "toConfirmThisTransaction": "to confirm this transaction",
+  "@toConfirmThisTransaction": { "description": "Suffix for verification code sent message" },
+  "verifyAndContinue": "Verify & Continue",
+  "@verifyAndContinue": { "description": "Verify and continue button" },
+  "verifyingCode": "Verifying code...",
+  "@verifyingCode": { "description": "Loading text while verifying OTP code" },
+
+  "send": "Send",
+  "@send": { "description": "Send button/tab label" },
+  "swap": "Swap",
+  "@swap": { "description": "Swap button/tab label" },
+  "redeem": "Redeem",
+  "@redeem": { "description": "Redeem button label" },
+  "gems": "Gems",
+  "@gems": { "description": "Gems label" },
+  "usdt": "USDT",
+  "@usdt": { "description": "USDT currency label" },
+  "viewAll": "View All",
+  "@viewAll": { "description": "View all transactions link" },
+  "goHome": "Go Home",
+  "@goHome": { "description": "Go home button" },
+  "transactions": "Transactions",
+  "@transactions": { "description": "Transactions section title" },
+  "transactionHistory": "Transaction History",
+  "@transactionHistory": { "description": "Transaction history screen title" },
+  "noTransactionHistory": "No transaction history",
+  "@noTransactionHistory": { "description": "Empty state for transaction history" },
+  "swapGemsForUsdtInstantly": "Swap your gems for USDT instantly",
+  "@swapGemsForUsdtInstantly": { "description": "Swap gems subtitle" },
+  "easilyTransferTokens": "Easily transfer tokens to any address",
+  "@easilyTransferTokens": { "description": "Send screen subtitle" },
+  "recipientAddress": "Recipient Address",
+  "@recipientAddress": { "description": "Recipient address field label" },
+  "enterAddressOrScan": "Enter address or scan QR",
+  "@enterAddressOrScan": { "description": "Recipient address field hint" },
+  "usdtAmount": "USDT amount",
+  "@usdtAmount": { "description": "USDT amount field hint" },
+  "tokenAmount": "Token Amount",
+  "@tokenAmount": { "description": "Token amount label" },
+  "network": "Network",
+  "@network": { "description": "Network label" },
+  "fee": "Fee",
+  "@fee": { "description": "Transaction fee label" },
+  "paymentAddress": "Payment Address",
+  "@paymentAddress": { "description": "Payment address label" },
+  "sendConfirmation": "Send Confirmation",
+  "@sendConfirmation": { "description": "Send confirmation screen title" },
+  "verifyAndSend": "Verify & Send",
+  "@verifyAndSend": { "description": "Verify and send button" },
+  "sendingOtp": "Sending OTP...",
+  "@sendingOtp": { "description": "Loading text while sending OTP" },
+  "pleaseWaitWhileWeProcess": "Please wait while we process your transaction",
+  "@pleaseWaitWhileWeProcess": { "description": "Processing transaction message" },
+  "processingTransaction": "Processing Transaction",
+  "@processingTransaction": { "description": "Processing transaction title" },
+  "viewOnchain": "View Onchain",
+  "@viewOnchain": { "description": "View onchain button" },
+  "couldNotOpenTransaction": "Could not open transaction: {error}",
+  "@couldNotOpenTransaction": {
+    "description": "Error when transaction link cannot be opened",
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "paymentStatus": "Payment Status",
+  "@paymentStatus": { "description": "Payment status label" },
+  "failed": "Failed",
+  "@failed": { "description": "Failed status" },
+  "pending": "Pending",
+  "@pending": { "description": "Pending status" },
+  "sending": "Sending",
+  "@sending": { "description": "Sending status" },
+  "unknown": "Unknown",
+  "@unknown": { "description": "Unknown status" },
+  "pleaseEnterAnAddress": "Please enter an address",
+  "@pleaseEnterAnAddress": { "description": "Validation message for empty address" },
+  "pleaseEnterValidEthereumAddress": "Please enter a valid Ethereum address",
+  "@pleaseEnterValidEthereumAddress": { "description": "Validation message for invalid Ethereum address" },
+  "pleaseEnterValidNumber": "Please enter a valid number",
+  "@pleaseEnterValidNumber": { "description": "Validation message for invalid number" },
+  "amountMustBeGreaterThanZero": "Amount must be greater than zero",
+  "@amountMustBeGreaterThanZero": { "description": "Validation message for zero amount" },
+  "amountExceedsBalance": "Amount exceeds your balance of {balance} USDT",
+  "@amountExceedsBalance": {
+    "description": "Validation message when amount exceeds balance",
+    "placeholders": { "balance": { "type": "String" } }
+  },
+
+  "cryptoDeposit": "Crypto Deposit",
+  "@cryptoDeposit": { "description": "Deposit transaction type label" },
+  "cryptoWithdraw": "Crypto Withdraw",
+  "@cryptoWithdraw": { "description": "Withdrawal transaction type label" },
+  "cryptoSwap": "Crypto Swap",
+  "@cryptoSwap": { "description": "Swap transaction type label" },
+
+  "leaderboard": "Leaderboard",
+  "@leaderboard": { "description": "Leaderboard screen title" },
+  "allTime": "All Time",
+  "@allTime": { "description": "All time leaderboard tab" },
+  "monthly": "Monthly",
+  "@monthly": { "description": "Monthly leaderboard tab" },
+  "weekly": "Weekly",
+  "@weekly": { "description": "Weekly leaderboard tab" },
+  "failedToLoadLeaderboard": "Failed to load leaderboard",
+  "@failedToLoadLeaderboard": { "description": "Error when leaderboard fails to load" },
+  "yourCurrentRank": "Your Current Rank",
+  "@yourCurrentRank": { "description": "Current user rank label in leaderboard" },
+  "noLeaderboardData": "No leaderboard data available yet.",
+  "@noLeaderboardData": { "description": "Empty state for leaderboard podium" },
+
+  "invite": "Invite",
+  "@invite": { "description": "Invite screen title" },
+  "errorLoadingInviteData": "Error Loading Invite Data",
+  "@errorLoadingInviteData": { "description": "Error state title on invite screen" },
+  "noInviteDataAvailable": "No Invite Data Available",
+  "@noInviteDataAvailable": { "description": "Empty state title on invite screen" },
+  "unableToLoadReferralInfo": "Unable to load your referral information.",
+  "@unableToLoadReferralInfo": { "description": "Empty state subtitle on invite screen" },
+  "inviteAFriend": "Invite a Friend",
+  "@inviteAFriend": { "description": "Invite a friend heading" },
+  "inviteDescription": "You've referred {totalReferrals} friends. Earn {gemsForReferrer} gems per referral, and your friend gets {gemsForReferee} gems too!",
+  "@inviteDescription": {
+    "description": "Invite description with referral stats",
+    "placeholders": {
+      "totalReferrals": { "type": "int" },
+      "gemsForReferrer": { "type": "int" },
+      "gemsForReferee": { "type": "int" }
+    }
+  },
+  "gemsLabel": "gems",
+  "@gemsLabel": { "description": "Gems label on invite screen reward display" },
+  "shareReferralCode": "Share Referral Code",
+  "@shareReferralCode": { "description": "Share referral code button" },
+  "haveAReferralCode": "Enter Referral code",
+  "@haveAReferralCode": { "description": "Button to open apply referral code dialog" },
+  "referralCodeApplied": "Referral code applied ✓",
+  "@referralCodeApplied": { "description": "Disabled button state after code applied" },
+  "enterReferralCode": "Enter Referral Code",
+  "@enterReferralCode": { "description": "Dialog title for applying a referral code" },
+  "referralCodeHintLabel": "Enter code",
+  "@referralCodeHintLabel": { "description": "Hint text in referral code input field" },
+  "applyCode": "Apply Code",
+  "@applyCode": { "description": "Apply referral code button in dialog" },
+
+  "failedToLoadBadges": "Failed to load badges",
+  "@failedToLoadBadges": { "description": "Error when badges fail to load" },
+  "noBadgesAvailable": "No badges available",
+  "@noBadgesAvailable": { "description": "Empty state for badges screen" },
+  "badgesYouveEarned": "Badges You've Earned",
+  "@badgesYouveEarned": { "description": "Badges earned section heading" },
+  "achievementsCollected": "achievements collected",
+  "@achievementsCollected": { "description": "Achievements collected subtitle" },
+  "allBadges": "All Badges",
+  "@allBadges": { "description": "All badges tab label" },
+  "earnedBadges": "Earned Badges",
+  "@earnedBadges": { "description": "Earned badges tab label" },
+  "noBadgesEarnedYet": "No Badges Earned Yet",
+  "@noBadgesEarnedYet": { "description": "Empty state title for earned badges" },
+  "completeChallengesForBadge": "Complete challenges and lessons to earn your first badge!",
+  "@completeChallengesForBadge": { "description": "Empty state subtitle for earned badges" },
+  "yourEarnedBadges": "Your Earned Badges",
+  "@yourEarnedBadges": { "description": "Earned badges list section title" },
+
+  "kycDone": "KYC Done",
+  "@kycDone": { "description": "KYC done screen title" },
+  "youveDoneYourKyc": "You've Completed Your KYC!",
+  "@youveDoneYourKyc": { "description": "KYC done success heading" },
+  "identityVerifiedSuccessfully": "Your identity has been verified successfully.",
+  "@identityVerifiedSuccessfully": { "description": "KYC done success subtitle" },
+  "backToHome": "Back to Home",
+  "@backToHome": { "description": "Back to home button" },
+
+  "checkingVerificationStatus": "Checking verification status...",
+  "@checkingVerificationStatus": { "description": "Snackbar while checking KYC status" },
+  "verificationApproved": "Verification approved!",
+  "@verificationApproved": { "description": "KYC verification approved message" },
+  "verificationDeclined": "Verification declined.",
+  "@verificationDeclined": { "description": "KYC verification declined message" },
+  "failedToCheckStatus": "Failed to check status: {error}",
+  "@failedToCheckStatus": {
+    "description": "Error when checking KYC status fails",
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "kycStatus": "KYC Status",
+  "@kycStatus": { "description": "KYC in review screen title" },
+  "kycUnderReview": "KYC Under Review",
+  "@kycUnderReview": { "description": "KYC under review heading" },
+  "kycProcessingDescription": "Your identity is being reviewed. This may take a few hours.",
+  "@kycProcessingDescription": { "description": "KYC under review description" },
+  "checkStatus": "Check Status",
+  "@checkStatus": { "description": "Check KYC status button" },
+
+  "failedToStartKyc": "Failed to start KYC",
+  "@failedToStartKyc": { "description": "Error when KYC session creation fails" },
+  "verificationError": "Verification error: {error}",
+  "@verificationError": {
+    "description": "Error during KYC verification",
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "kycNotDone": "KYC Not Done",
+  "@kycNotDone": { "description": "KYC not done screen title" },
+  "noKycDone": "No KYC Done Yet",
+  "@noKycDone": { "description": "KYC not done heading" },
+  "verifyIdentityToRemoveRestrictions": "Verify your identity to remove restrictions and unlock all features.",
+  "@verifyIdentityToRemoveRestrictions": { "description": "KYC not done description" },
+  "startKyc": "Start KYC",
+  "@startKyc": { "description": "Start KYC button" },
+
+  "preference": "Preferences",
+  "@preference": { "description": "Preferences screen title" },
+  "sound": "Sound",
+  "@sound": { "description": "Sound toggle label" },
+
+  "profileUpdatedSuccessfully": "Profile updated successfully",
+  "@profileUpdatedSuccessfully": { "description": "Profile update success snackbar" },
+  "updateFailed": "Update failed",
+  "@updateFailed": { "description": "Profile update failure snackbar" },
+  "errorWithMessage": "Error: {message}",
+  "@errorWithMessage": {
+    "description": "Generic error with message",
+    "placeholders": { "message": { "type": "String" } }
+  },
+  "addUsername": "Add username",
+  "@addUsername": { "description": "Placeholder when username is not set" },
+  "addEmail": "Add email",
+  "@addEmail": { "description": "Placeholder when email is not set" },
+  "addCountry": "Add country",
+  "@addCountry": { "description": "Placeholder when country is not set" },
+  "updatingProfile": "Updating profile...",
+  "@updatingProfile": { "description": "Loading text while updating profile" },
+  "noDataAvailable": "No data available",
+  "@noDataAvailable": { "description": "Generic no data available message" },
+
+  "deletingAccountEllipsis": "Deleting account...",
+  "@deletingAccountEllipsis": { "description": "Loading state text on delete account tile" },
+  "areYouDeletingAccount": "Are you sure you want to delete your account?",
+  "@areYouDeletingAccount": { "description": "Delete account confirmation title" },
+  "deleteAccountDescription": "This action is permanent and cannot be undone.",
+  "@deleteAccountDescription": { "description": "Delete account confirmation description" },
+
+  "processingLogout": "Processing logout...",
+  "@processingLogout": { "description": "Loading text during logout" },
+  "deleting": "Deleting...",
+  "@deleting": { "description": "Deleting status text in dialog button" },
+
+  "selectCountryDescription": "Select your country of residence",
+  "@selectCountryDescription": { "description": "Country picker helper text" },
+
+  "deleteConfirmInstruction": "Type 'delete' below to confirm account deletion",
+  "@deleteConfirmInstruction": { "description": "Instruction for delete confirmation input" },
+  "typeDeleteToConfirm": "Type 'delete' to confirm",
+  "@typeDeleteToConfirm": { "description": "Hint text for delete confirmation input" },
+  "pleaseTypeDeleteToConfirm": "Please type 'delete' to confirm",
+  "@pleaseTypeDeleteToConfirm": { "description": "Validation error when field is empty" },
+  "pleaseSpellDeleteExactly": "Please spell 'delete' exactly",
+  "@pleaseSpellDeleteExactly": { "description": "Validation error when text does not match" },
+  "processingEllipsis": "Processing...",
+  "@processingEllipsis": { "description": "Processing button loading state" },
+  "deletingYourAccountEllipsis": "Deleting your account...",
+  "@deletingYourAccountEllipsis": { "description": "Loading text during account deletion" },
+
+  "enterEmailAddress": "Enter email address",
+  "@enterEmailAddress": { "description": "Email field hint in email edit sheet" },
+
+  "usernameTakenError": "This username is already taken",
+  "@usernameTakenError": { "description": "Error banner when username is unavailable" },
+  "usernameVisibleOnLeaderboard": "Your username will be visible on the leaderboard",
+  "@usernameVisibleOnLeaderboard": { "description": "Helper text below username field" },
+  "errorCheckingUsername": "Error checking username",
+  "@errorCheckingUsername": { "description": "Error when username check fails" },
+
+  "enterPhoneNumberHint": "Enter phone number",
+  "@enterPhoneNumberHint": { "description": "Phone number field hint" },
+  "phoneNumberDescription": "Enter your phone number with country code",
+  "@phoneNumberDescription": { "description": "Phone number field helper text" },
+
+  "termsAndConditions": "Terms & Conditions",
+  "@termsAndConditions": { "description": "Terms and conditions menu item" },
+
+  "onchainWithdrawal": "Onchain Withdrawal",
+  "@onchainWithdrawal": { "description": "Onchain withdrawal option title" },
+  "transferViaCryptoAddress": "Transfer via crypto address",
+  "@transferViaCryptoAddress": { "description": "Onchain withdrawal option subtitle" },
+  "usingLocalPaymentMethods": "Using local payment methods",
+  "@usingLocalPaymentMethods": { "description": "Local payment methods option subtitle" },
+  "total": "Total",
+  "@total": { "description": "Total balance label on wallet card" },
+  "depositViaCrypto": "Deposit via Crypto",
+  "@depositViaCrypto": { "description": "Crypto deposit option title" },
+  "fundYourAccountWithCrypto": "Fund your account with crypto",
+  "@fundYourAccountWithCrypto": { "description": "Crypto deposit option subtitle" },
+
+  "quizResult": "Quiz Result",
+  "@quizResult": { "description": "Quiz result screen title" },
+  "sec": "sec",
+  "@sec": { "description": "Seconds abbreviation" },
+  "practiceMakesPerfect": "Practice Makes Perfect!",
+  "@practiceMakesPerfect": { "description": "Retake quiz result heading" },
+  "goodEffort": "Good effort, {name}!",
+  "@goodEffort": {
+    "description": "First time quiz result heading with username",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "alreadyCompletedLesson": "You've already completed this lesson.",
+  "@alreadyCompletedLesson": { "description": "Retake quiz result subheading" },
+  "keepLearningAndTrying": "Keep learning and trying your best!",
+  "@keepLearningAndTrying": { "description": "First time quiz result subheading" },
+  "reviewAnswers": "Review Answers",
+  "@reviewAnswers": { "description": "Review answers button" },
+  "watchAdToReviewAnswers": "Watch a short ad to review your answers",
+  "@watchAdToReviewAnswers": { "description": "Ad gate dialog description for review answers" },
+  "watchAd": "Watch Ad",
+  "@watchAd": { "description": "Watch ad button text" },
+  "correctAnswers": "Correct Answers",
+  "@correctAnswers": { "description": "Correct answers label in quiz result" },
+  "wrongAnswer": "Wrong Answer",
+  "@wrongAnswer": { "description": "Wrong answers label in quiz result" },
+  "preparing": "Preparing...",
+  "@preparing": { "description": "Loading state while preparing share card" },
+  "shareYourScores": "Share Your Scores",
+  "@shareYourScores": { "description": "Share scores button" },
+  "goBackToLessons": "Go Back to Lessons",
+  "@goBackToLessons": { "description": "Go back to lessons button" },
+  "student": "Student",
+  "@student": { "description": "Default username fallback" },
+  "unknownLesson": "Unknown Lesson",
+  "@unknownLesson": { "description": "Fallback lesson title" },
+  "lessonShareText": "I just completed a lesson on LearnWay! Check out my score! 🎉 Learning web3, AI, and finance has never been this fun or rewarding.\n\nJoin me and start earning real rewards while leveling up your skills! 🚀\n\nDownload the app now 👉 https://onelink.to/q3ypvq",
+  "@lessonShareText": { "description": "Text shared with lesson score card" },
+  "lessonCompletedSubject": "I just completed a lesson on LearnWay! 🎉",
+  "@lessonCompletedSubject": { "description": "Subject line when sharing lesson result" },
+  "failedToShare": "Failed to share: {error}",
+  "@failedToShare": {
+    "description": "Error message when sharing fails",
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "goBack": "Go Back",
+  "@goBack": { "description": "Go back button label" },
+  "contest": "Contest",
+  "@contest": { "description": "Contest section title" },
+  "language": "Language",
+  "@language": { "description": "Language screen title" },
+  "chooseTheLanguage": "Choose the Language",
+  "@chooseTheLanguage": { "description": "Language screen heading" },
+  "chooseLanguageSubtitle": "Select your preferred language below. This helps us serve you better.",
+  "@chooseLanguageSubtitle": { "description": "Language screen subtitle" },
+  "failedToLoadLanguages": "Failed to load languages",
+  "@failedToLoadLanguages": { "description": "Error when languages fail to load" },
+  "languageUpdatedSuccessfully": "Language updated successfully",
+  "@languageUpdatedSuccessfully": { "description": "Success message after language update" },
+  "failedToUpdateLanguage": "Failed to update language. Please try again.",
+  "@failedToUpdateLanguage": { "description": "Error when language update fails" },
+  "saving": "Saving...",
+  "@saving": { "description": "Loading text while saving" },
+
+  "battle": "Battle",
+  "@battle": { "description": "Battle screen AppBar title" },
+  "questionNumber": "Question {index}",
+  "@questionNumber": {
+    "description": "Question label with number",
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "opponent": "Opponent",
+  "@opponent": { "description": "Fallback name for opponent" },
+  "battles": "Quiz Battles",
+  "@battles": { "description": "Battle section title" },
+  "battleHeroDescription": "Compete in real-time quiz battles and earn more rewards.",
+  "@battleHeroDescription": { "description": "Battle hero card subtitle" },
+  "battleHistory": "Battle History",
+  "@battleHistory": { "description": "Battle history link label" },
+  "playWithAFriend": "Challenge a Friend",
+  "@playWithAFriend": { "description": "Play with a friend option" },
+  "challengeAI": "Challenge AI",
+  "@challengeAI": { "description": "Challenge AI battle option" },
+  "joinABattle": "Join a Battle",
+  "@joinABattle": { "description": "Bot battle modal title" },
+  "payToStart": "Pay to Start",
+  "@payToStart": { "description": "Bot battle pay button" },
+  "playWithFriends": "Play with friends",
+  "@playWithFriends": { "description": "Play with friends screen title" },
+  "getReadyToParticipate": "Get ready to participate",
+  "@getReadyToParticipate": { "description": "Play with friends heading" },
+  "battleEntryDescription": "Battle your friends and win real rewards!",
+  "@battleEntryDescription": { "description": "Play with friends subtitle" },
+  "createARoom": "Create a Room",
+  "@createARoom": { "description": "Create room button" },
+  "joinARoom": "Join a Room",
+  "@joinARoom": { "description": "Join room button" },
+  "or": "OR",
+  "@or": { "description": "Divider between create and join" },
+  "createABattle": "Create a Battle",
+  "@createABattle": { "description": "Create battle modal title" },
+  "yourGemBalance": "Your Gem Balance",
+  "@yourGemBalance": { "description": "Gem balance label" },
+  "howBattleWorks": "How Battle works",
+  "@howBattleWorks": { "description": "How battle works link" },
+  "chooseYourTopic": "Choose Your Topic",
+  "@chooseYourTopic": { "description": "Topic selection label" },
+  "selectATopic": "Select a topic",
+  "@selectATopic": { "description": "Topic dropdown hint" },
+  "enterAmount": "Enter Amount",
+  "@enterAmount": { "description": "Amount input label" },
+  "gemsAmount": "Gems Amount",
+  "@gemsAmount": { "description": "Gems amount input hint" },
+  "pleaseSelectATopic": "Please select a topic",
+  "@pleaseSelectATopic": { "description": "Topic validation error" },
+  "pleaseEnterValidGemAmount": "Please enter a valid gem amount",
+  "@pleaseEnterValidGemAmount": { "description": "Gem amount validation error" },
+  "joinRoom": "Join Room",
+  "@joinRoom": { "description": "Join room modal title" },
+  "enterRoomCodeToJoin": "Enter Room Code to join Battle",
+  "@enterRoomCodeToJoin": { "description": "Join room instruction" },
+  "waitingRoom": "Waiting Room",
+  "@waitingRoom": { "description": "Waiting room title" },
+  "battleTopic": "Topic: {topicTitle}",
+  "@battleTopic": {
+    "description": "Topic label with value",
+    "placeholders": { "topicTitle": { "type": "String" } }
+  },
+  "entryFees": "Entry Fees:",
+  "@entryFees": { "description": "Entry fees label" },
+  "inviteCode": "Invite code",
+  "@inviteCode": { "description": "Invite code section label" },
+  "shareCodeWithFriend": "Share this code with a friend and Invite them to join",
+  "@shareCodeWithFriend": { "description": "Invite code instruction" },
+  "roomCodeCopied": "Room code copied!",
+  "@roomCodeCopied": { "description": "Snackbar after copying room code" },
+  "battleShareInviteText": "Join my LearnWay battle! 🎮\n\nTopic: {topic}\nEntry fee: {gems} gems 💎\n\nUse room code: {code}\n\nDownload LearnWay 👉 https://onelink.to/q3ypvq",
+  "@battleShareInviteText": {
+    "description": "Share invite text",
+    "placeholders": {
+      "code": { "type": "String" },
+      "topic": { "type": "String" },
+      "gems": { "type": "String" }
+    }
+  },
+  "cancelRoom": "Cancel Room?",
+  "@cancelRoom": { "description": "Cancel room dialog title" },
+  "cancelRoomDescription": "If you leave this screen, the room will no longer exist",
+  "@cancelRoomDescription": { "description": "Cancel room dialog description" },
+  "leaveRoomConfirmation": "Are you sure you want to leave this room?",
+  "@leaveRoomConfirmation": { "description": "Leave room confirmation" },
+  "roomFullReadyToStart": "Room is full — ready to start!",
+  "@roomFullReadyToStart": { "description": "Room full status message" },
+  "waitingForPlayers": "Waiting...",
+  "@waitingForPlayers": { "description": "Waiting for players button state" },
+  "creatorRole": "CREATOR",
+  "@creatorRole": { "description": "Creator role label" },
+  "playerRole": "PLAYER",
+  "@playerRole": { "description": "Player role label" },
+  "creatorWillStart": "Creator will start and the Quiz will begin.",
+  "@creatorWillStart": { "description": "Waiting message for joiner" },
+  "getReadyToBattle": "Get ready to battle",
+  "@getReadyToBattle": { "description": "Battle ready screen heading" },
+  "goodLuck": "Good Luck!",
+  "@goodLuck": { "description": "Good luck message before battle" },
+  "startBattle": "Start Battle",
+  "@startBattle": { "description": "Start battle button" },
+  "waitingForCreatorToStart": "Waiting for creator to start…",
+  "@waitingForCreatorToStart": { "description": "Waiting for creator message" },
+  "playWithFriendsTitle": "Play With Friends",
+  "@playWithFriendsTitle": { "description": "Win screen app bar title" },
+  "congratulations": "You won the Battle",
+  "@congratulations": {
+    "description": "Win screen title"
+  },
+  "itsADraw": "It's a Draw, {name}.",
+  "@itsADraw": {
+    "description": "Draw message with name",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "youWonThisBattle": "Good work, you won {gems} Gems",
+  "@youWonThisBattle": {
+    "description": "Win subtitle showing gems earned",
+    "placeholders": { "gems": { "type": "int" } }
+  },
+  "youFoughtHard": "You fought hard.",
+  "@youFoughtHard": { "description": "Draw/lose subtitle" },
+  "preparingShare": "Preparing...",
+  "@preparingShare": { "description": "Sharing in progress text" },
+  "playAgain": "Play Again",
+  "@playAgain": { "description": "Play again button" },
+  "battleResults": "Battle Results",
+  "@battleResults": { "description": "Battle results app bar title" },
+  "defeat": "Defeat",
+  "@defeat": { "description": "Defeat label" },
+  "betterLuckNextTime": "Better Luck next time.",
+  "@betterLuckNextTime": { "description": "Defeat subtitle" },
+  "leaveGameConfirmation": "Are you sure you want to leave the games?",
+  "@leaveGameConfirmation": { "description": "Leave game dialog default title" },
+  "leaveButton": "Leave",
+  "@leaveButton": { "description": "Leave button label" },
+  "howBattleWorksTitle": "How Battle Works",
+  "@howBattleWorksTitle": { "description": "How battle works dialog title" },
+  "howBattleWorksStep1": "Select a topic and enter the number of Gems you want to stake.",
+  "@howBattleWorksStep1": { "description": "How battle works step 1" },
+  "howBattleWorksStep2": "Create a quiz room and share the invitation code.",
+  "@howBattleWorksStep2": { "description": "How battle works step 2" },
+  "howBattleWorksStep3": "Another learner joins using the code and matches your stake.",
+  "@howBattleWorksStep3": { "description": "How battle works step 3" },
+  "howBattleWorksStep4": "Both players take the quiz in real time.",
+  "@howBattleWorksStep4": { "description": "How battle works step 4" },
+  "howBattleWorksStep5": "Earn extra points for speed.",
+  "@howBattleWorksStep5": { "description": "How battle works step 5" },
+  "howBattleWorksStep6": "The player with the highest XP wins the staked Gems.",
+  "@howBattleWorksStep6": { "description": "How battle works step 6" },
+  "howBattleWorksStep7": "A small commission is deducted by the platform.",
+  "@howBattleWorksStep7": { "description": "How battle works step 7" },
+  "howBotBattleWorksStep1": "Select a topic. The number of Gems to stake is fixed.",
+  "@howBotBattleWorksStep1": { "description": "How bot battle works step 1" },
+  "howBotBattleWorksStep2": "Click Pay to Start to begin the battle.",
+  "@howBotBattleWorksStep2": { "description": "How bot battle works step 2" },
+  "recent": "Recent",
+  "@recent": { "description": "Recent section label in battle history" },
+  "yourCompletedBattles": "Your completed battles",
+  "@yourCompletedBattles": { "description": "Battle history subtitle" },
+  "noBattleHistoryYet": "No battle history yet",
+  "@noBattleHistoryYet": { "description": "Empty state for battle history" },
+  "won": "Won",
+  "@won": { "description": "Won outcome label" },
+  "draw": "Draw",
+  "@draw": { "description": "Draw outcome label" },
+  "groupBattle": "GROUP BATTLE",
+  "@groupBattle": { "description": "Group battle type label" },
+  "nPlayers": "{count} Players",
+  "@nPlayers": {
+    "description": "Number of players in group battle",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "yesterday": "Yesterday",
+  "@yesterday": { "description": "Yesterday date label" },
+  "battleDetails": "Battle Details",
+  "@battleDetails": { "description": "Battle details screen title" },
+  "entryFee": "Entry Fee:",
+  "@entryFee": { "description": "Entry fee label in battle details" },
+  "battleStatus": "BATTLE STATUS",
+  "@battleStatus": { "description": "Battle status section label" },
+  "completedDate": "COMPLETED DATE",
+  "@completedDate": { "description": "Completed date section label" },
+  "meLabel": "Me",
+  "@meLabel": { "description": "Label for current user in participant list" },
+  "redeemUnavailableTitle": "Redeem Gems for USDT",
+  "@redeemUnavailableTitle": {"description": "Redeem feature unavailable text"},
+  "redeemUnavailableSubText": "This feature is unavailable",
+  "@redeemUnavailableSubText": {"description": "Redeem sub text"},
+  "iUnderstand": "I understand",
+  "@iUnderstand": {"description": "Confirmation button text on unavailable feature modal"},
+  "withdrawUnavailableTitle": "Withdraw to local accounts",
+  "@withdrawUnavailableTitle": {"description": "Withdraw feature unavailable text"},
+  "withdrawUnavailableSubText": "This feature is unavailable",
+  "@withdrawUnavailableSubText": {"description": "Withdraw sub text"}
+}

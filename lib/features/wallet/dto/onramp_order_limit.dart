@@ -1,0 +1,4 @@
+// ///
+//  class OnrampOrderLimit{
+//   final fiatCurrency
+//  }

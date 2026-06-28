@@ -1,0 +1,80 @@
+workflows:
+  # iOS release workflow — to be configured later
+  # ios-release:
+  #   name: iOS Release Build
+  #   max_build_duration: 60
+  #   instance_type: mac_mini_m2
+  #
+  #   triggering:
+  #     events:
+  #       - push
+  #     branch_patterns:
+  #       - pattern: main
+  #         include: true
+  #
+  #   environment:
+  #     flutter: 3.24.0
+  #     xcode: latest
+  #     cocoapods: default
+  #     vars:
+  #       BUNDLE_ID: "com.learnway.learnwayv2" # TODO: update to your actual bundle ID
+  #       APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
+  #       APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
+  #       APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
+  #       CERTIFICATE_PRIVATE_KEY: $CERTIFICATE_PRIVATE_KEY
+  #       GITHUB_TOKEN: $GITHUB_TOKEN
+  #     groups:
+  #       - app_store_credentials
+  #       - github_credentials
+  #
+  #   scripts:
+  #     - name: Get Flutter dependencies
+  #       script: flutter pub get
+  #
+  #     - name: Run build_runner
+  #       script: flutter pub run build_runner build --delete-conflicting-outputs
+  #
+  #     - name: Set up code signing
+  #       script: |
+  #         keychain initialize
+  #         app-store-connect fetch-signing-files "$BUNDLE_ID" \
+  #           --type IOS_APP_STORE \
+  #           --create
+  #         keychain add-certificates
+  #         xcode-project use-profiles
+  #
+  #     - name: Build iOS IPA
+  #       script: |
+  #         flutter build ipa \
+  #           --flavor prod \
+  #           -t lib/main.dart \
+  #           --release \
+  #           --export-options-plist=/Users/builder/export_options.plist
+  #
+  #     - name: Attach IPA to GitHub Release
+  #       script: |
+  #         # Get the latest tag from git (set by GitHub Actions version-bump job)
+  #         TAG=$(git describe --tags --abbrev=0)
+  #         IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
+  #
+  #         echo "Uploading $IPA_PATH to GitHub release $TAG"
+  #
+  #         gh release upload "$TAG" "$IPA_PATH" \
+  #           --repo "$CM_REPO_SLUG" \
+  #           --clobber
+  #
+  #   artifacts:
+  #     - build/ios/ipa/*.ipa
+  #     - /tmp/xcodebuild_logs/*.log
+  #
+  #   publishing:
+  #     app_store_connect:
+  #       auth: integration
+  #       submit_to_testflight: true
+  #       submit_to_app_store: false
+  #     email:
+  #       recipients:
+  #         - $CM_COMMIT_EMAIL
+  #       notify:
+  #         success: true
+  #         failure: true

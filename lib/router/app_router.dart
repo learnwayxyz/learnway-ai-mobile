@@ -1,0 +1,248 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:learnwayv2/features/about_us/view/terms_and_condition.dart';
+import 'package:learnwayv2/features/account/view/change_avatar_screen.dart';
+import 'package:learnwayv2/features/account/view/change_avatar_success_screen.dart';
+import 'package:learnwayv2/features/account/view/change_theme_screen.dart';
+import 'package:learnwayv2/features/account/view/profile_screen.dart';
+import 'package:learnwayv2/features/account_setup/widgets/setup_loader_screen.dart';
+import 'package:learnwayv2/features/bookmarks/view/bookmarks_screen.dart';
+import 'package:learnwayv2/features/contest/model/all_contest_model.dart';
+import 'package:learnwayv2/features/contest/view/contest_loader_screen.dart';
+import 'package:learnwayv2/features/contest/view/contest_quiz_screen.dart';
+import 'package:learnwayv2/features/contest/view/contest_result_screen.dart';
+import 'package:learnwayv2/features/contest/view/contest_review_screen.dart';
+import 'package:learnwayv2/features/contest/view/contest_submit_screen.dart';
+import 'package:learnwayv2/features/contest/view/contest_xp_earned.dart';
+import 'package:learnwayv2/features/contest/view/contest_leader_board_screen.dart';
+import 'package:learnwayv2/features/contest/view/upcoming_details_screen.dart';
+import 'package:learnwayv2/features/home/view/native_ad_screen.dart';
+import 'package:learnwayv2/features/notifications/model/notification_model.dart';
+import 'package:learnwayv2/features/notifications/views/notification_detail_screen.dart';
+import 'package:learnwayv2/features/quiz/view/quiz_review_screen.dart';
+import 'package:learnwayv2/features/statistics/view/statistics_screen.dart';
+import 'package:learnwayv2/features/invite_friends/view/invite_friends_screen.dart';
+import 'package:learnwayv2/features/about_us/view/about_us_screen.dart';
+import 'package:learnwayv2/features/about_us/view/about_learnway_screen.dart';
+import 'package:learnwayv2/features/about_us/view/privacy_policy_screen.dart';
+import 'package:learnwayv2/features/about_us/view/help_center_screen.dart';
+import 'package:learnwayv2/features/about_us/view/report_problem_screen.dart';
+import 'package:learnwayv2/features/account_setup/view/pass_phrase_screen.dart';
+import 'package:learnwayv2/features/account_setup/view/select_avatar_screen.dart';
+import 'package:learnwayv2/features/account_setup/view/set_up_account_view.dart';
+import 'package:learnwayv2/features/account_setup/view/set_up_success_screen.dart';
+import 'package:learnwayv2/features/account_setup/view/user_name_screen.dart';
+import 'package:learnwayv2/features/account_setup/view/welcome_to_setup_screen.dart';
+import 'package:learnwayv2/features/auth/view/register_screen.dart';
+import 'package:learnwayv2/features/auth/authenticate_email/view/enter_email_screen.dart';
+import 'package:learnwayv2/features/auth/authenticate_email/view/verify_email_screen.dart';
+import 'package:learnwayv2/features/battles/view/battles_main_entry_screen.dart';
+import 'package:learnwayv2/features/battles/view/shared/battle_completion_screen.dart';
+import 'package:learnwayv2/features/battles/view/shared/battle_final_results_screen.dart';
+import 'package:learnwayv2/features/battles/view/shared/battle_lose_screen.dart';
+import 'package:learnwayv2/features/battles/view/shared/battle_results_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_with_friend/battle_ready_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_with_friend/battle_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_in_group/group_battle_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_in_group/group_battle_win_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_in_group/group_battle_defeat_screen.dart';
+import 'package:learnwayv2/features/battles/view/shared/battle_win_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_with_friend/play_with_friend_entry_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_in_group/play_in_group_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_with_bot/play_with_bot_screen.dart';
+import 'package:learnwayv2/features/battles/view/play_with_bot/bot_battle_screen.dart';
+import 'package:learnwayv2/features/battles/view/online_opponent/online_opponent_screen.dart';
+import 'package:learnwayv2/features/battles/view/battle_history/battle_history_screen.dart';
+import 'package:learnwayv2/features/battles/view/battle_history/battle_history_details_screen.dart';
+import 'package:learnwayv2/features/contest/view/contest_screen.dart';
+import 'package:learnwayv2/features/home/view/home_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/level_screens/advanced_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/level_screens/beginner_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/content_reader_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/lesson_onboard_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/lesson_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/learn_and_earn_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/level_screens/intermidiate_screen.dart';
+import 'package:learnwayv2/features/account/view/account_screen.dart';
+import 'package:learnwayv2/features/account/view/learning_progress_screen.dart';
+import 'package:learnwayv2/features/account/view/preference_screen.dart';
+import 'package:learnwayv2/features/account/view/language_screen.dart';
+import 'package:learnwayv2/features/account/view/security_screen.dart';
+import 'package:learnwayv2/features/account/view/kyc_not_done_screen.dart';
+import 'package:learnwayv2/features/account/view/kyc_done_screen.dart';
+import 'package:learnwayv2/features/account/view/kyc_in_review_screen.dart';
+import 'package:learnwayv2/features/account/view/manage_subscription_screen.dart';
+import 'package:learnwayv2/features/badges/view/badges_screen.dart';
+import 'package:learnwayv2/features/badges/view/badge_details_screen.dart';
+import 'package:learnwayv2/features/quiz/view/quiz_gems_earned.dart';
+import 'package:learnwayv2/features/quiz/view/quiz_loader_screen.dart';
+import 'package:learnwayv2/features/quiz/view/quiz_onboard_screen.dart';
+import 'package:learnwayv2/features/quiz/view/quiz_result.dart';
+import 'package:learnwayv2/features/quiz/view/quiz_screen.dart';
+import 'package:learnwayv2/features/quiz/view/quiz_submit_screen.dart';
+import 'package:learnwayv2/features/quiz/view/quiz_xp_earned.dart';
+import 'package:learnwayv2/features/onboarding/view/widgets/onboarding_initial.dart';
+import 'package:learnwayv2/features/splash/splash_screen.dart';
+import 'package:learnwayv2/features/main_activity/main_activity_screen.dart';
+import 'package:learnwayv2/features/explore_paths/view/explore_paths_screen.dart';
+import 'package:learnwayv2/features/onboarding/view/onboarding_screen.dart';
+import 'package:learnwayv2/features/subscription/view/paywall_sheet.dart';
+import 'package:learnwayv2/features/vocabulary_carousel.dart/view/vocabulary_view_screen.dart';
+import 'package:learnwayv2/features/ai_tutor/view/ai_tutor_terminal_screen.dart';
+import 'package:learnwayv2/features/ai_tutor/view/career_goal_screen.dart';
+import 'package:learnwayv2/features/ai_tutor/view/discovery_flow_screen.dart';
+import 'package:learnwayv2/features/wallet/cubit/wallet_cubit.dart';
+import 'package:learnwayv2/features/wallet/dto/offramp_details_param.dart';
+import 'package:learnwayv2/features/wallet/view/deposit/deposit_confirmation_screen.dart';
+import 'package:learnwayv2/features/wallet/view/deposit/deposit_successful_screen.dart';
+import 'package:learnwayv2/features/wallet/view/deposit/deposit_converter_screen.dart';
+import 'package:learnwayv2/features/wallet/view/deposit/deposit_loader_screen.dart';
+import 'package:learnwayv2/features/wallet/view/deposit/deposit_payment_method_screen.dart';
+import 'package:learnwayv2/features/wallet/view/deposit/deposit_ussd_screen.dart';
+import 'package:learnwayv2/features/wallet/view/deposit/mobilemoney_money_screen.dart';
+import 'package:learnwayv2/features/wallet/view/deposit_and_buy_screen.dart';
+import 'package:learnwayv2/features/wallet/view/receive.screen.dart';
+import 'package:learnwayv2/features/wallet/view/send_confirmation_screen.dart';
+import 'package:learnwayv2/features/wallet/view/send_screen.dart';
+import 'package:learnwayv2/features/wallet/view/swap_screen.dart';
+import 'package:learnwayv2/features/wallet/view/transaction_otp_screen.dart';
+import 'package:learnwayv2/features/wallet/view/withdraw/offramp_amount_screen.dart';
+import 'package:learnwayv2/features/wallet/view/withdraw/offramp_screen.dart';
+import 'package:learnwayv2/features/wallet/view/withdraw/offramp_confirmation_screen.dart';
+import 'package:learnwayv2/features/wallet/view/withdraw/offramp_verification_screen.dart';
+import 'package:learnwayv2/features/wallet/view/withdraw/offramp_loader_screen.dart';
+import 'package:learnwayv2/features/wallet/view/withdraw/offramp_success_screen.dart';
+import 'package:learnwayv2/features/wallet/view/send_success_screen.dart';
+import 'package:learnwayv2/features/wallet/widgets/simple_loader_screen.dart';
+import 'package:learnwayv2/features/notifications/views/notifications_screen.dart';
+import 'package:learnwayv2/features/wallet/verification_screen.dart';
+import 'package:learnwayv2/shared/loader/screen_loader.dart';
+import 'package:learnwayv2/shared/widgets/card_component/lesson_cards_factory.dart';
+import 'package:learnwayv2/router/paywall_guard.dart';
+part 'app_router.gr.dart';
+
+@AutoRouterConfig()
+class AppRouter extends RootStackRouter {
+  @override
+  List<AutoRoute> get routes => [
+    AutoRoute(page: SplashRoute.page, initial: true),
+    AutoRoute(page: OnboardingInitialRoute.page),
+    AutoRoute(page: HomeRoute.page),
+    AutoRoute(page: MainActivityRoute.page),
+    AutoRoute(page: RegisterRoute.page),
+    AutoRoute(page: OnBoardingRoute.page),
+    AutoRoute(
+      page: SetUpAccountViewRoute.page,
+      children: [
+        AutoRoute(page: SelectAvatarRoute.page),
+        AutoRoute(page: UserNameRoute.page),
+      ],
+    ),
+    AutoRoute(page: VocabularyViewRoute.page),
+    AutoRoute(page: DiscoveryFlowRoute.page),
+    AutoRoute(page: ExplorePathsRoute.page),
+    AutoRoute(page: AiTutorTerminalRoute.page),
+    AutoRoute(page: CareerGoalRoute.page),
+    AutoRoute(page: EnterEmailRoute.page),
+    AutoRoute(page: VerifyEmailRoute.page),
+    AutoRoute(page: SetUpSuccessRoute.page),
+    AutoRoute(page: WelcomeToSetupRoute.page),
+    AutoRoute(page: BattlesMainEntryRoute.page),
+    AutoRoute(page: BattleRoute.page),
+    AutoRoute(page: BattleReadyRoute.page),
+    AutoRoute(page: GroupBattleRoute.page),
+    AutoRoute(page: GroupBattleWinRoute.page),
+    AutoRoute(page: GroupBattleDefeatRoute.page),
+    AutoRoute(page: BattleCompletionRoute.page),
+    AutoRoute(page: BattleFinalResultsRoute.page),
+    AutoRoute(page: BattleResultsRoute.page),
+    AutoRoute(page: BattleWinRoute.page),
+    AutoRoute(page: BattleLoseRoute.page),
+    AutoRoute(page: PlayWithFriendEntryRoute.page),
+    AutoRoute(page: PlayInGroupRoute.page),
+    AutoRoute(page: PlayWithBotRoute.page),
+    AutoRoute(page: BotBattleRoute.page),
+    AutoRoute(page: OnlineOpponentRoute.page),
+    AutoRoute(page: BattleHistoryRoute.page),
+    AutoRoute(page: BattleHistoryDetailsRoute.page),
+    AutoRoute(page: ContestRoute.page),
+    AutoRoute(page: LearnAndEarnRoute.page),
+    AutoRoute(page: BeginnerRoute.page),
+    AutoRoute(page: LessonRoute.page),
+    AutoRoute(page: LessonOnboardRoute.page),
+    AutoRoute(page: ContentReaderRoute.page),
+    AutoRoute(page: QuizRoute.page),
+    AutoRoute(page: QuizOnboardRoute.page),
+    AutoRoute(page: QuizResultRoute.page),
+    AutoRoute(page: QuizGemsEarnedRoute.page),
+    AutoRoute(page: QuizXPEarnedRoute.page),
+    AutoRoute(page: IntermediateRoute.page),
+    AutoRoute(page: AdvancedRoute.page),
+    AutoRoute(page: PassphraseRoute.page),
+    AutoRoute(page: ReceiveRoute.page),
+    AutoRoute(page: SendRoute.page),
+    AutoRoute(page: SwapRoute.page),
+    AutoRoute(page: SendConfirmationRoute.page),
+    AutoRoute(page: AccountRoute.page),
+    AutoRoute(page: BadgesRoute.page),
+    AutoRoute(page: BadgeDetailsRoute.page),
+    AutoRoute(page: LearningProgressRoute.page),
+    AutoRoute(page: PreferenceRoute.page),
+    AutoRoute(page: LanguageRoute.page),
+    AutoRoute(page: SecurityRoute.page),
+    AutoRoute(page: KycNotDoneRoute.page),
+    AutoRoute(page: KycDoneRoute.page),
+    AutoRoute(page: KycInReviewRoute.page),
+    AutoRoute(page: ManageSubscriptionRoute.page),
+    AutoRoute(page: ProfileRoute.page),
+    AutoRoute(page: ChangeAvatarRoute.page),
+    AutoRoute(page: ChangeAvatarSuccessRoute.page),
+    AutoRoute(page: BookmarksRoute.page),
+    AutoRoute(page: StatisticsRoute.page),
+    AutoRoute(page: InviteFriendsRoute.page),
+    AutoRoute(page: AboutUsRoute.page),
+    AutoRoute(page: AboutLearnWayRoute.page),
+    AutoRoute(page: PrivacyPolicyRoute.page),
+    AutoRoute(page: HelpCenterRoute.page),
+    AutoRoute(page: ReportProblemRoute.page),
+    AutoRoute(page: ChangeThemeRoute.page),
+    AutoRoute(page: RouteLoaderRoute.page),
+    AutoRoute(page: QuizLoaderRoute.page),
+    AutoRoute(page: QuizSubmitRoute.page),
+    AutoRoute(page: SendSuccessRoute.page),
+    AutoRoute(page: AccountSetupLoaderRoute.page),
+    AutoRoute(page: QuizReviewRoute.page),
+    AutoRoute(page: UpcomingDetailsRoute.page),
+    AutoRoute(page: ContestLeaderBoardRoute.page),
+    AutoRoute(page: SendLoaderRoute.page),
+    AutoRoute(page: ContestLoaderRoute.page),
+    AutoRoute(page: ContestXPEarnedRoute.page),
+    AutoRoute(page: ContestSubmitRoute.page),
+    AutoRoute(page: ContestQuizRoute.page),
+    AutoRoute(page: ContestResultRoute.page),
+    AutoRoute(page: ContestReviewRoute.page),
+    AutoRoute(page: VerificationRoute.page),
+    AutoRoute(page: NotificationsRoute.page),
+    AutoRoute(page: NotificationDetailRoute.page),
+    AutoRoute(page: MobileMoneyRoute.page),
+    AutoRoute(page: DepositUssdRoute.page),
+    AutoRoute(page: DepositLoaderRoute.page),
+    AutoRoute(page: DepositConverterRoute.page),
+    AutoRoute(page: OnrampDepositConfirmationRoute.page),
+    AutoRoute(page: TransactionVerifyOtpRoute.page),
+    AutoRoute(page: TermsAndConditionRoute.page),
+    AutoRoute(page: DepositAndBuyRoute.page),
+    AutoRoute(page: DepositPaymentMethodRoute.page),
+    AutoRoute(page: OfframpRoute.page),
+    AutoRoute(page: OfframpConfirmationRoute.page),
+    AutoRoute(page: OfframpVerificationRoute.page),
+    AutoRoute(page: OfframpLoaderRoute.page),
+    AutoRoute(page: OfframpSuccessRoute.page),
+    AutoRoute(page: OfframpAmountRoute.page),
+    AutoRoute(page: PayWallRoute.page, guards: [PaywallGuard()]),
+    AutoRoute(page: NativeAdRoute.page),
+    AutoRoute(page: DepositSuccessfulRoute.page),
+  ];
+}

@@ -1,0 +1,87 @@
+{
+  "project_info": {
+    "project_number": "1032790144017",
+    "project_id": "learnwayv2",
+    "storage_bucket": "learnwayv2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1032790144017:android:0489d25f4275f583622db0",
+        "android_client_info": {
+          "package_name": "xyz.learnway.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1032790144017-4eb84rgqvcrk0c06dkvs5apto1bncvs8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xyz.learnway.app",
+            "certificate_hash": "8530d7a094d19c7e5823248ba40beb866a560f8e"
+          }
+        },
+        {
+          "client_id": "1032790144017-cqdm50edl1djfm51msm6gq8h1eavh50c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xyz.learnway.app",
+            "certificate_hash": "99b8e11554720a07546420d41a05550fe4eb24a8"
+          }
+        },
+        {
+          "client_id": "1032790144017-eko37n8eqsat1t8e572a4e4m1sha4r4c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xyz.learnway.app",
+            "certificate_hash": "82beeab66f4da84bd811834bd0464cbe16ab41e6"
+          }
+        },
+        {
+          "client_id": "1032790144017-fqvf375huk6o9n0bd222m1aof1a74kus.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xyz.learnway.app",
+            "certificate_hash": "d2ea506df31947ed1651d9aa0cb80fb731b30895"
+          }
+        },
+        {
+          "client_id": "1032790144017-rmsmqmfrpc1p30lilifp7d815gq4sv3m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xyz.learnway.app",
+            "certificate_hash": "fa8a6102dea53b66d432482923113d80194977c4"
+          }
+        },
+        {
+          "client_id": "1032790144017-ln53vs29418b15dtgefateqsimmq5g0d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGmYNlVtOICOkjTEEROKk78wfRcDaKnVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1032790144017-ln53vs29418b15dtgefateqsimmq5g0d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1032790144017-3dts7s7hc7fvv7a3eqvme70393pen4ao.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "xyz.learnway.app"
+              }
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-8238990887197144~3233231838"
+    }
+  ],
+  "configuration_version": "1"
+}

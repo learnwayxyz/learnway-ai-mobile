@@ -1,0 +1,156 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'mobile_money_request.g.dart';
+
+/// Mobile Money Deposit Request Model
+@JsonSerializable(explicitToJson: true)
+class MobileMoneyDepositRequest {
+  MobileMoneyDepositRequest({
+    required this.fiatAmount,
+    required this.currency,
+    required this.chain,
+    required this.token,
+    required this.receiverAddress,
+    required this.referenceId,
+    required this.mobileMoneyObjects,
+    this.callbackUrl,
+    this.rateId,
+  });
+
+  final double fiatAmount;
+  final Currency currency;
+  final Chain chain;
+  final Token token;
+  final String receiverAddress;
+  final String referenceId;
+  final String? callbackUrl;
+  final String? rateId;
+  final MobileMoneyDepositObjects? mobileMoneyObjects;
+
+  factory MobileMoneyDepositRequest.fromJson(Map<String, dynamic> json) =>
+      _$MobileMoneyDepositRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MobileMoneyDepositRequestToJson(this);
+}
+
+@JsonSerializable()
+class MobileMoneyDepositObjects {
+  MobileMoneyDepositObjects({
+    required this.phoneNumber,
+    required this.accountName,
+    required this.networkProvider,
+  });
+  final String phoneNumber;
+  final String accountName;
+  final String networkProvider;
+  factory MobileMoneyDepositObjects.fromJson(Map<String, dynamic> json) =>
+      _$MobileMoneyDepositObjectsFromJson(json);
+  Map<String, dynamic> toJson() => _$MobileMoneyDepositObjectsToJson(this);
+}
+
+/// Currency Enum
+@JsonEnum(alwaysCreate: true)
+enum Currency {
+  @JsonValue('KES')
+  kes,
+  @JsonValue('GHS')
+  ghs,
+  @JsonValue('NGN')
+  ngn,
+  @JsonValue('ZAR')
+  zar,
+  @JsonValue('USD')
+  usd,
+  @JsonValue('XOF')
+  xof,
+  @JsonValue('ZMW')
+  zmw,
+  @JsonValue('XAF')
+  xaf,
+  @JsonValue('SLE')
+  sle,
+  @JsonValue('CDF')
+  cdf,
+  @JsonValue('TZS')
+  tzs,
+  @JsonValue('UGX')
+  ugx,
+  @JsonValue('EGP')
+  egp,
+  @JsonValue('MWK')
+  mwk,
+  @JsonValue('RWF')
+  rwf,
+  @JsonValue('ETB')
+  etb,
+}
+
+/// Chain Enum
+@JsonEnum(alwaysCreate: true)
+enum Chain {
+  @JsonValue('ETHEREUM')
+  ethereum,
+  @JsonValue('CELO')
+  celo,
+  @JsonValue('AVALANCHE')
+  avalanche,
+  @JsonValue('POLYGON')
+  polygon,
+  @JsonValue('ARBITRUM')
+  arbitrum,
+  @JsonValue('OPTIMISM')
+  optimism,
+  @JsonValue('STELLAR')
+  stellar,
+  @JsonValue('TRON')
+  tron,
+  @JsonValue('FUSE')
+  fuse,
+  @JsonValue('LIGHTNING')
+  lightning,
+  @JsonValue('SOLANA')
+  solana,
+  @JsonValue('PROVENANCE')
+  provenance,
+  @JsonValue('CARDANO')
+  cardano,
+  @JsonValue('HEDERA')
+  hedera,
+  @JsonValue('BASE')
+  base,
+  @JsonValue('LISK')
+  lisk,
+  @JsonValue('VICTION')
+  viction,
+  @JsonValue('SCROLL')
+  scroll,
+}
+
+/// Token Enum
+@JsonEnum(alwaysCreate: true)
+enum Token {
+  @JsonValue('CUSD')
+  cusd,
+  @JsonValue('USDC')
+  usdc,
+  @JsonValue('USDT')
+  usdt,
+  @JsonValue('SAT')
+  sat,
+  @JsonValue('BTC')
+  btc,
+  @JsonValue('HASH')
+  hash,
+  @JsonValue('FUSE')
+  fuse,
+  @JsonValue('HBAR')
+  hbar,
+  @JsonValue('USD')
+  usd,
+  @JsonValue('GLOCK')
+  glock,
+  @JsonValue('ESCGHS')
+  escghs,
+  @JsonValue('MSAT')
+  msat,
+}

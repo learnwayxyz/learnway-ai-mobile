@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "682312128368",
+    "project_id": "learnway-dev",
+    "storage_bucket": "learnway-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682312128368:android:25d8bde7d39519202c21b5",
+        "android_client_info": {
+          "package_name": "xyz.learnway.app.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "682312128368-coe35s9a3drv3vp6f1um9ivo6klj119m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xyz.learnway.app.dev",
+            "certificate_hash": "82beeab66f4da84bd811834bd0464cbe16ab41e6"
+          }
+        },
+        {
+          "client_id": "682312128368-j7ignf24j83duuec7krngni9bpas247q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeuBHeYssHXr0oYMBDwCTP_fszzu6ubbI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "682312128368-j7ignf24j83duuec7krngni9bpas247q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "682312128368-451qilsre0mp5d8avdu9usoh0o9aovhr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "xyz.learnway.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

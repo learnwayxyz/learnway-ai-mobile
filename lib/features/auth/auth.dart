@@ -1,0 +1,1 @@
+export 'package:learnwayv2/features/auth/view/register_screen.dart';
