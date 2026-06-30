@@ -48,10 +48,7 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
     );
   }
 
-  List<LearningPathModel> _filterPaths(
-    List<LearningPathModel> paths,
-    int tab,
-  ) {
+  List<LearningPathModel> _filterPaths(List<LearningPathModel> paths, int tab) {
     switch (tab) {
       case 1:
         return paths.where((p) => p.access.userHasAccess).toList();
@@ -75,10 +72,7 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
             state.accessCheckedPath != null) {
           final path = state.accessCheckedPath!;
           context.router.push(
-            PathCoursesRoute(
-              learningPathId: path.id,
-              pathTitle: path.title,
-            ),
+            PathCoursesRoute(learningPathId: path.id, pathTitle: path.title),
           );
         } else if (state.accessResult == PathAccessResult.denied) {
           _showPaywall(context);
@@ -142,14 +136,16 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: selected ? AppColors.gray950 : AppColors.gray100,
+                color: selected ? AppColors.gray950 : AppColors.gray200,
                 borderRadius: BorderRadius.circular(50),
               ),
-              child: Text(
-                _tabs[i],
-                style: AppTextStyles.smMedium(
-                  context,
-                ).copyWith(color: selected ? Colors.white : AppColors.gray600),
+              child: Center(
+                child: Text(
+                  _tabs[i],
+                  style: AppTextStyles.smMedium(context).copyWith(
+                    color: selected ? Colors.white : AppColors.gray600,
+                  ),
+                ),
               ),
             ),
           );
