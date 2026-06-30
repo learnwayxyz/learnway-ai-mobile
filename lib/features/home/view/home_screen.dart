@@ -344,8 +344,8 @@ class _HomeScreenState extends State<HomeScreen>
           CardFactory.lessonCard(
             margin: EdgeInsets.symmetric(horizontal: 16),
             cardType: CardType.lesson,
-            title: AppLocalizations.of(context)!.learnAndEarn,
-            subtitle: AppLocalizations.of(context)!.learnThroughShortLessons,
+            title: AppLocalizations.of(context)!.learningPaths,
+            subtitle: AppLocalizations.of(context)!.discoverLearningPaths,
             buttonText: AppLocalizations.of(context)!.startLesson,
             onButtonPressed: () {
               context.router.push(const LearnAndEarnRoute());

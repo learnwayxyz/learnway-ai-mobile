@@ -29,14 +29,12 @@ class _PlayScreenState extends State<PlayScreen> {
               ),
               const VSpace(20),
               CardFactory.lessonCard(
-                title: AppLocalizations.of(context)!.learnAndEarn,
-                subtitle: AppLocalizations.of(
-                  context,
-                )!.learnThroughShortLessons,
+                title: AppLocalizations.of(context)!.learningPaths,
+                subtitle: AppLocalizations.of(context)!.discoverLearningPaths,
                 buttonText: AppLocalizations.of(context)!.startLearning,
                 margin: EdgeInsets.symmetric(vertical: 5, horizontal: 16),
                 onButtonPressed: () {
-                  context.router.push(const LearnAndEarnRoute());
+                  context.router.push(const ExplorePathsRoute());
                 },
               ),
               CardFactory.lessonCard(

@@ -30,7 +30,7 @@ class _SectionHeader extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Text(
-          'AI Quick Actions',
+          'Quick Actions',
           style: AppTextStyles.baseSemiBold(
             context,
           ).copyWith(color: AppColors.gray950),

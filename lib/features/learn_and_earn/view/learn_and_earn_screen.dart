@@ -41,7 +41,7 @@ class _LearnAndEarnScreenState extends State<LearnAndEarnScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarFactory.standardAppBar(
-        title: AppLocalizations.of(context)!.learnAndEarn,
+        title: AppLocalizations.of(context)!.learningPaths,
         barHeight: 10,
       ),
       body: SafeArea(
