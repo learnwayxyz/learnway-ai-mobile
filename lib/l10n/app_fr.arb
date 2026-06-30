@@ -613,6 +613,8 @@
   "@learnThroughShortLessons": { "description": "Subtitle for Learn & Earn card" },
   "startLearning": "Commencer à apprendre",
   "@startLearning": { "description": "Button text to start learning" },
+  "startExploring": "Commencer à explorer",
+  "@startExploring": { "description": "Button text on Learning Paths card to start exploring paths" },
   "contestSubtitle": "Participez à des concours thématiques, montrez vos connaissances et gagnez des récompenses.",
   "@contestSubtitle": { "description": "Subtitle for Contest card" },
   "startContest": "Démarrer le concours",

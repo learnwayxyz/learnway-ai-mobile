@@ -607,6 +607,8 @@
   "@discoverLearningPaths": { "description": "Subtitle for learning path card" },
   "startLearning": "Start Learning",
   "@startLearning": { "description": "Button text to start learning" },
+  "startExploring": "Start Exploring",
+  "@startExploring": { "description": "Button text on Learning Paths card to start exploring paths" },
   "contestSubtitle": "Join themed contests, showcase knowledge, and earn rewards.",
   "@contestSubtitle": { "description": "Subtitle for Contest card" },
   "startContest": "Start Contest",

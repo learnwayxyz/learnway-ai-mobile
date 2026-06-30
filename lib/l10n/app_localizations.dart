@@ -1247,6 +1247,12 @@ abstract class AppLocalizations {
   /// **'Start Learning'**
   String get startLearning;
 
+  /// Button text on Learning Paths card to start exploring paths
+  ///
+  /// In en, this message translates to:
+  /// **'Start Exploring'**
+  String get startExploring;
+
   /// Subtitle for Contest card
   ///
   /// In en, this message translates to:

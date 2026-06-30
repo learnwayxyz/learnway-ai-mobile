@@ -31,7 +31,7 @@ class _PlayScreenState extends State<PlayScreen> {
               CardFactory.lessonCard(
                 title: AppLocalizations.of(context)!.learningPaths,
                 subtitle: AppLocalizations.of(context)!.discoverLearningPaths,
-                buttonText: AppLocalizations.of(context)!.startLearning,
+                buttonText: AppLocalizations.of(context)!.startExploring,
                 margin: EdgeInsets.symmetric(vertical: 5, horizontal: 16),
                 onButtonPressed: () {
                   context.router.push(const ExplorePathsRoute());
