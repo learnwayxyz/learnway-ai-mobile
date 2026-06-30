@@ -16,12 +16,7 @@ class ExplorePathsScreen extends StatefulWidget {
 class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
   int _selectedTabIndex = 0;
 
-  static const _tabs = [
-    'All Path',
-    'Recommended',
-    'Most Popular',
-    'Foundation',
-  ];
+  static const _tabs = ['All Path', 'Foundation', 'Specialization'];
 
   @override
   void initState() {
@@ -30,7 +25,13 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
   }
 
   void _onPathTap(LearningPathModel path) {
-    locator<LearningPathCubit>().checkPathAccess(path.id);
+    if (path.access.userHasAccess) {
+      context.router.push(
+        PathCoursesRoute(learningPathId: path.id, pathTitle: path.title),
+      );
+    } else {
+      _showPaywall(context);
+    }
   }
 
   void _showPaywall(BuildContext context) {
@@ -51,12 +52,9 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
   List<LearningPathModel> _filterPaths(List<LearningPathModel> paths, int tab) {
     switch (tab) {
       case 1:
-        return paths.where((p) => p.access.userHasAccess).toList();
-      case 2:
-        return [...paths]
-          ..sort((a, b) => b.totalCourses.compareTo(a.totalCourses));
-      case 3:
         return paths.where((p) => p.isFoundation).toList();
+      case 2:
+        return paths.where((p) => p.type == 'specialization').toList();
       default:
         return paths;
     }
@@ -64,60 +62,53 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LearningPathCubit, LearningPathState>(
-      bloc: locator<LearningPathCubit>(),
-      listenWhen: (prev, curr) => prev.accessResult != curr.accessResult,
-      listener: (context, state) {
-        if (state.accessResult == PathAccessResult.granted &&
-            state.accessCheckedPath != null) {
-          final path = state.accessCheckedPath!;
-          context.router.push(
-            PathCoursesRoute(learningPathId: path.id, pathTitle: path.title),
-          );
-        } else if (state.accessResult == PathAccessResult.denied) {
-          _showPaywall(context);
-        }
-      },
-      child: Scaffold(
-        backgroundColor: AppColors.gray50,
-        body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              _buildTabBar(),
-              Expanded(child: _buildPathList()),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: AppColors.gray50,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            _buildTabBar(),
+            Expanded(child: _buildPathList()),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CustomBackButton(onPress: () => context.router.maybePop()),
-          const SizedBox(height: 16),
-          Text(
-            'Explore Paths',
-            style: AppTextStyles.xlBold(
-              context,
-            ).copyWith(color: AppColors.gray950),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: CustomBackButton(onPress: () => context.router.maybePop()),
+        ),
+        // const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Explore Paths',
+                style: AppTextStyles.xlBold(
+                  context,
+                ).copyWith(color: AppColors.gray950),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Discover Paths to build in-demand skills and grow your career',
+                style: AppTextStyles.smRegular(
+                  context,
+                ).copyWith(color: AppColors.gray500),
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            'Discover Paths to build in-demand skills and grow your career',
-            style: AppTextStyles.smRegular(
-              context,
-            ).copyWith(color: AppColors.gray500),
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -191,11 +182,8 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
           itemCount: paths.length,
           separatorBuilder: (context, i) => const SizedBox(height: 16),
-          itemBuilder: (_, i) => _PathCard(
-            path: paths[i],
-            isLoading: state.checkingPathId == paths[i].id,
-            onTap: () => _onPathTap(paths[i]),
-          ),
+          itemBuilder: (_, i) =>
+              _PathCard(path: paths[i], onTap: () => _onPathTap(paths[i])),
         );
       },
     );
@@ -203,15 +191,10 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
 }
 
 class _PathCard extends StatelessWidget {
-  const _PathCard({
-    required this.path,
-    required this.onTap,
-    this.isLoading = false,
-  });
+  const _PathCard({required this.path, required this.onTap});
 
   final LearningPathModel path;
   final VoidCallback onTap;
-  final bool isLoading;
 
   String _fallbackAsset(BuildContext context) {
     if (path.isFoundation) return Assets.images.botToMoonPng.path;
@@ -266,7 +249,7 @@ class _PathCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   GestureDetector(
-                    onTap: isLoading ? null : onTap,
+                    onTap: onTap,
                     child: Container(
                       width: 40,
                       height: 40,
@@ -274,21 +257,13 @@ class _PathCard extends StatelessWidget {
                         color: AppColors.gray950,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: isLoading
-                          ? const Padding(
-                              padding: EdgeInsets.all(10),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Icon(
-                              path.isPremium
-                                  ? Icons.lock_outline_rounded
-                                  : Icons.arrow_outward_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+                      child: Icon(
+                        path.access.userHasAccess
+                            ? Icons.arrow_outward_rounded
+                            : Icons.lock_outline_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],
@@ -387,58 +362,61 @@ class _LearningPathPaywallSheet extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.gray300,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Assets.images.lennyHi.image(width: 80, height: 80),
-          const SizedBox(height: 16),
-          Text(
-            'LearnWay Premium',
-            style: AppTextStyles.xlBold(
-              context,
-            ).copyWith(color: AppColors.gray950),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Upgrade to LearnWay Premium to unlock advanced career-focused learning paths, premium content, exclusive assessments, and certifications.',
-            style: AppTextStyles.smRegular(
-              context,
-            ).copyWith(color: AppColors.gray600, height: 1.5),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 28),
-          SizedBox(
-            width: double.infinity,
-            child: ButtonFactory.blackButton(
-              mainAxisAlignment: MainAxisAlignment.center,
-              onPressed: onSubscribe,
-              text: 'Subscribe Now',
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: onDismiss,
-              child: Text(
-                'Maybe Later',
-                style: AppTextStyles.smMedium(
-                  context,
-                ).copyWith(color: AppColors.gray500),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.gray300,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            Assets.images.lennyHi.image(width: 80, height: 80),
+            const SizedBox(height: 16),
+            Text(
+              'Upgrade to Premium',
+              style: AppTextStyles.xlBold(
+                context,
+              ).copyWith(color: AppColors.gray950),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Upgrade to LearnWay Premium to unlock advanced career-focused learning paths, premium content, exclusive assessments, and certifications.',
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray600, height: 1.5),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: double.infinity,
+              child: ButtonFactory.blackButton(
+                mainAxisAlignment: MainAxisAlignment.center,
+                onPressed: onSubscribe,
+                text: 'Subscribe Now',
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: onDismiss,
+                child: Text(
+                  'Maybe Later',
+                  style: AppTextStyles.smMedium(
+                    context,
+                  ).copyWith(color: AppColors.gray500),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
