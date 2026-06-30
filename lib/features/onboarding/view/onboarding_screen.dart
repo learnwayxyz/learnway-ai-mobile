@@ -1,13 +1,8 @@
 import 'dart:developer';
 
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 import 'package:learnwayv2/features/onboarding/onboarding.dart';
-import 'package:learnwayv2/router/app_router.dart';
-import 'package:core/core.dart';
-import 'package:learnwayv2/shared/utilities/standard_spacer.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
