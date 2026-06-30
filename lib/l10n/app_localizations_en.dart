@@ -135,7 +135,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
-  String get learnAndEarn => 'Learn & Earn';
+  String get learningPaths => 'Learning Paths';
 
   @override
   String get quizBattle => 'Quiz Battle';
@@ -204,13 +204,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get learnWayTokenDescription => 'Convert your Gems into LWT or buy LWT. Send LWT to your wallet or exchange anytime, 24/7.';
 
   @override
-  String get masterWeb3 => 'Master Web3';
+  String get masterWeb3 => 'Master In-Demand ';
 
   @override
-  String get learnAndEarnTagline => 'AI and Finance';
+  String get learnAndEarnTagline => 'Digital Skills';
 
   @override
-  String get onboardingDescription => 'Learn future-ready digital skills through gamified lessons, quizzes, and rewards.';
+  String get onboardingDescription => 'Learn through gamified lessons with personalized AI guidance and support.';
 
   @override
   String get opening => 'Opening';
@@ -396,7 +396,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedSendVerificationCode => 'Failed to send verification code. Please try again.';
 
   @override
-  String get getAccount => 'Get Account';
+  String get getAccount => 'Get Started';
 
   @override
   String get welcomeToLearnWay => 'Welcome to LearnWay';
@@ -555,31 +555,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get walletGenerationNote => 'This process may take 30-60 seconds as we create your secure wallet with military-grade encryption.';
 
   @override
-  String get onboarding1Title => 'Learn Through Play';
+  String get onboarding1Title => 'Learn Smarter Daily';
 
   @override
-  String get onboarding1Description => 'Turn complex topics into fun, bite-sized challenges that keep you engaged and motivated every day.';
+  String get onboarding1Description => 'Learn with AI personalized lessons tailored to your pace and goals.';
 
   @override
-  String get onboarding2Title => 'Unlock Opportunities';
+  String get onboarding2Title => 'Track Your Progress';
 
   @override
-  String get onboarding2Description => 'Gain knowledge that opens doors to jobs, income, and financial freedom across Africa and beyond.';
+  String get onboarding2Description => 'AI tracks your growth and celebrates every learning milestone.';
 
   @override
-  String get onboarding3Title => 'Your Global Wallet';
+  String get onboarding3Title => 'Learn Your Way';
 
   @override
-  String get onboarding3Description => 'Use your inbuilt wallet to receive funds, protect your savings from inflation, and enjoy borderless payments worldwide.';
+  String get onboarding3Description => 'Get AI recommended lessons based on your interests and goals.';
 
   @override
-  String get onboarding4Title => 'Join the Movement';
+  String get onboarding4Title => 'Meet Lenny';
 
   @override
-  String get onboarding4Description => 'Join Africa\'s first gamified learning platform, where mastering Web3, AI, and finance creates future opportunities.';
+  String get onboarding4Description => 'Your AI mentor guides every step of your learning journey.';
 
   @override
-  String get learnThroughShortLessons => 'Learn through short lessons, take quizzes, and earn rewards.';
+  String get discoverLearningPaths => 'Discover paths to build in-demad skills';
 
   @override
   String get startLearning => 'Start Learning';

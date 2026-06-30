@@ -172,6 +172,10 @@
   "@learnAndEarn": {
     "description": "Texte de navigation apprendre et gagner"
   },
+  "learningPaths": "Parcours d'apprentissage",
+  "@learningPaths": {
+    "description": "Découvrez des parcours pour développer des compétences recherchées"
+  },
   "play": "Jouer",
   "@play": {
     "description": "Texte de navigation jouer"
@@ -256,15 +260,15 @@
   "@learnWayTokenDescription": {
     "description": "Description du token LearnWay"
   },
- "masterWeb3": "Maîtrisez le Web3",
+ "masterWeb3": "Maîtrisez les compétences ",
 "@masterWeb3": {
   "description": "Slogan d’introduction, partie 1"
 },
-"learnAndEarnTagline": "IA et Finance",
+"learnAndEarnTagline": "numériques recherchées",
 "@learnAndEarnTagline": {
   "description": "Slogan d’introduction, partie 2"
 },
-"onboardingDescription": "Apprenez des compétences numériques d’avenir grâce à des leçons, quiz et récompenses ludiques.",
+"onboardingDescription": "Apprenez grâce à des leçons ludiques avec des conseils et un accompagnement IA personnalisés.",
 "@onboardingDescription": {
   "description": "Description de l’onboarding"
 },
@@ -589,21 +593,21 @@
 "@preparingAccountSetup": { "description": "Texte de statut initial de l’écran de chargement" },
 "walletGenerationNote": "Ce processus peut prendre 30 à 60 secondes pendant que nous créons votre portefeuille sécurisé avec un chiffrement de niveau militaire.",
 "@walletGenerationNote": { "description": "Note affichée lors de l’étape de génération du portefeuille" },
-  "onboarding1Title": "Apprendre en jouant",
+  "onboarding1Title": "Apprenez plus intelligemment",
   "@onboarding1Title": { "description": "Titre de la diapositive 1" },
-  "onboarding1Description": "Transformez des sujets complexes en défis amusants et courts qui vous gardent engagé et motivé chaque jour.",
+  "onboarding1Description": "Apprenez avec des leçons personnalisées par l'IA, adaptées à votre rythme et vos objectifs.",
   "@onboarding1Description": { "description": "Corps de la diapositive 1" },
-  "onboarding2Title": "Ouvrez des portes",
+  "onboarding2Title": "Suivez vos progrès",
   "@onboarding2Title": { "description": "Titre de la diapositive 2" },
-  "onboarding2Description": "Acquérez des connaissances qui ouvrent des portes vers des emplois, des revenus et la liberté financière en Afrique et au-delà.",
+  "onboarding2Description": "L'IA suit votre évolution et célèbre chaque étape de votre apprentissage.",
   "@onboarding2Description": { "description": "Corps de la diapositive 2" },
-  "onboarding3Title": "Votre portefeuille mondial",
+  "onboarding3Title": "Apprenez à votre façon",
   "@onboarding3Title": { "description": "Titre de la diapositive 3" },
-  "onboarding3Description": "Utilisez votre portefeuille intégré pour recevoir des fonds, protéger vos économies contre l'inflation et profiter de paiements sans frontières dans le monde entier.",
+  "onboarding3Description": "Recevez des leçons recommandées par l'IA selon vos intérêts et vos objectifs.",
   "@onboarding3Description": { "description": "Corps de la diapositive 3" },
-  "onboarding4Title": "Rejoignez le mouvement",
+  "onboarding4Title": "Rencontrez Lenny",
   "@onboarding4Title": { "description": "Titre de la diapositive 4" },
-  "onboarding4Description": "Rejoignez la première plateforme d'apprentissage ludique d'Afrique, où maîtriser le Web3, l'IA et la finance crée des opportunités d'avenir.",
+  "onboarding4Description": "Votre mentor IA vous guide à chaque étape de votre parcours d'apprentissage.",
   "@onboarding4Description": { "description": "Corps de la diapositive 4" },
   "learnThroughShortLessons": "Apprenez grâce à de courtes leçons, participez à des quiz et gagnez des récompenses.",
   "@learnThroughShortLessons": { "description": "Subtitle for Learn & Earn card" },

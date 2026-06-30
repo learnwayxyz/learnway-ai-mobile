@@ -347,11 +347,11 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
-  /// Learn and earn navigation text
+  /// Discover paths to build in-demand skills
   ///
   /// In en, this message translates to:
-  /// **'Learn & Earn'**
-  String get learnAndEarn;
+  /// **'Learning Paths'**
+  String get learningPaths;
 
   /// Quiz Battle navigation text
   ///
@@ -488,19 +488,19 @@ abstract class AppLocalizations {
   /// Onboarding tagline part 1
   ///
   /// In en, this message translates to:
-  /// **'Master Web3'**
+  /// **'Master In-Demand '**
   String get masterWeb3;
 
   /// Onboarding tagline part 2
   ///
   /// In en, this message translates to:
-  /// **'AI and Finance'**
+  /// **'Digital Skills'**
   String get learnAndEarnTagline;
 
   /// Onboarding description
   ///
   /// In en, this message translates to:
-  /// **'Learn future-ready digital skills through gamified lessons, quizzes, and rewards.'**
+  /// **'Learn through gamified lessons with personalized AI guidance and support.'**
   String get onboardingDescription;
 
   /// Opening text for bookmarks
@@ -872,7 +872,7 @@ abstract class AppLocalizations {
   /// Get account button text on onboarding
   ///
   /// In en, this message translates to:
-  /// **'Get Account'**
+  /// **'Get Started'**
   String get getAccount;
 
   /// Welcome screen title
@@ -1190,56 +1190,56 @@ abstract class AppLocalizations {
   /// Onboarding slide 1 title
   ///
   /// In en, this message translates to:
-  /// **'Learn Through Play'**
+  /// **'Learn Smarter Daily'**
   String get onboarding1Title;
 
   /// Onboarding slide 1 body
   ///
   /// In en, this message translates to:
-  /// **'Turn complex topics into fun, bite-sized challenges that keep you engaged and motivated every day.'**
+  /// **'Learn with AI personalized lessons tailored to your pace and goals.'**
   String get onboarding1Description;
 
   /// Onboarding slide 2 title
   ///
   /// In en, this message translates to:
-  /// **'Unlock Opportunities'**
+  /// **'Track Your Progress'**
   String get onboarding2Title;
 
   /// Onboarding slide 2 body
   ///
   /// In en, this message translates to:
-  /// **'Gain knowledge that opens doors to jobs, income, and financial freedom across Africa and beyond.'**
+  /// **'AI tracks your growth and celebrates every learning milestone.'**
   String get onboarding2Description;
 
   /// Onboarding slide 3 title
   ///
   /// In en, this message translates to:
-  /// **'Your Global Wallet'**
+  /// **'Learn Your Way'**
   String get onboarding3Title;
 
   /// Onboarding slide 3 body
   ///
   /// In en, this message translates to:
-  /// **'Use your inbuilt wallet to receive funds, protect your savings from inflation, and enjoy borderless payments worldwide.'**
+  /// **'Get AI recommended lessons based on your interests and goals.'**
   String get onboarding3Description;
 
   /// Onboarding slide 4 title
   ///
   /// In en, this message translates to:
-  /// **'Join the Movement'**
+  /// **'Meet Lenny'**
   String get onboarding4Title;
 
   /// Onboarding slide 4 body
   ///
   /// In en, this message translates to:
-  /// **'Join Africa\'s first gamified learning platform, where mastering Web3, AI, and finance creates future opportunities.'**
+  /// **'Your AI mentor guides every step of your learning journey.'**
   String get onboarding4Description;
 
-  /// Subtitle for Learn & Earn card
+  /// Subtitle for learning path card
   ///
   /// In en, this message translates to:
-  /// **'Learn through short lessons, take quizzes, and earn rewards.'**
-  String get learnThroughShortLessons;
+  /// **'Discover paths to build in-demad skills'**
+  String get discoverLearningPaths;
 
   /// Button text to start learning
   ///
@@ -1271,16 +1271,16 @@ abstract class AppLocalizations {
   /// **'Coming Soon'**
   String get comingSoon;
 
-  /// Title for Certified Courses card
+  /// Title for Micro-Skills Track card
   ///
   /// In en, this message translates to:
-  /// **'Certified Courses'**
+  /// **'Micro-Skills Track'**
   String get certifiedCourses;
 
-  /// Subtitle for Certified Courses card
+  /// Subtitle for Micro-Skills Track card
   ///
   /// In en, this message translates to:
-  /// **'Enroll in structured courses, master topics, and earn verified certificates.'**
+  /// **'Practical lessons focused on high-demand, income-generating skills.'**
   String get certifiedCoursesSubtitle;
 
   /// Section title in Learn & Earn screen
