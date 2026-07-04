@@ -144,6 +144,36 @@ class AppLocalizationsFr extends AppLocalizations {
   String get play => 'Jouer';
 
   @override
+  String get discover => 'Découvrir';
+
+  @override
+  String get myLearning => 'Mon apprentissage';
+
+  @override
+  String get myLearningSubtitle => 'Restez constant dans votre apprentissage';
+
+  @override
+  String get yourCareerGoal => 'Votre objectif de carrière';
+
+  @override
+  String get changeGoal => 'Changer d\'objectif';
+
+  @override
+  String get myLearningPathsTitle => 'Mes parcours d\'apprentissage';
+
+  @override
+  String get seeAll => 'Tout voir';
+
+  @override
+  String get overallProgress => 'Progression globale';
+
+  @override
+  String get completedCoursesLabel => 'Cours terminés';
+
+  @override
+  String get coursesCompletedSuffix => 'cours terminés';
+
+  @override
   String get wallet => 'Portefeuille';
 
   @override

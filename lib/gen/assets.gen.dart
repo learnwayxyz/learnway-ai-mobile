@@ -973,6 +973,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/xps.png
   AssetGenImage get xps => const AssetGenImage('assets/images/xps.png');
 
+  /// File path: assets/images/young_woman.png
+  AssetGenImage get youngWoman =>
+      const AssetGenImage('assets/images/young_woman.png');
+
   /// List of all assets
   List<dynamic> get values => [
     a1c60d3e2e212c1a14417da35b4b05b31bf4309bd,
@@ -1106,6 +1110,7 @@ class $AssetsImagesGen {
     xp,
     xpImage,
     xps,
+    youngWoman,
   ];
 }
 

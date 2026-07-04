@@ -180,6 +180,46 @@
   "@play": {
     "description": "Texte de navigation jouer"
   },
+  "discover": "Découvrir",
+  "@discover": {
+    "description": "Libellé de l'onglet Découvrir"
+  },
+  "myLearning": "Mon apprentissage",
+  "@myLearning": {
+    "description": "Libellé de l'onglet Mon apprentissage"
+  },
+  "myLearningSubtitle": "Restez constant dans votre apprentissage",
+  "@myLearningSubtitle": {
+    "description": "Sous-titre affiché sous le titre de l'onglet Mon apprentissage"
+  },
+  "yourCareerGoal": "Votre objectif de carrière",
+  "@yourCareerGoal": {
+    "description": "Libellé sur la carte d'objectif de carrière"
+  },
+  "changeGoal": "Changer d'objectif",
+  "@changeGoal": {
+    "description": "Texte du bouton pour changer l'objectif de carrière"
+  },
+  "myLearningPathsTitle": "Mes parcours d'apprentissage",
+  "@myLearningPathsTitle": {
+    "description": "Titre de la section des parcours d'apprentissage en cours"
+  },
+  "seeAll": "Tout voir",
+  "@seeAll": {
+    "description": "Texte de lien pour voir la liste complète"
+  },
+  "overallProgress": "Progression globale",
+  "@overallProgress": {
+    "description": "Libellé pour la statistique de pourcentage de progression globale"
+  },
+  "completedCoursesLabel": "Cours terminés",
+  "@completedCoursesLabel": {
+    "description": "Libellé pour la statistique du nombre de cours terminés"
+  },
+  "coursesCompletedSuffix": "cours terminés",
+  "@coursesCompletedSuffix": {
+    "description": "Texte après 'X sur Y' décrivant les cours terminés"
+  },
   "wallet": "Portefeuille",
   "@wallet": {
     "description": "Texte de navigation portefeuille"

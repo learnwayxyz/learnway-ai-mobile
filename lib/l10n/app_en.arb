@@ -180,6 +180,46 @@
   "@play": {
     "description": "Play navigation text"
   },
+  "discover": "Discover",
+  "@discover": {
+    "description": "Discover tab label"
+  },
+  "myLearning": "My Learning",
+  "@myLearning": {
+    "description": "My Learning tab label"
+  },
+  "myLearningSubtitle": "Keep up your consistency",
+  "@myLearningSubtitle": {
+    "description": "Subtitle shown under the My Learning tab title"
+  },
+  "yourCareerGoal": "Your Career Goal",
+  "@yourCareerGoal": {
+    "description": "Label on the career goal card"
+  },
+  "changeGoal": "Change Goal",
+  "@changeGoal": {
+    "description": "Button text to change the career goal"
+  },
+  "myLearningPathsTitle": "My Learning Paths",
+  "@myLearningPathsTitle": {
+    "description": "Section title for the user's in-progress learning paths"
+  },
+  "seeAll": "See All",
+  "@seeAll": {
+    "description": "Link text to see the full list"
+  },
+  "overallProgress": "Overall Progress",
+  "@overallProgress": {
+    "description": "Label for the overall progress percentage stat"
+  },
+  "completedCoursesLabel": "Completed Courses",
+  "@completedCoursesLabel": {
+    "description": "Label for the completed courses count stat"
+  },
+  "coursesCompletedSuffix": "courses completed",
+  "@coursesCompletedSuffix": {
+    "description": "Suffix text after 'X of Y' describing completed courses"
+  },
   "wallet": "Wallet",
   "@wallet": {
     "description": "Wallet navigation text"

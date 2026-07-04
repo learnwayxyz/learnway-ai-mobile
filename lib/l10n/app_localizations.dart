@@ -365,6 +365,66 @@ abstract class AppLocalizations {
   /// **'Play'**
   String get play;
 
+  /// Discover tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get discover;
+
+  /// My Learning tab label
+  ///
+  /// In en, this message translates to:
+  /// **'My Learning'**
+  String get myLearning;
+
+  /// Subtitle shown under the My Learning tab title
+  ///
+  /// In en, this message translates to:
+  /// **'Keep up your consistency'**
+  String get myLearningSubtitle;
+
+  /// Label on the career goal card
+  ///
+  /// In en, this message translates to:
+  /// **'Your Career Goal'**
+  String get yourCareerGoal;
+
+  /// Button text to change the career goal
+  ///
+  /// In en, this message translates to:
+  /// **'Change Goal'**
+  String get changeGoal;
+
+  /// Section title for the user's in-progress learning paths
+  ///
+  /// In en, this message translates to:
+  /// **'My Learning Paths'**
+  String get myLearningPathsTitle;
+
+  /// Link text to see the full list
+  ///
+  /// In en, this message translates to:
+  /// **'See All'**
+  String get seeAll;
+
+  /// Label for the overall progress percentage stat
+  ///
+  /// In en, this message translates to:
+  /// **'Overall Progress'**
+  String get overallProgress;
+
+  /// Label for the completed courses count stat
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Courses'**
+  String get completedCoursesLabel;
+
+  /// Suffix text after 'X of Y' describing completed courses
+  ///
+  /// In en, this message translates to:
+  /// **'courses completed'**
+  String get coursesCompletedSuffix;
+
   /// Wallet navigation text
   ///
   /// In en, this message translates to:
