@@ -150,6 +150,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myLearning => 'My Learning';
 
   @override
+  String get learnTitle => 'Learn';
+
+  @override
+  String get setGoalEmptyTitle => 'Set your career goal';
+
+  @override
+  String get setGoalEmptySubtitle => 'Tell us where you\'re headed and we\'ll build a personalized learning path to get you there.';
+
+  @override
+  String get setGoalCta => 'Set My Goal';
+
+  @override
+  String get exploreFirstCta => 'Explore paths first';
+
+  @override
+  String coursesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count courses',
+      one: '1 course',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roadmapLoadError => 'We couldn\'t load your learning paths.';
+
+  @override
   String get myLearningSubtitle => 'Keep up your consistency';
 
   @override

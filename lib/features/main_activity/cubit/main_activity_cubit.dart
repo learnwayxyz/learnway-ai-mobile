@@ -6,6 +6,7 @@ import 'package:learnwayv2/features/leader_board/view/leader_board_screen.dart';
 import 'package:learnwayv2/features/play/view/play_screen.dart';
 import 'package:learnwayv2/features/account/view/account_screen.dart';
 import 'package:learnwayv2/features/wallet/view/wallet_screen.dart';
+import 'package:learnwayv2/gen/assets.gen.dart';
 
 part 'main_activity_state.dart';
 

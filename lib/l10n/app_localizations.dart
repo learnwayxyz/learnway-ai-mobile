@@ -377,6 +377,48 @@ abstract class AppLocalizations {
   /// **'My Learning'**
   String get myLearning;
 
+  /// Header title on the Play/Learn screen
+  ///
+  /// In en, this message translates to:
+  /// **'Learn'**
+  String get learnTitle;
+
+  /// Title of the empty state on My Learning tab when no career goal is set
+  ///
+  /// In en, this message translates to:
+  /// **'Set your career goal'**
+  String get setGoalEmptyTitle;
+
+  /// Subtitle of the empty state on My Learning tab when no career goal is set
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us where you\'re headed and we\'ll build a personalized learning path to get you there.'**
+  String get setGoalEmptySubtitle;
+
+  /// Primary CTA on the My Learning empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Set My Goal'**
+  String get setGoalCta;
+
+  /// Secondary action on the My Learning empty state, switches to Discover tab
+  ///
+  /// In en, this message translates to:
+  /// **'Explore paths first'**
+  String get exploreFirstCta;
+
+  /// Number of courses in a learning path
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 course} other{{count} courses}}'**
+  String coursesCount(int count);
+
+  /// Error message when the roadmap fails to load on My Learning tab
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your learning paths.'**
+  String get roadmapLoadError;
+
   /// Subtitle shown under the My Learning tab title
   ///
   /// In en, this message translates to:

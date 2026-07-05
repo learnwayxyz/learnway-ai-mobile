@@ -1,6 +1,9 @@
+import 'package:ai_mentor/ai_mentor.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/home/enums/card_type.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
+import 'package:learnwayv2/features/play/cubit/roadmap_cubit.dart';
+import 'package:learnwayv2/features/play/models/roadmap_model.dart';
 import 'package:learnwayv2/shared/widgets/card_component/lesson_cards_factory.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 
@@ -11,27 +14,6 @@ class PlayScreen extends StatefulWidget {
   State<PlayScreen> createState() => _PlayScreenState();
 }
 
-class _MyLearningPathData {
-  const _MyLearningPathData({
-    required this.title,
-    required this.icon,
-    required this.iconBackground,
-    required this.isPremium,
-    required this.completedCourses,
-    required this.totalCourses,
-  });
-
-  final String title;
-  final IconData icon;
-  final Color iconBackground;
-  final bool isPremium;
-  final int completedCourses;
-  final int totalCourses;
-
-  double get progress =>
-      totalCourses == 0 ? 0 : completedCourses / totalCourses;
-}
-
 class _PlayScreenState extends State<PlayScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController = TabController(
@@ -39,40 +21,12 @@ class _PlayScreenState extends State<PlayScreen>
     vsync: this,
   )..addListener(() => setState(() {}));
 
-  static final _myLearningPaths = [
-    _MyLearningPathData(
-      title: 'Digital Literacy',
-      icon: Icons.phone_android_rounded,
-      iconBackground: const Color(0xFFE8EAF6),
-      isPremium: false,
-      completedCourses: 5,
-      totalCourses: 25,
-    ),
-    _MyLearningPathData(
-      title: 'Financial Literacy',
-      icon: Icons.savings_rounded,
-      iconBackground: const Color(0xFFFFF9E6),
-      isPremium: true,
-      completedCourses: 5,
-      totalCourses: 25,
-    ),
-    _MyLearningPathData(
-      title: 'AI Literacy',
-      icon: Icons.memory_rounded,
-      iconBackground: const Color(0xFFE8EAF6),
-      isPremium: false,
-      completedCourses: 5,
-      totalCourses: 25,
-    ),
-    _MyLearningPathData(
-      title: 'Software Development',
-      icon: Icons.laptop_mac_rounded,
-      iconBackground: const Color(0xFFE8EAF6),
-      isPremium: false,
-      completedCourses: 5,
-      totalCourses: 25,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    locator<DashboardCubit>().fetchDashboard();
+    locator<RoadmapCubit>().fetchMyRoadmap();
+  }
 
   @override
   void dispose() {
@@ -93,7 +47,7 @@ class _PlayScreenState extends State<PlayScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.myLearning,
+                    AppLocalizations.of(context)!.learnTitle,
                     style: AppTextStyles.xlBold(context),
                   ),
                   const VSpace(4),
@@ -210,20 +164,73 @@ class _PlayScreenState extends State<PlayScreen>
   }
 
   Widget _buildMyLearningTab(BuildContext context) {
+    return BlocBuilder<DashboardCubit, DashboardState>(
+      bloc: locator<DashboardCubit>(),
+      builder: (context, state) {
+        final dashboard = state.dashboard;
+        final isLoading = dashboard == null &&
+            (state.status == DashboardStatus.initial ||
+                state.status == DashboardStatus.loading);
+
+        if (isLoading) {
+          return const Center(
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(strokeWidth: 2.5),
+            ),
+          );
+        }
+
+        final hasGoal =
+            dashboard != null && dashboard.profile.careerGoal.isNotEmpty;
+        if (!hasGoal) {
+          return _SetGoalEmptyState(
+            onSetGoal: () =>
+                context.router.push(DiscoveryFlowRoute(allowBack: true)),
+            onExplore: () => _tabController.animateTo(0),
+          );
+        }
+
+        return _buildMyLearningContent(context, state);
+      },
+    );
+  }
+
+  Widget _buildMyLearningContent(BuildContext context, DashboardState state) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _CareerGoalCard(
-            goalTitle: 'Become a Software Engineer',
-            goalSubtitle:
-                "Keep learning and stay consistent, you're building your future",
-            overallProgressPercent: 25,
-            completedCourses: 12,
-            totalCourses: 48,
-            onChangeGoal: () {
-              context.router.push(const CareerGoalRoute());
+          Builder(
+            builder: (context) {
+              final dashboard = state.dashboard;
+              final insights = dashboard?.recentInsights ?? const [];
+              final goalInsight = insights.isEmpty
+                  ? null
+                  : insights.firstWhere(
+                      (i) => i.title == 'Build Consistency',
+                      orElse: () => insights.firstWhere(
+                        (i) => i.type == 'recommendation',
+                        orElse: () => insights.first,
+                      ),
+                    );
+              return _CareerGoalCard(
+                goalTitle: dashboard == null || dashboard.profile.careerGoal.isEmpty
+                    ? '...'
+                    : dashboard.profile.careerGoal,
+                goalSubtitle: goalInsight?.description ??
+                    "Keep learning and stay consistent, you're building your future",
+                overallProgressPercent:
+                    dashboard?.profile.employabilityScore ?? 0,
+                completedCourses:
+                    dashboard?.learnerStats.completedCourses ?? 0,
+                totalCourses: dashboard?.learnerStats.totalCourses ?? 0,
+                onChangeGoal: () {
+                  context.router.push(DiscoveryFlowRoute(allowBack: true));
+                },
+              );
             },
           ),
           const VSpace(28),
@@ -234,26 +241,222 @@ class _PlayScreenState extends State<PlayScreen>
                 AppLocalizations.of(context)!.myLearningPathsTitle,
                 style: AppTextStyles.smSemiBold(context),
               ),
-              Text(
-                AppLocalizations.of(context)!.seeAll,
-                style: AppTextStyles.smMedium(
-                  context,
-                ).copyWith(color: AppColors.primary700),
+              GestureDetector(
+                onTap: () => context.router.push(const ExplorePathsRoute()),
+                child: Text(
+                  AppLocalizations.of(context)!.seeAll,
+                  style: AppTextStyles.smMedium(
+                    context,
+                  ).copyWith(color: AppColors.primary700),
+                ),
               ),
             ],
           ),
           const VSpace(16),
-          ...List.generate(_myLearningPaths.length, (index) {
-            final path = _myLearningPaths[index];
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: index == _myLearningPaths.length - 1 ? 0 : 12,
-              ),
-              child: _MyLearningPathCard(path: path, onTap: () {}),
-            );
-          }),
+          BlocBuilder<RoadmapCubit, RoadmapState>(
+            bloc: locator<RoadmapCubit>(),
+            builder: (context, state) {
+              final paths = state.roadmap?.paths ?? const [];
+
+              if (paths.isEmpty &&
+                  (state.status == RoadmapStatus.initial ||
+                      state.status == RoadmapStatus.loading)) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    ),
+                  ),
+                );
+              }
+
+              if (paths.isEmpty) {
+                return _RoadmapErrorCard(
+                  onRetry: () => locator<RoadmapCubit>().fetchMyRoadmap(),
+                );
+              }
+
+              return Column(
+                children: List.generate(paths.length, (index) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: index == paths.length - 1 ? 0 : 12,
+                    ),
+                    child: _MyLearningPathCard(
+                      path: paths[index],
+                      onTap: () => context.router.push(
+                        PathCoursesRoute(
+                          learningPathId: paths[index].id,
+                          pathTitle: paths[index].title,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              );
+            },
+          ),
           const VSpace(16),
         ],
+      ),
+    );
+  }
+}
+
+class _PathCover extends StatelessWidget {
+  const _PathCover({required this.coverImageUrl});
+
+  final String? coverImageUrl;
+
+  static const _size = 52.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Container(
+      width: _size,
+      height: _size,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8EAF6),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(Icons.route_rounded, color: AppColors.gray950, size: 24),
+    );
+
+    final url = coverImageUrl;
+    if (url == null || url.isEmpty) return fallback;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.network(
+        url,
+        width: _size,
+        height: _size,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => fallback,
+      ),
+    );
+  }
+}
+
+class _RoadmapErrorCard extends StatelessWidget {
+  const _RoadmapErrorCard({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.roadmapLoadError,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray500),
+          ),
+          const VSpace(12),
+          TextButton(
+            onPressed: onRetry,
+            child: Text(
+              AppLocalizations.of(context)!.retry,
+              style: AppTextStyles.smBold(
+                context,
+              ).copyWith(color: AppColors.primary700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SetGoalEmptyState extends StatelessWidget {
+  const _SetGoalEmptyState({required this.onSetGoal, required this.onExplore});
+
+  final VoidCallback onSetGoal;
+  final VoidCallback onExplore;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height * 0.45,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: const BoxDecoration(
+                color: Color(0xffF6F8FE),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Assets.images.targetIcon.image(width: 48, height: 48),
+              ),
+            ),
+            const VSpace(20),
+            Text(
+              l10n.setGoalEmptyTitle,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.baseBold(
+                context,
+              ).copyWith(color: AppColors.gray950),
+            ),
+            const VSpace(8),
+            Text(
+              l10n.setGoalEmptySubtitle,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray500, height: 1.5),
+            ),
+            const VSpace(24),
+            GestureDetector(
+              onTap: onSetGoal,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.gray950,
+                  borderRadius: BorderRadius.circular(60),
+                ),
+                child: Text(
+                  l10n.setGoalCta,
+                  style: AppTextStyles.smBold(
+                    context,
+                  ).copyWith(color: Colors.white),
+                ),
+              ),
+            ),
+            const VSpace(8),
+            TextButton(
+              onPressed: onExplore,
+              child: Text(
+                l10n.exploreFirstCta,
+                style: AppTextStyles.smMedium(
+                  context,
+                ).copyWith(color: AppColors.primary700),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -441,7 +644,7 @@ class _GoalStat extends StatelessWidget {
 class _MyLearningPathCard extends StatelessWidget {
   const _MyLearningPathCard({required this.path, required this.onTap});
 
-  final _MyLearningPathData path;
+  final RoadmapPath path;
   final VoidCallback onTap;
 
   @override
@@ -456,15 +659,7 @@ class _MyLearningPathCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: path.iconBackground,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(path.icon, color: AppColors.gray950, size: 24),
-            ),
+            _PathCover(coverImageUrl: path.coverImageUrl),
             const HSpace(12),
             Expanded(
               child: Column(
@@ -481,8 +676,8 @@ class _MyLearningPathCard extends StatelessWidget {
                         ),
                       ),
                       _Badge(
-                        label: path.isPremium ? 'Premium' : 'Free',
-                        color: path.isPremium
+                        label: path.hasPremiumCourse ? 'Premium' : 'Free',
+                        color: path.hasPremiumCourse
                             ? const Color(0xFFF97316)
                             : const Color(0xFF16A34A),
                       ),
@@ -502,35 +697,23 @@ class _MyLearningPathCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const VSpace(6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${path.completedCourses} of ${path.totalCourses} ${AppLocalizations.of(context)!.coursesCompletedSuffix}',
-                        style: AppTextStyles.xsRegular(
-                          context,
-                        ).copyWith(color: AppColors.gray500),
-                      ),
-                      Text(
-                        '${(path.progress * 100).round()}%',
-                        style: AppTextStyles.xsSemiBold(
-                          context,
-                        ).copyWith(color: AppColors.primary700),
-                      ),
-                    ],
+                  const VSpace(4),
+                  Text(
+                    path.description,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.xsRegular(
+                      context,
+                    ).copyWith(color: AppColors.gray500),
                   ),
-                  const VSpace(6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: path.progress,
-                      minHeight: 6,
-                      backgroundColor: AppColors.gray200,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primary800,
-                      ),
-                    ),
+                  const VSpace(4),
+                  Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.coursesCount(path.courses.length),
+                    style: AppTextStyles.xsSemiBold(
+                      context,
+                    ).copyWith(color: AppColors.primary700),
                   ),
                 ],
               ),

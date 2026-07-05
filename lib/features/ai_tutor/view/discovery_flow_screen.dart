@@ -5,7 +5,9 @@ import 'package:learnwayv2/features/home/home_bloc/home_event.dart';
 
 @RoutePage()
 class DiscoveryFlowScreen extends StatefulWidget {
-  const DiscoveryFlowScreen({super.key});
+  const DiscoveryFlowScreen({super.key, this.allowBack = false});
+
+  final bool allowBack;
 
   @override
   State<DiscoveryFlowScreen> createState() => _DiscoveryFlowScreenState();
@@ -37,6 +39,7 @@ class _DiscoveryFlowScreenState extends State<DiscoveryFlowScreen> {
       getUserId: () => _userId,
       onEnterRecommendations: () =>
           locator<HomeBloc>().add(FetchHomeDataEvent()),
+      allowBack: widget.allowBack,
     );
   }
 }

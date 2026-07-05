@@ -62,7 +62,7 @@ class _ActionGrid extends StatelessWidget {
     _QuickActionItem(
       icon: Assets.images.careerIcon.path,
       label: 'Career Roadmap',
-      onTap: () => context.router.push(const DiscoveryFlowRoute()),
+      onTap: () => locator.get<MainActivityCubit>().navigateTo(1),
     ),
   ];
 }

@@ -188,6 +188,39 @@
   "@myLearning": {
     "description": "Libellé de l'onglet Mon apprentissage"
   },
+  "learnTitle": "Apprendre",
+  "@learnTitle": {
+    "description": "Titre d'en-tête de l'écran Apprendre"
+  },
+  "setGoalEmptyTitle": "Définissez votre objectif de carrière",
+  "@setGoalEmptyTitle": {
+    "description": "Titre de l'état vide de l'onglet Mon apprentissage sans objectif de carrière"
+  },
+  "setGoalEmptySubtitle": "Dites-nous où vous voulez aller et nous créerons un parcours d'apprentissage personnalisé pour vous y amener.",
+  "@setGoalEmptySubtitle": {
+    "description": "Sous-titre de l'état vide de l'onglet Mon apprentissage sans objectif de carrière"
+  },
+  "setGoalCta": "Définir mon objectif",
+  "@setGoalCta": {
+    "description": "CTA principal de l'état vide de Mon apprentissage"
+  },
+  "exploreFirstCta": "Explorer les parcours d'abord",
+  "@exploreFirstCta": {
+    "description": "Action secondaire de l'état vide, bascule vers l'onglet Découvrir"
+  },
+  "coursesCount": "{count, plural, =1{1 cours} other{{count} cours}}",
+  "@coursesCount": {
+    "description": "Nombre de cours dans un parcours d'apprentissage",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roadmapLoadError": "Impossible de charger vos parcours d'apprentissage.",
+  "@roadmapLoadError": {
+    "description": "Message d'erreur lorsque la feuille de route ne se charge pas"
+  },
   "myLearningSubtitle": "Restez constant dans votre apprentissage",
   "@myLearningSubtitle": {
     "description": "Sous-titre affiché sous le titre de l'onglet Mon apprentissage"

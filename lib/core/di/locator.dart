@@ -58,6 +58,9 @@ import 'package:learnwayv2/features/promotions/repository/promotions_repository.
 import 'package:learnwayv2/shared/utilities/app_version_info.dart';
 import 'package:learnwayv2/shared/widgets/course_layout_widget/bloc/course_tabs_bloc.dart';
 import 'package:ai_mentor/ai_mentor.dart';
+import 'package:learnwayv2/features/play/cubit/roadmap_cubit.dart';
+import 'package:learnwayv2/features/play/data_source/roadmap_data_source.dart';
+import 'package:learnwayv2/features/play/repository/roadmap_repository.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
 
 final locator = GetIt.instance;
@@ -260,6 +263,29 @@ Future<void> setupLocator() async {
   );
   locator.registerLazySingleton<WeeklyGoalCubit>(
     () => WeeklyGoalCubit(
+      repository: locator(),
+      getUserId: () => LocalStorageService.getUserSync()?.id ?? '',
+    ),
+  );
+
+  locator.registerLazySingleton<RoadmapDataSource>(
+    () => RoadmapDataSource(locator<BaseApiClients>()),
+  );
+  locator.registerLazySingleton<RoadmapRepository>(
+    () => RoadmapRepository(locator()),
+  );
+  locator.registerLazySingleton<RoadmapCubit>(() => RoadmapCubit(locator()));
+
+  locator.registerLazySingleton<DashboardDataSource>(
+    () => DashboardDataSource(
+      locator<BaseApiClients>(instanceName: 'aiTutorApiClient'),
+    ),
+  );
+  locator.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepository(locator()),
+  );
+  locator.registerLazySingleton<DashboardCubit>(
+    () => DashboardCubit(
       repository: locator(),
       getUserId: () => LocalStorageService.getUserSync()?.id ?? '',
     ),

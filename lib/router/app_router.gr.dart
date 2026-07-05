@@ -2280,18 +2280,51 @@ class DepositUssdRouteArgs {
 
 /// generated route for
 /// [DiscoveryFlowScreen]
-class DiscoveryFlowRoute extends PageRouteInfo<void> {
-  const DiscoveryFlowRoute({List<PageRouteInfo>? children})
-    : super(DiscoveryFlowRoute.name, initialChildren: children);
+class DiscoveryFlowRoute extends PageRouteInfo<DiscoveryFlowRouteArgs> {
+  DiscoveryFlowRoute({
+    Key? key,
+    bool allowBack = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+         DiscoveryFlowRoute.name,
+         args: DiscoveryFlowRouteArgs(key: key, allowBack: allowBack),
+         initialChildren: children,
+       );
 
   static const String name = 'DiscoveryFlowRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const DiscoveryFlowScreen();
+      final args = data.argsAs<DiscoveryFlowRouteArgs>(
+        orElse: () => const DiscoveryFlowRouteArgs(),
+      );
+      return DiscoveryFlowScreen(key: args.key, allowBack: args.allowBack);
     },
   );
+}
+
+class DiscoveryFlowRouteArgs {
+  const DiscoveryFlowRouteArgs({this.key, this.allowBack = false});
+
+  final Key? key;
+
+  final bool allowBack;
+
+  @override
+  String toString() {
+    return 'DiscoveryFlowRouteArgs{key: $key, allowBack: $allowBack}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! DiscoveryFlowRouteArgs) return false;
+    return key == other.key && allowBack == other.allowBack;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ allowBack.hashCode;
 }
 
 /// generated route for

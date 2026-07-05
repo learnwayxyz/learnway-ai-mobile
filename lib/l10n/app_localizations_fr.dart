@@ -150,6 +150,35 @@ class AppLocalizationsFr extends AppLocalizations {
   String get myLearning => 'Mon apprentissage';
 
   @override
+  String get learnTitle => 'Apprendre';
+
+  @override
+  String get setGoalEmptyTitle => 'Définissez votre objectif de carrière';
+
+  @override
+  String get setGoalEmptySubtitle => 'Dites-nous où vous voulez aller et nous créerons un parcours d\'apprentissage personnalisé pour vous y amener.';
+
+  @override
+  String get setGoalCta => 'Définir mon objectif';
+
+  @override
+  String get exploreFirstCta => 'Explorer les parcours d\'abord';
+
+  @override
+  String coursesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cours',
+      one: '1 cours',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roadmapLoadError => 'Impossible de charger vos parcours d\'apprentissage.';
+
+  @override
   String get myLearningSubtitle => 'Restez constant dans votre apprentissage';
 
   @override

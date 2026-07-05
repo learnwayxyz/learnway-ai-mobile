@@ -1251,6 +1251,14 @@ class $AssetsImagesNavIconsGen {
   String get leaderNavIconInactive =>
       'assets/images/nav_icons/leader_nav_icon_inactive.svg';
 
+  /// File path: assets/images/nav_icons/learn_nav_icon_active.svg
+  String get learnNavIconActive =>
+      'assets/images/nav_icons/learn_nav_icon_active.svg';
+
+  /// File path: assets/images/nav_icons/learn_nav_icon_inactive.svg
+  String get learnNavIconInactive =>
+      'assets/images/nav_icons/learn_nav_icon_inactive.svg';
+
   /// File path: assets/images/nav_icons/play_nav_icon_active.svg
   String get playNavIconActive =>
       'assets/images/nav_icons/play_nav_icon_active.svg';
@@ -1283,6 +1291,8 @@ class $AssetsImagesNavIconsGen {
     homeNavIconInactive,
     leaderNavIconActive,
     leaderNavIconInactive,
+    learnNavIconActive,
+    learnNavIconInactive,
     playNavIconActive,
     playNavIconInactive,
     profileNavIconActive,

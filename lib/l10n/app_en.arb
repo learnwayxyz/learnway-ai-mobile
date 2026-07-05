@@ -188,6 +188,39 @@
   "@myLearning": {
     "description": "My Learning tab label"
   },
+  "learnTitle": "Learn",
+  "@learnTitle": {
+    "description": "Header title on the Play/Learn screen"
+  },
+  "setGoalEmptyTitle": "Set your career goal",
+  "@setGoalEmptyTitle": {
+    "description": "Title of the empty state on My Learning tab when no career goal is set"
+  },
+  "setGoalEmptySubtitle": "Tell us where you're headed and we'll build a personalized learning path to get you there.",
+  "@setGoalEmptySubtitle": {
+    "description": "Subtitle of the empty state on My Learning tab when no career goal is set"
+  },
+  "setGoalCta": "Set My Goal",
+  "@setGoalCta": {
+    "description": "Primary CTA on the My Learning empty state"
+  },
+  "exploreFirstCta": "Explore paths first",
+  "@exploreFirstCta": {
+    "description": "Secondary action on the My Learning empty state, switches to Discover tab"
+  },
+  "coursesCount": "{count, plural, =1{1 course} other{{count} courses}}",
+  "@coursesCount": {
+    "description": "Number of courses in a learning path",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roadmapLoadError": "We couldn't load your learning paths.",
+  "@roadmapLoadError": {
+    "description": "Error message when the roadmap fails to load on My Learning tab"
+  },
   "myLearningSubtitle": "Keep up your consistency",
   "@myLearningSubtitle": {
     "description": "Subtitle shown under the My Learning tab title"

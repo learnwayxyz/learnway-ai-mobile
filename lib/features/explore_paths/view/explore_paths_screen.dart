@@ -30,21 +30,20 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
         PathCoursesRoute(learningPathId: path.id, pathTitle: path.title),
       );
     } else {
-      _showPaywall(context);
+      _showPaywall(context, path);
     }
   }
 
-  void _showPaywall(BuildContext context) {
-    showModalBottomSheet(
+  void _showPaywall(BuildContext context, LearningPathModel path) {
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _LearningPathPaywallSheet(
+      barrierColor: Colors.black54,
+      builder: (_) => _LearningPathPaywallDialog(
+        path: path,
         onSubscribe: () {
           Navigator.of(context).pop();
           context.router.push(const PayWallRoute());
         },
-        onDismiss: () => Navigator.of(context).pop(),
       ),
     );
   }
@@ -345,74 +344,176 @@ class _Badge extends StatelessWidget {
   }
 }
 
-class _LearningPathPaywallSheet extends StatelessWidget {
-  const _LearningPathPaywallSheet({
+class _LearningPathPaywallDialog extends StatelessWidget {
+  const _LearningPathPaywallDialog({
+    required this.path,
     required this.onSubscribe,
-    required this.onDismiss,
   });
 
+  final LearningPathModel path;
   final VoidCallback onSubscribe;
-  final VoidCallback onDismiss;
+
+  static const _includes = ['AI Mentor', 'Hands on Projects', 'Certificate'];
+
+  String get _fallbackAsset {
+    if (path.isFoundation) return Assets.images.botToMoonPng.path;
+    return Assets.images.codeImage.path;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-      child: SafeArea(
-        top: false,
+    return Dialog(
+      backgroundColor: Colors.white,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.gray300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Assets.images.lennyHi.image(width: 80, height: 80),
-            const SizedBox(height: 16),
-            Text(
-              'Upgrade to Premium',
-              style: AppTextStyles.xlBold(
-                context,
-              ).copyWith(color: AppColors.gray950),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Upgrade to LearnWay Premium to unlock advanced career-focused learning paths, premium content, exclusive assessments, and certifications.',
-              style: AppTextStyles.smRegular(
-                context,
-              ).copyWith(color: AppColors.gray600, height: 1.5),
-              textAlign: TextAlign.center,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8EAF6),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: SizedBox.expand(
+                      child: path.coverImageUrl != null
+                          ? Image.network(
+                              path.coverImageUrl!,
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, e, s) => Image.asset(
+                                _fallbackAsset,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : Image.asset(_fallbackAsset, fit: BoxFit.contain),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const _Badge(
+                            label: 'Premium',
+                            color: Color(0xFFF97316),
+                          ),
+                          const Spacer(),
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: AppColors.gray950,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.lock_outline_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        path.title,
+                        style: AppTextStyles.baseBold(
+                          context,
+                        ).copyWith(color: AppColors.gray950),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        path.description,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.xsRegular(
+                          context,
+                        ).copyWith(color: AppColors.gray500, height: 1.4),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF16A34A),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Beginner',
+                            style: AppTextStyles.xsRegular(
+                              context,
+                            ).copyWith(color: AppColors.gray500),
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.library_books_outlined,
+                            size: 13,
+                            color: AppColors.gray400,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${path.totalCourses} Courses',
+                            style: AppTextStyles.xsRegular(
+                              context,
+                            ).copyWith(color: AppColors.gray500),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 28),
+            Text(
+              'Includes',
+              style: AppTextStyles.baseBold(
+                context,
+              ).copyWith(color: AppColors.gray950),
+            ),
+            const SizedBox(height: 12),
+            ...List.generate(_includes.length, (index) {
+              return Padding(
+                padding: EdgeInsets.only(
+                  left: 12,
+                  bottom: index == _includes.length - 1 ? 0 : 10,
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.check, size: 18, color: AppColors.primary700),
+                    const SizedBox(width: 8),
+                    Text(
+                      _includes[index],
+                      style: AppTextStyles.smMedium(
+                        context,
+                      ).copyWith(color: AppColors.primary700),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ButtonFactory.blackButton(
                 mainAxisAlignment: MainAxisAlignment.center,
                 onPressed: onSubscribe,
-                text: 'Subscribe Now',
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: onDismiss,
-                child: Text(
-                  'Maybe Later',
-                  style: AppTextStyles.smMedium(
-                    context,
-                  ).copyWith(color: AppColors.gray500),
-                ),
+                text: 'Unlock Premium',
               ),
             ),
           ],

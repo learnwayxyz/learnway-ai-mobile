@@ -348,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen>
             subtitle: AppLocalizations.of(context)!.discoverLearningPaths,
             buttonText: AppLocalizations.of(context)!.startLesson,
             onButtonPressed: () {
-              context.router.push(const LearnAndEarnRoute());
+              context.router.push(const ExplorePathsRoute());
             },
           ),
           VSpace(20),

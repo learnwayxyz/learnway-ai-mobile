@@ -43,46 +43,43 @@ class MainActivityState extends Equatable {
 
 List<BottomNavItems> _inActiveBottomNav = [
   BottomNavItems(
-    icon: 'assets/images/nav_icons/home_nav_icon_inactive.svg',
+    icon: Assets.images.navIcons.homeNavIconInactive,
     label: 'Home',
   ),
   BottomNavItems(
-    icon: 'assets/images/nav_icons/play_nav_icon_inactive.svg',
-    label: 'Play',
+    icon: Assets.images.navIcons.learnNavIconInactive,
+    label: 'Learn',
   ),
   BottomNavItems(
-    icon: 'assets/images/nav_icons/leader_nav_icon_inactive.svg',
+    icon: Assets.images.navIcons.leaderNavIconInactive,
     label: 'Leader',
   ),
   BottomNavItems(
-    icon: 'assets/images/nav_icons/wallet_nav_icon_inactive.svg',
+    icon: Assets.images.navIcons.walletNavIconInactive,
     label: 'Wallet',
   ),
   BottomNavItems(
-    icon: 'assets/images/nav_icons/profile_nav_icon_inactive.svg',
+    icon: Assets.images.navIcons.profileNavIconInactive,
     label: 'Account',
   ),
 ];
 
 List<BottomNavItems> _activeBottomNav = [
+  BottomNavItems(icon: Assets.images.navIcons.homeNavIconActive, label: 'Home'),
   BottomNavItems(
-    icon: 'assets/images/nav_icons/home_nav_icon_active.svg',
-    label: 'Home',
+    icon: Assets.images.navIcons.learnNavIconActive,
+    label: 'Learn',
   ),
   BottomNavItems(
-    icon: 'assets/images/nav_icons/play_nav_icon_active.svg',
-    label: 'Play',
-  ),
-  BottomNavItems(
-    icon: 'assets/images/nav_icons/leader_nav_icon_active.svg',
+    icon: Assets.images.navIcons.leaderNavIconActive,
     label: 'Leader',
   ),
   BottomNavItems(
-    icon: 'assets/images/nav_icons/wallet_nav_icon_active.svg',
+    icon: Assets.images.navIcons.walletNavIconActive,
     label: 'Wallet',
   ),
   BottomNavItems(
-    icon: 'assets/images/nav_icons/profile_nav_icon_active.svg',
+    icon: Assets.images.navIcons.profileNavIconActive,
     label: 'Account',
   ),
 ];
