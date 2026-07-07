@@ -647,6 +647,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startExploring => 'Start Exploring';
 
   @override
+  String get exploreLearningPathTitle => 'Explore Learning Path 🚀';
+
+  @override
+  String get exploreLearningPathSubtitle => 'Build in-demand skills and grow your career';
+
+  @override
   String get contestSubtitle => 'Join themed contests, showcase knowledge, and earn rewards.';
 
   @override

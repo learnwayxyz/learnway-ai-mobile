@@ -2936,6 +2936,22 @@ class MobileMoneyRouteArgs {
 }
 
 /// generated route for
+/// [MyPathsScreen]
+class MyPathsRoute extends PageRouteInfo<void> {
+  const MyPathsRoute({List<PageRouteInfo>? children})
+    : super(MyPathsRoute.name, initialChildren: children);
+
+  static const String name = 'MyPathsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MyPathsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [NativeAdScreen]
 class NativeAdRoute extends PageRouteInfo<void> {
   const NativeAdRoute({List<PageRouteInfo>? children})

@@ -647,6 +647,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get startExploring => 'Commencer à explorer';
 
   @override
+  String get exploreLearningPathTitle => 'Explorez les parcours d\'apprentissage 🚀';
+
+  @override
+  String get exploreLearningPathSubtitle => 'Développez des compétences recherchées et faites évoluer votre carrière';
+
+  @override
   String get contestSubtitle => 'Participez à des concours thématiques, montrez vos connaissances et gagnez des récompenses.';
 
   @override

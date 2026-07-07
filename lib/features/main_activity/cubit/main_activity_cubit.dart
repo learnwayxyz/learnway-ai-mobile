@@ -29,6 +29,14 @@ class MainActivityCubit extends Cubit<MainActivityState> {
 
   int _previousIndex = 0;
 
+  /// Inner tab PlayScreen should open on next time it becomes visible.
+  final ValueNotifier<int?> pendingPlayTab = ValueNotifier<int?>(null);
+
+  void navigateToPlayTab(int playTabIndex) {
+    pendingPlayTab.value = playTabIndex;
+    navigateTo(1);
+  }
+
   void navigateTo(int index) {
     if (index != state.currentIndex) {
       _previousIndex = state.currentIndex;

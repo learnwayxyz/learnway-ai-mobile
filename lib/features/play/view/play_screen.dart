@@ -26,10 +26,25 @@ class _PlayScreenState extends State<PlayScreen>
     super.initState();
     locator<DashboardCubit>().fetchDashboard();
     locator<RoadmapCubit>().fetchMyRoadmap();
+    locator<MainActivityCubit>().pendingPlayTab.addListener(
+      _handlePendingPlayTab,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _handlePendingPlayTab());
+  }
+
+  void _handlePendingPlayTab() {
+    final pending = locator<MainActivityCubit>().pendingPlayTab;
+    final tab = pending.value;
+    if (tab == null || !mounted) return;
+    _tabController.animateTo(tab);
+    pending.value = null;
   }
 
   @override
   void dispose() {
+    locator<MainActivityCubit>().pendingPlayTab.removeListener(
+      _handlePendingPlayTab,
+    );
     _tabController.dispose();
     super.dispose();
   }
@@ -242,7 +257,7 @@ class _PlayScreenState extends State<PlayScreen>
                 style: AppTextStyles.smSemiBold(context),
               ),
               GestureDetector(
-                onTap: () => context.router.push(const ExplorePathsRoute()),
+                onTap: () => context.router.push(const MyPathsRoute()),
                 child: Text(
                   AppLocalizations.of(context)!.seeAll,
                   style: AppTextStyles.smMedium(

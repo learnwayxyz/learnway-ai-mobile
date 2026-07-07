@@ -1355,6 +1355,18 @@ abstract class AppLocalizations {
   /// **'Start Exploring'**
   String get startExploring;
 
+  /// Home screen heading above the Learning Paths card
+  ///
+  /// In en, this message translates to:
+  /// **'Explore Learning Path 🚀'**
+  String get exploreLearningPathTitle;
+
+  /// Home screen subtitle above the Learning Paths card
+  ///
+  /// In en, this message translates to:
+  /// **'Build in-demand skills and grow your career'**
+  String get exploreLearningPathSubtitle;
+
   /// Subtitle for Contest card
   ///
   /// In en, this message translates to:

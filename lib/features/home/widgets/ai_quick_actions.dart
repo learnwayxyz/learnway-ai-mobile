@@ -62,7 +62,7 @@ class _ActionGrid extends StatelessWidget {
     _QuickActionItem(
       icon: Assets.images.careerIcon.path,
       label: 'Career Roadmap',
-      onTap: () => locator.get<MainActivityCubit>().navigateTo(1),
+      onTap: () => locator.get<MainActivityCubit>().navigateToPlayTab(1),
     ),
   ];
 }
@@ -205,7 +205,7 @@ class _LennyFloatingButtonState extends State<LennyFloatingButton>
       end: 6,
     ).animate(CurvedAnimation(parent: _bobbleCtrl, curve: Curves.easeInOut));
 
-    _collapseTimer = Timer(const Duration(seconds: 3), () {
+    _collapseTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) _collapseCtrl.forward();
     });
   }

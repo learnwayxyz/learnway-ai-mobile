@@ -321,14 +321,14 @@ class _HomeScreenState extends State<HomeScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AppLocalizations.of(context)!.playAndWinRewards,
+                        AppLocalizations.of(context)!.exploreLearningPathTitle,
                         style: AppTextStyles.mdSemiBold(context),
                         maxLines: 2,
                         softWrap: true,
                       ),
                       const VSpace(4),
                       AutoSizeText(
-                        AppLocalizations.of(context)!.letsBringYouOnTechJourney,
+                        AppLocalizations.of(context)!.exploreLearningPathSubtitle,
                         style: AppTextStyles.mdRegular(context),
                         maxLines: 2,
                         minFontSize: 8,
@@ -346,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen>
             cardType: CardType.lesson,
             title: AppLocalizations.of(context)!.learningPaths,
             subtitle: AppLocalizations.of(context)!.discoverLearningPaths,
-            buttonText: AppLocalizations.of(context)!.startLesson,
+            buttonText: AppLocalizations.of(context)!.startExploring,
             onButtonPressed: () {
               context.router.push(const ExplorePathsRoute());
             },
