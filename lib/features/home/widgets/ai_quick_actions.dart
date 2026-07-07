@@ -30,7 +30,7 @@ class _SectionHeader extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Text(
-          'AI Quick Actions',
+          'Quick Actions',
           style: AppTextStyles.baseSemiBold(
             context,
           ).copyWith(color: AppColors.gray950),
@@ -62,7 +62,7 @@ class _ActionGrid extends StatelessWidget {
     _QuickActionItem(
       icon: Assets.images.careerIcon.path,
       label: 'Career Roadmap',
-      onTap: () => context.router.push(const DiscoveryFlowRoute()),
+      onTap: () => locator.get<MainActivityCubit>().navigateToPlayTab(1),
     ),
   ];
 }
@@ -205,7 +205,7 @@ class _LennyFloatingButtonState extends State<LennyFloatingButton>
       end: 6,
     ).animate(CurvedAnimation(parent: _bobbleCtrl, curve: Curves.easeInOut));
 
-    _collapseTimer = Timer(const Duration(seconds: 3), () {
+    _collapseTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) _collapseCtrl.forward();
     });
   }

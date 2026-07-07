@@ -73,7 +73,7 @@ class VocabularyViewScreen extends StatelessWidget {
                       vocabularyKey,
                       true,
                     );
-                    context.router.replace(const DiscoveryFlowRoute());
+                    context.router.replace(DiscoveryFlowRoute());
                   },
                 ),
                 const SizedBox(height: 32),

@@ -99,7 +99,7 @@ class _SetUpSuccessScreenState extends State<SetUpSuccessScreen> {
                       ).copyWith(color: Colors.white),
                       onPressed: () {
                         // Reset MainActivityCubit to ensure we start on Home tab
-                        context.router.replace(const DiscoveryFlowRoute());
+                        context.router.replace(DiscoveryFlowRoute());
                       },
                     ),
                   ],
@@ -136,7 +136,7 @@ Widget emptyState(BuildContext context) {
         onPressed: () {
           // Reset MainActivityCubit to ensure we start on Home tab
           context.read<MainActivityCubit>().resetState();
-          context.router.replace(const DiscoveryFlowRoute());
+          context.router.replace(DiscoveryFlowRoute());
         },
       ),
     ],

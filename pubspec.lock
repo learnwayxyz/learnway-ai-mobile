@@ -28,7 +28,7 @@ packages:
   ai_mentor:
     dependency: "direct main"
     description:
-      path: "../ai_tutor/packages/ai_mentor"
+      path: "../packages/ai_mentor"
       relative: true
     source: path
     version: "0.0.1"
@@ -395,7 +395,7 @@ packages:
   core:
     dependency: "direct main"
     description:
-      path: "../ai_tutor/packages/core"
+      path: "../packages/core"
       relative: true
     source: path
     version: "0.0.1"

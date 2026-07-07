@@ -973,6 +973,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/xps.png
   AssetGenImage get xps => const AssetGenImage('assets/images/xps.png');
 
+  /// File path: assets/images/young_woman.png
+  AssetGenImage get youngWoman =>
+      const AssetGenImage('assets/images/young_woman.png');
+
   /// List of all assets
   List<dynamic> get values => [
     a1c60d3e2e212c1a14417da35b4b05b31bf4309bd,
@@ -1106,6 +1110,7 @@ class $AssetsImagesGen {
     xp,
     xpImage,
     xps,
+    youngWoman,
   ];
 }
 
@@ -1246,6 +1251,14 @@ class $AssetsImagesNavIconsGen {
   String get leaderNavIconInactive =>
       'assets/images/nav_icons/leader_nav_icon_inactive.svg';
 
+  /// File path: assets/images/nav_icons/learn_nav_icon_active.svg
+  String get learnNavIconActive =>
+      'assets/images/nav_icons/learn_nav_icon_active.svg';
+
+  /// File path: assets/images/nav_icons/learn_nav_icon_inactive.svg
+  String get learnNavIconInactive =>
+      'assets/images/nav_icons/learn_nav_icon_inactive.svg';
+
   /// File path: assets/images/nav_icons/play_nav_icon_active.svg
   String get playNavIconActive =>
       'assets/images/nav_icons/play_nav_icon_active.svg';
@@ -1278,6 +1291,8 @@ class $AssetsImagesNavIconsGen {
     homeNavIconInactive,
     leaderNavIconActive,
     leaderNavIconInactive,
+    learnNavIconActive,
+    learnNavIconInactive,
     playNavIconActive,
     playNavIconInactive,
     profileNavIconActive,

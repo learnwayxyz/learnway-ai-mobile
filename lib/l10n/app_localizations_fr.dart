@@ -135,13 +135,72 @@ class AppLocalizationsFr extends AppLocalizations {
   String get home => 'Accueil';
 
   @override
-  String get learnAndEarn => 'Apprendre et Gagner';
+  String get learningPaths => 'Parcours d\'apprentissage';
 
   @override
   String get quizBattle => 'Quiz Battle';
 
   @override
   String get play => 'Jouer';
+
+  @override
+  String get discover => 'Découvrir';
+
+  @override
+  String get myLearning => 'Mon apprentissage';
+
+  @override
+  String get learnTitle => 'Apprendre';
+
+  @override
+  String get setGoalEmptyTitle => 'Définissez votre objectif de carrière';
+
+  @override
+  String get setGoalEmptySubtitle => 'Dites-nous où vous voulez aller et nous créerons un parcours d\'apprentissage personnalisé pour vous y amener.';
+
+  @override
+  String get setGoalCta => 'Définir mon objectif';
+
+  @override
+  String get exploreFirstCta => 'Explorer les parcours d\'abord';
+
+  @override
+  String coursesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cours',
+      one: '1 cours',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get roadmapLoadError => 'Impossible de charger vos parcours d\'apprentissage.';
+
+  @override
+  String get myLearningSubtitle => 'Restez constant dans votre apprentissage';
+
+  @override
+  String get yourCareerGoal => 'Votre objectif de carrière';
+
+  @override
+  String get changeGoal => 'Changer d\'objectif';
+
+  @override
+  String get myLearningPathsTitle => 'Mes parcours d\'apprentissage';
+
+  @override
+  String get seeAll => 'Tout voir';
+
+  @override
+  String get overallProgress => 'Progression globale';
+
+  @override
+  String get completedCoursesLabel => 'Cours terminés';
+
+  @override
+  String get coursesCompletedSuffix => 'cours terminés';
 
   @override
   String get wallet => 'Portefeuille';
@@ -204,13 +263,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get learnWayTokenDescription => 'Convertissez vos Gemmes en LWT ou achetez des LWT. Envoyez des LWT à votre portefeuille ou échangez à tout moment, 24h/24 et 7j/7.';
 
   @override
-  String get masterWeb3 => 'Maîtrisez le Web3';
+  String get masterWeb3 => 'Maîtrisez les compétences ';
 
   @override
-  String get learnAndEarnTagline => 'IA et Finance';
+  String get learnAndEarnTagline => 'numériques recherchées';
 
   @override
-  String get onboardingDescription => 'Apprenez des compétences numériques d’avenir grâce à des leçons, quiz et récompenses ludiques.';
+  String get onboardingDescription => 'Apprenez grâce à des leçons ludiques avec des conseils et un accompagnement IA personnalisés.';
 
   @override
   String get opening => 'Ouverture';
@@ -555,34 +614,43 @@ class AppLocalizationsFr extends AppLocalizations {
   String get walletGenerationNote => 'Ce processus peut prendre 30 à 60 secondes pendant que nous créons votre portefeuille sécurisé avec un chiffrement de niveau militaire.';
 
   @override
-  String get onboarding1Title => 'Apprendre en jouant';
+  String get onboarding1Title => 'Apprenez plus intelligemment';
 
   @override
-  String get onboarding1Description => 'Transformez des sujets complexes en défis amusants et courts qui vous gardent engagé et motivé chaque jour.';
+  String get onboarding1Description => 'Apprenez avec des leçons personnalisées par l\'IA, adaptées à votre rythme et vos objectifs.';
 
   @override
-  String get onboarding2Title => 'Ouvrez des portes';
+  String get onboarding2Title => 'Suivez vos progrès';
 
   @override
-  String get onboarding2Description => 'Acquérez des connaissances qui ouvrent des portes vers des emplois, des revenus et la liberté financière en Afrique et au-delà.';
+  String get onboarding2Description => 'L\'IA suit votre évolution et célèbre chaque étape de votre apprentissage.';
 
   @override
-  String get onboarding3Title => 'Votre portefeuille mondial';
+  String get onboarding3Title => 'Apprenez à votre façon';
 
   @override
-  String get onboarding3Description => 'Utilisez votre portefeuille intégré pour recevoir des fonds, protéger vos économies contre l\'inflation et profiter de paiements sans frontières dans le monde entier.';
+  String get onboarding3Description => 'Recevez des leçons recommandées par l\'IA selon vos intérêts et vos objectifs.';
 
   @override
-  String get onboarding4Title => 'Rejoignez le mouvement';
+  String get onboarding4Title => 'Rencontrez Lenny';
 
   @override
-  String get onboarding4Description => 'Rejoignez la première plateforme d\'apprentissage ludique d\'Afrique, où maîtriser le Web3, l\'IA et la finance crée des opportunités d\'avenir.';
+  String get onboarding4Description => 'Votre mentor IA vous guide à chaque étape de votre parcours d\'apprentissage.';
 
   @override
-  String get learnThroughShortLessons => 'Apprenez grâce à de courtes leçons, participez à des quiz et gagnez des récompenses.';
+  String get discoverLearningPaths => 'Discover paths to build in-demad skills';
 
   @override
   String get startLearning => 'Commencer à apprendre';
+
+  @override
+  String get startExploring => 'Commencer à explorer';
+
+  @override
+  String get exploreLearningPathTitle => 'Explorez les parcours d\'apprentissage 🚀';
+
+  @override
+  String get exploreLearningPathSubtitle => 'Développez des compétences recherchées et faites évoluer votre carrière';
 
   @override
   String get contestSubtitle => 'Participez à des concours thématiques, montrez vos connaissances et gagnez des récompenses.';

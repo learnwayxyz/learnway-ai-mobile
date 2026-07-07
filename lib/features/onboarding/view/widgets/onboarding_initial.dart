@@ -62,7 +62,7 @@ class _OnboardingInitialScreenState extends State<OnboardingInitialScreen> {
               AppLocalizations.of(context)!.masterWeb3,
               style: AppTextStyles.xxl(context).copyWith(
                 color: Colors.white,
-                fontSize: 50,
+                fontSize: 35,
                 fontWeight: FontWeight.w300,
                 fontFamily: 'Poppins',
                 height: 1.20,
@@ -72,7 +72,7 @@ class _OnboardingInitialScreenState extends State<OnboardingInitialScreen> {
               AppLocalizations.of(context)!.learnAndEarnTagline,
               style: AppTextStyles.xxl(context).copyWith(
                 color: Colors.white,
-                fontSize: 50,
+                fontSize: 35,
                 fontWeight: FontWeight.w300,
                 height: 1.20,
               ),

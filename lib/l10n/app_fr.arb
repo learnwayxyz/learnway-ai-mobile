@@ -172,9 +172,86 @@
   "@learnAndEarn": {
     "description": "Texte de navigation apprendre et gagner"
   },
+  "learningPaths": "Parcours d'apprentissage",
+  "@learningPaths": {
+    "description": "Découvrez des parcours pour développer des compétences recherchées"
+  },
   "play": "Jouer",
   "@play": {
     "description": "Texte de navigation jouer"
+  },
+  "discover": "Découvrir",
+  "@discover": {
+    "description": "Libellé de l'onglet Découvrir"
+  },
+  "myLearning": "Mon apprentissage",
+  "@myLearning": {
+    "description": "Libellé de l'onglet Mon apprentissage"
+  },
+  "learnTitle": "Apprendre",
+  "@learnTitle": {
+    "description": "Titre d'en-tête de l'écran Apprendre"
+  },
+  "setGoalEmptyTitle": "Définissez votre objectif de carrière",
+  "@setGoalEmptyTitle": {
+    "description": "Titre de l'état vide de l'onglet Mon apprentissage sans objectif de carrière"
+  },
+  "setGoalEmptySubtitle": "Dites-nous où vous voulez aller et nous créerons un parcours d'apprentissage personnalisé pour vous y amener.",
+  "@setGoalEmptySubtitle": {
+    "description": "Sous-titre de l'état vide de l'onglet Mon apprentissage sans objectif de carrière"
+  },
+  "setGoalCta": "Définir mon objectif",
+  "@setGoalCta": {
+    "description": "CTA principal de l'état vide de Mon apprentissage"
+  },
+  "exploreFirstCta": "Explorer les parcours d'abord",
+  "@exploreFirstCta": {
+    "description": "Action secondaire de l'état vide, bascule vers l'onglet Découvrir"
+  },
+  "coursesCount": "{count, plural, =1{1 cours} other{{count} cours}}",
+  "@coursesCount": {
+    "description": "Nombre de cours dans un parcours d'apprentissage",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roadmapLoadError": "Impossible de charger vos parcours d'apprentissage.",
+  "@roadmapLoadError": {
+    "description": "Message d'erreur lorsque la feuille de route ne se charge pas"
+  },
+  "myLearningSubtitle": "Restez constant dans votre apprentissage",
+  "@myLearningSubtitle": {
+    "description": "Sous-titre affiché sous le titre de l'onglet Mon apprentissage"
+  },
+  "yourCareerGoal": "Votre objectif de carrière",
+  "@yourCareerGoal": {
+    "description": "Libellé sur la carte d'objectif de carrière"
+  },
+  "changeGoal": "Changer d'objectif",
+  "@changeGoal": {
+    "description": "Texte du bouton pour changer l'objectif de carrière"
+  },
+  "myLearningPathsTitle": "Mes parcours d'apprentissage",
+  "@myLearningPathsTitle": {
+    "description": "Titre de la section des parcours d'apprentissage en cours"
+  },
+  "seeAll": "Tout voir",
+  "@seeAll": {
+    "description": "Texte de lien pour voir la liste complète"
+  },
+  "overallProgress": "Progression globale",
+  "@overallProgress": {
+    "description": "Libellé pour la statistique de pourcentage de progression globale"
+  },
+  "completedCoursesLabel": "Cours terminés",
+  "@completedCoursesLabel": {
+    "description": "Libellé pour la statistique du nombre de cours terminés"
+  },
+  "coursesCompletedSuffix": "cours terminés",
+  "@coursesCompletedSuffix": {
+    "description": "Texte après 'X sur Y' décrivant les cours terminés"
   },
   "wallet": "Portefeuille",
   "@wallet": {
@@ -256,15 +333,15 @@
   "@learnWayTokenDescription": {
     "description": "Description du token LearnWay"
   },
- "masterWeb3": "Maîtrisez le Web3",
+ "masterWeb3": "Maîtrisez les compétences ",
 "@masterWeb3": {
   "description": "Slogan d’introduction, partie 1"
 },
-"learnAndEarnTagline": "IA et Finance",
+"learnAndEarnTagline": "numériques recherchées",
 "@learnAndEarnTagline": {
   "description": "Slogan d’introduction, partie 2"
 },
-"onboardingDescription": "Apprenez des compétences numériques d’avenir grâce à des leçons, quiz et récompenses ludiques.",
+"onboardingDescription": "Apprenez grâce à des leçons ludiques avec des conseils et un accompagnement IA personnalisés.",
 "@onboardingDescription": {
   "description": "Description de l’onboarding"
 },
@@ -589,26 +666,32 @@
 "@preparingAccountSetup": { "description": "Texte de statut initial de l’écran de chargement" },
 "walletGenerationNote": "Ce processus peut prendre 30 à 60 secondes pendant que nous créons votre portefeuille sécurisé avec un chiffrement de niveau militaire.",
 "@walletGenerationNote": { "description": "Note affichée lors de l’étape de génération du portefeuille" },
-  "onboarding1Title": "Apprendre en jouant",
+  "onboarding1Title": "Apprenez plus intelligemment",
   "@onboarding1Title": { "description": "Titre de la diapositive 1" },
-  "onboarding1Description": "Transformez des sujets complexes en défis amusants et courts qui vous gardent engagé et motivé chaque jour.",
+  "onboarding1Description": "Apprenez avec des leçons personnalisées par l'IA, adaptées à votre rythme et vos objectifs.",
   "@onboarding1Description": { "description": "Corps de la diapositive 1" },
-  "onboarding2Title": "Ouvrez des portes",
+  "onboarding2Title": "Suivez vos progrès",
   "@onboarding2Title": { "description": "Titre de la diapositive 2" },
-  "onboarding2Description": "Acquérez des connaissances qui ouvrent des portes vers des emplois, des revenus et la liberté financière en Afrique et au-delà.",
+  "onboarding2Description": "L'IA suit votre évolution et célèbre chaque étape de votre apprentissage.",
   "@onboarding2Description": { "description": "Corps de la diapositive 2" },
-  "onboarding3Title": "Votre portefeuille mondial",
+  "onboarding3Title": "Apprenez à votre façon",
   "@onboarding3Title": { "description": "Titre de la diapositive 3" },
-  "onboarding3Description": "Utilisez votre portefeuille intégré pour recevoir des fonds, protéger vos économies contre l'inflation et profiter de paiements sans frontières dans le monde entier.",
+  "onboarding3Description": "Recevez des leçons recommandées par l'IA selon vos intérêts et vos objectifs.",
   "@onboarding3Description": { "description": "Corps de la diapositive 3" },
-  "onboarding4Title": "Rejoignez le mouvement",
+  "onboarding4Title": "Rencontrez Lenny",
   "@onboarding4Title": { "description": "Titre de la diapositive 4" },
-  "onboarding4Description": "Rejoignez la première plateforme d'apprentissage ludique d'Afrique, où maîtriser le Web3, l'IA et la finance crée des opportunités d'avenir.",
+  "onboarding4Description": "Votre mentor IA vous guide à chaque étape de votre parcours d'apprentissage.",
   "@onboarding4Description": { "description": "Corps de la diapositive 4" },
   "learnThroughShortLessons": "Apprenez grâce à de courtes leçons, participez à des quiz et gagnez des récompenses.",
   "@learnThroughShortLessons": { "description": "Subtitle for Learn & Earn card" },
   "startLearning": "Commencer à apprendre",
   "@startLearning": { "description": "Button text to start learning" },
+  "startExploring": "Commencer à explorer",
+  "@startExploring": { "description": "Button text on Learning Paths card to start exploring paths" },
+  "exploreLearningPathTitle": "Explorez les parcours d'apprentissage 🚀",
+  "@exploreLearningPathTitle": { "description": "Home screen heading above the Learning Paths card" },
+  "exploreLearningPathSubtitle": "Développez des compétences recherchées et faites évoluer votre carrière",
+  "@exploreLearningPathSubtitle": { "description": "Home screen subtitle above the Learning Paths card" },
   "contestSubtitle": "Participez à des concours thématiques, montrez vos connaissances et gagnez des récompenses.",
   "@contestSubtitle": { "description": "Subtitle for Contest card" },
   "startContest": "Démarrer le concours",

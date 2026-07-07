@@ -20,6 +20,7 @@ import 'package:learnwayv2/features/contest/view/upcoming_details_screen.dart';
 import 'package:learnwayv2/features/home/view/native_ad_screen.dart';
 import 'package:learnwayv2/features/notifications/model/notification_model.dart';
 import 'package:learnwayv2/features/notifications/views/notification_detail_screen.dart';
+import 'package:learnwayv2/features/play/view/my_paths_screen.dart';
 import 'package:learnwayv2/features/quiz/view/quiz_review_screen.dart';
 import 'package:learnwayv2/features/statistics/view/statistics_screen.dart';
 import 'package:learnwayv2/features/invite_friends/view/invite_friends_screen.dart';
@@ -144,6 +145,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: VocabularyViewRoute.page),
     AutoRoute(page: DiscoveryFlowRoute.page),
     AutoRoute(page: ExplorePathsRoute.page),
+    AutoRoute(page: MyPathsRoute.page),
     AutoRoute(page: AiTutorTerminalRoute.page),
     AutoRoute(page: CareerGoalRoute.page),
     AutoRoute(page: EnterEmailRoute.page),

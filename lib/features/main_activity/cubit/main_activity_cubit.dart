@@ -6,6 +6,7 @@ import 'package:learnwayv2/features/leader_board/view/leader_board_screen.dart';
 import 'package:learnwayv2/features/play/view/play_screen.dart';
 import 'package:learnwayv2/features/account/view/account_screen.dart';
 import 'package:learnwayv2/features/wallet/view/wallet_screen.dart';
+import 'package:learnwayv2/gen/assets.gen.dart';
 
 part 'main_activity_state.dart';
 
@@ -27,6 +28,14 @@ class MainActivityCubit extends Cubit<MainActivityState> {
       );
 
   int _previousIndex = 0;
+
+  /// Inner tab PlayScreen should open on next time it becomes visible.
+  final ValueNotifier<int?> pendingPlayTab = ValueNotifier<int?>(null);
+
+  void navigateToPlayTab(int playTabIndex) {
+    pendingPlayTab.value = playTabIndex;
+    navigateTo(1);
+  }
 
   void navigateTo(int index) {
     if (index != state.currentIndex) {

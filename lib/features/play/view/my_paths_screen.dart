@@ -1,19 +1,20 @@
-import 'package:ai_mentor/ai_mentor.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/explore_paths/widgets/explore_paths_shimmer.dart';
+import 'package:learnwayv2/features/play/cubit/roadmap_cubit.dart';
+import 'package:learnwayv2/features/play/models/roadmap_model.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/shared/widgets/back_button.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
 @RoutePage()
-class ExplorePathsScreen extends StatefulWidget {
-  const ExplorePathsScreen({super.key});
+class MyPathsScreen extends StatefulWidget {
+  const MyPathsScreen({super.key});
 
   @override
-  State<ExplorePathsScreen> createState() => _ExplorePathsScreenState();
+  State<MyPathsScreen> createState() => _MyPathsScreenState();
 }
 
-class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
+class _MyPathsScreenState extends State<MyPathsScreen> {
   int _selectedTabIndex = 0;
 
   static const _tabs = ['All Path', 'Foundation', 'Specialization'];
@@ -21,11 +22,12 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
   @override
   void initState() {
     super.initState();
-    locator<LearningPathCubit>().fetchLearningPaths();
+    locator<RoadmapCubit>().fetchMyRoadmap();
   }
 
-  void _onPathTap(LearningPathModel path) {
-    if (path.access.userHasAccess) {
+  void _onPathTap(RoadmapPath path, RoadmapModel roadmap) {
+    final locked = path.hasPremiumCourse && !roadmap.userHasAccess;
+    if (!locked) {
       context.router.push(
         PathCoursesRoute(learningPathId: path.id, pathTitle: path.title),
       );
@@ -34,11 +36,11 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
     }
   }
 
-  void _showPaywall(BuildContext context, LearningPathModel path) {
+  void _showPaywall(BuildContext context, RoadmapPath path) {
     showDialog(
       context: context,
       barrierColor: Colors.black54,
-      builder: (_) => _LearningPathPaywallDialog(
+      builder: (_) => _RoadmapPathPaywallDialog(
         path: path,
         onSubscribe: () {
           Navigator.of(context).pop();
@@ -48,10 +50,10 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
     );
   }
 
-  List<LearningPathModel> _filterPaths(List<LearningPathModel> paths, int tab) {
+  List<RoadmapPath> _filterPaths(List<RoadmapPath> paths, int tab) {
     switch (tab) {
       case 1:
-        return paths.where((p) => p.isFoundation).toList();
+        return paths.where((p) => p.type == 'foundation').toList();
       case 2:
         return paths.where((p) => p.type == 'specialization').toList();
       default:
@@ -84,21 +86,20 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
           padding: const EdgeInsets.only(left: 4),
           child: CustomBackButton(onPress: () => context.router.maybePop()),
         ),
-        // const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Explore Paths',
+                'My Learning Paths',
                 style: AppTextStyles.xlBold(
                   context,
                 ).copyWith(color: AppColors.gray950),
               ),
               const SizedBox(height: 4),
               Text(
-                'Discover Paths to build in-demand skills and grow your career',
+                'All the paths on your personal roadmap toward your career goal',
                 style: AppTextStyles.smRegular(
                   context,
                 ).copyWith(color: AppColors.gray500),
@@ -145,15 +146,18 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
   }
 
   Widget _buildPathList() {
-    return BlocBuilder<LearningPathCubit, LearningPathState>(
-      bloc: locator<LearningPathCubit>(),
+    return BlocBuilder<RoadmapCubit, RoadmapState>(
+      bloc: locator<RoadmapCubit>(),
       builder: (context, state) {
-        if (state.status == LearningPathStatus.loading ||
-            state.status == LearningPathStatus.initial) {
+        final roadmap = state.roadmap;
+
+        if (roadmap == null &&
+            (state.status == RoadmapStatus.loading ||
+                state.status == RoadmapStatus.initial)) {
           return const ExplorePathsShimmer();
         }
 
-        if (state.status == LearningPathStatus.failure) {
+        if (roadmap == null) {
           return Center(
             child: Text(
               state.errorMessage ?? 'Failed to load paths',
@@ -164,7 +168,7 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
           );
         }
 
-        final paths = _filterPaths(state.paths, _selectedTabIndex);
+        final paths = _filterPaths(roadmap.paths, _selectedTabIndex);
 
         if (paths.isEmpty) {
           return Center(
@@ -181,8 +185,11 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
           itemCount: paths.length,
           separatorBuilder: (context, i) => const SizedBox(height: 16),
-          itemBuilder: (_, i) =>
-              _PathCard(path: paths[i], onTap: () => _onPathTap(paths[i])),
+          itemBuilder: (_, i) => _PathCard(
+            path: paths[i],
+            locked: paths[i].hasPremiumCourse && !roadmap.userHasAccess,
+            onTap: () => _onPathTap(paths[i], roadmap),
+          ),
         );
       },
     );
@@ -190,18 +197,25 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
 }
 
 class _PathCard extends StatelessWidget {
-  const _PathCard({required this.path, required this.onTap});
+  const _PathCard({
+    required this.path,
+    required this.locked,
+    required this.onTap,
+  });
 
-  final LearningPathModel path;
+  final RoadmapPath path;
+  final bool locked;
   final VoidCallback onTap;
 
-  String _fallbackAsset(BuildContext context) {
-    if (path.isFoundation) return Assets.images.botToMoonPng.path;
+  bool get _isFoundation => path.type == 'foundation';
+
+  String get _fallbackAsset {
+    if (_isFoundation) return Assets.images.botToMoonPng.path;
     return Assets.images.codeImage.path;
   }
 
   Color get _bgColor {
-    if (path.isFoundation) return const Color(0xFFFFF9E6);
+    if (_isFoundation) return const Color(0xFFFFF9E6);
     return const Color(0xFFE8EAF6);
   }
 
@@ -224,12 +238,10 @@ class _PathCard extends StatelessWidget {
                   ? Image.network(
                       path.coverImageUrl!,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, e, s) => Image.asset(
-                        _fallbackAsset(context),
-                        fit: BoxFit.contain,
-                      ),
+                      errorBuilder: (_, e, s) =>
+                          Image.asset(_fallbackAsset, fit: BoxFit.contain),
                     )
-                  : Image.asset(_fallbackAsset(context), fit: BoxFit.contain),
+                  : Image.asset(_fallbackAsset, fit: BoxFit.contain),
             ),
           ),
         ),
@@ -241,8 +253,8 @@ class _PathCard extends StatelessWidget {
               Row(
                 children: [
                   _Badge(
-                    label: path.isPremium ? 'Premium' : 'Free',
-                    color: path.isPremium
+                    label: path.hasPremiumCourse ? 'Premium' : 'Free',
+                    color: path.hasPremiumCourse
                         ? const Color(0xFFF97316)
                         : const Color(0xFF16A34A),
                   ),
@@ -257,9 +269,9 @@ class _PathCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        path.access.userHasAccess
-                            ? Icons.arrow_outward_rounded
-                            : Icons.lock_outline_rounded,
+                        locked
+                            ? Icons.lock_outline_rounded
+                            : Icons.arrow_outward_rounded,
                         color: Colors.white,
                         size: 18,
                       ),
@@ -277,6 +289,8 @@ class _PathCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 path.description,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.xsRegular(
                   context,
                 ).copyWith(color: AppColors.gray500, height: 1.4),
@@ -294,7 +308,7 @@ class _PathCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    path.isFoundation ? 'Foundation' : 'Specialization',
+                    _isFoundation ? 'Foundation' : 'Specialization',
                     style: AppTextStyles.xsRegular(
                       context,
                     ).copyWith(color: AppColors.gray500),
@@ -307,7 +321,7 @@ class _PathCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '${path.totalCourses} Courses',
+                    '${path.courses.length} Courses',
                     style: AppTextStyles.xsRegular(
                       context,
                     ).copyWith(color: AppColors.gray500),
@@ -344,19 +358,19 @@ class _Badge extends StatelessWidget {
   }
 }
 
-class _LearningPathPaywallDialog extends StatelessWidget {
-  const _LearningPathPaywallDialog({
+class _RoadmapPathPaywallDialog extends StatelessWidget {
+  const _RoadmapPathPaywallDialog({
     required this.path,
     required this.onSubscribe,
   });
 
-  final LearningPathModel path;
+  final RoadmapPath path;
   final VoidCallback onSubscribe;
 
   static const _includes = ['AI Mentor', 'Hands on Projects', 'Certificate'];
 
   String get _fallbackAsset {
-    if (path.isFoundation) return Assets.images.botToMoonPng.path;
+    if (path.type == 'foundation') return Assets.images.botToMoonPng.path;
     return Assets.images.codeImage.path;
   }
 
@@ -467,7 +481,7 @@ class _LearningPathPaywallDialog extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${path.totalCourses} Courses',
+                            '${path.courses.length} Courses',
                             style: AppTextStyles.xsRegular(
                               context,
                             ).copyWith(color: AppColors.gray500),
