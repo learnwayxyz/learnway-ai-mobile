@@ -172,117 +172,131 @@ class _PathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 110,
-          height: 110,
-          decoration: BoxDecoration(
-            color: _bgColor,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: SizedBox.expand(
-              child: path.coverImageUrl != null
-                  ? Image.network(
-                      path.coverImageUrl!,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, e, s) =>
-                          Image.asset(_fallbackAsset, fit: BoxFit.contain),
-                    )
-                  : Image.asset(_fallbackAsset, fit: BoxFit.contain),
+    final total = path.courses.length;
+    final completed = path.completedCourses;
+    final progress = total == 0 ? 0.0 : (completed / total).clamp(0.0, 1.0);
+    final percent = (progress * 100).round();
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
+          ],
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: _bgColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: SizedBox.expand(
+                  child: path.coverImageUrl != null
+                      ? Image.network(
+                          path.coverImageUrl!,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, _, _) =>
+                              Image.asset(_fallbackAsset, fit: BoxFit.contain),
+                        )
+                      : Image.asset(_fallbackAsset, fit: BoxFit.contain),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _Badge(
-                    label: locked || path.hasPremiumCourse ? 'Premium' : 'Free',
-                    color: locked || path.hasPremiumCourse
-                        ? const Color(0xFFF97316)
-                        : const Color(0xFF16A34A),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: onTap,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.gray950,
-                        borderRadius: BorderRadius.circular(10),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          path.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.smBold(
+                            context,
+                          ).copyWith(color: AppColors.gray950),
+                        ),
                       ),
-                      child: Icon(
-                        locked
-                            ? Icons.lock_outline_rounded
-                            : Icons.arrow_outward_rounded,
-                        color: Colors.white,
-                        size: 18,
+                      const SizedBox(width: 8),
+                      _Badge(
+                        label: locked || path.hasPremiumCourse ? 'Premium' : 'Free',
+                        color: locked || path.hasPremiumCourse
+                            ? const Color(0xFFF97316)
+                            : const Color(0xFF16A34A),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: AppColors.gray100,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          locked
+                              ? Icons.lock_outline_rounded
+                              : Icons.chevron_right_rounded,
+                          color: AppColors.gray500,
+                          size: locked ? 15 : 20,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                path.title,
-                style: AppTextStyles.baseBold(
-                  context,
-                ).copyWith(color: AppColors.gray950),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                path.description,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.xsRegular(
-                  context,
-                ).copyWith(color: AppColors.gray500, height: 1.4),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF16A34A),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
+                  const SizedBox(height: 6),
                   Text(
-                    _isFoundation ? 'Foundation' : 'Specialization',
+                    '$completed of $total courses completed',
                     style: AppTextStyles.xsRegular(
                       context,
                     ).copyWith(color: AppColors.gray500),
                   ),
-                  const SizedBox(width: 12),
-                  Icon(
-                    Icons.library_books_outlined,
-                    size: 13,
-                    color: AppColors.gray400,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${path.courses.length} Courses',
-                    style: AppTextStyles.xsRegular(
-                      context,
-                    ).copyWith(color: AppColors.gray500),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 6,
+                            backgroundColor: AppColors.gray200,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xFF2563EB),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$percent%',
+                        style: AppTextStyles.xsSemiBold(
+                          context,
+                        ).copyWith(color: const Color(0xFF2563EB)),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

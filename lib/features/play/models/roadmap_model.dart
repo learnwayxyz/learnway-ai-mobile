@@ -31,6 +31,7 @@ class RoadmapPath {
     required this.order,
     required this.coverImageUrl,
     required this.courses,
+    required this.completedCourses,
   });
 
   factory RoadmapPath.fromJson(Map<String, dynamic> json) => RoadmapPath(
@@ -43,6 +44,7 @@ class RoadmapPath {
         courses: (json['courses'] as List<dynamic>? ?? [])
             .map((e) => RoadmapCourse.fromJson(e as Map<String, dynamic>))
             .toList(),
+        completedCourses: json['completedCourses'] as int? ?? 0,
       );
 
   final String id;
@@ -52,6 +54,7 @@ class RoadmapPath {
   final int order;
   final String? coverImageUrl;
   final List<RoadmapCourse> courses;
+  final int completedCourses;
 
   bool get hasPremiumCourse => courses.any((c) => c.isPremium);
 }
