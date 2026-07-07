@@ -4,6 +4,7 @@ import 'package:learnwayv2/features/home/enums/card_type.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/features/play/cubit/roadmap_cubit.dart';
 import 'package:learnwayv2/features/play/models/roadmap_model.dart';
+import 'package:learnwayv2/shared/widgets/buttons.dart';
 import 'package:learnwayv2/shared/widgets/card_component/lesson_cards_factory.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 
@@ -64,13 +65,6 @@ class _PlayScreenState extends State<PlayScreen>
                   Text(
                     AppLocalizations.of(context)!.learnTitle,
                     style: AppTextStyles.xlBold(context),
-                  ),
-                  const VSpace(4),
-                  Text(
-                    AppLocalizations.of(context)!.myLearningSubtitle,
-                    style: AppTextStyles.smRegular(
-                      context,
-                    ).copyWith(color: AppColors.gray500),
                   ),
                 ],
               ),
@@ -296,18 +290,38 @@ class _PlayScreenState extends State<PlayScreen>
 
               return Column(
                 children: List.generate(paths.length, (index) {
+                  final path = paths[index];
+                  final locked =
+                      path.type == 'specialization' && !state.roadmap!.userHasAccess;
                   return Padding(
                     padding: EdgeInsets.only(
                       bottom: index == paths.length - 1 ? 0 : 12,
                     ),
                     child: _MyLearningPathCard(
-                      path: paths[index],
-                      onTap: () => context.router.push(
-                        PathCoursesRoute(
-                          learningPathId: paths[index].id,
-                          pathTitle: paths[index].title,
-                        ),
-                      ),
+                      path: path,
+                      locked: locked,
+                      onTap: () {
+                        if (locked) {
+                          showDialog(
+                            context: context,
+                            barrierColor: Colors.black54,
+                            builder: (_) => _MyLearningPaywallDialog(
+                              path: path,
+                              onSubscribe: () {
+                                Navigator.of(context).pop();
+                                context.router.push(const PayWallRoute());
+                              },
+                            ),
+                          );
+                        } else {
+                          context.router.push(
+                            PathCoursesRoute(
+                              learningPathId: path.id,
+                              pathTitle: path.title,
+                            ),
+                          );
+                        }
+                      },
                     ),
                   );
                 }),
@@ -657,9 +671,14 @@ class _GoalStat extends StatelessWidget {
 }
 
 class _MyLearningPathCard extends StatelessWidget {
-  const _MyLearningPathCard({required this.path, required this.onTap});
+  const _MyLearningPathCard({
+    required this.path,
+    required this.locked,
+    required this.onTap,
+  });
 
   final RoadmapPath path;
+  final bool locked;
   final VoidCallback onTap;
 
   @override
@@ -685,14 +704,16 @@ class _MyLearningPathCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           path.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.smBold(
                             context,
                           ).copyWith(color: AppColors.gray950),
                         ),
                       ),
                       _Badge(
-                        label: path.hasPremiumCourse ? 'Premium' : 'Free',
-                        color: path.hasPremiumCourse
+                        label: locked || path.hasPremiumCourse ? 'Premium' : 'Free',
+                        color: locked || path.hasPremiumCourse
                             ? const Color(0xFFF97316)
                             : const Color(0xFF16A34A),
                       ),
@@ -705,9 +726,11 @@ class _MyLearningPathCard extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          Icons.chevron_right_rounded,
+                          locked
+                              ? Icons.lock_outline_rounded
+                              : Icons.chevron_right_rounded,
                           color: AppColors.gray500,
-                          size: 20,
+                          size: locked ? 14 : 20,
                         ),
                       ),
                     ],
@@ -734,6 +757,127 @@ class _MyLearningPathCard extends StatelessWidget {
               ),
             ),
             const HSpace(8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MyLearningPaywallDialog extends StatelessWidget {
+  const _MyLearningPaywallDialog({
+    required this.path,
+    required this.onSubscribe,
+  });
+
+  final RoadmapPath path;
+  final VoidCallback onSubscribe;
+
+  static const _includes = ['AI Mentor', 'Hands on Projects', 'Certificate'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.white,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8EAF6),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: path.coverImageUrl != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            path.coverImageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => const Icon(Icons.route_rounded, size: 32),
+                          ),
+                        )
+                      : const Icon(Icons.route_rounded, size: 32),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          _Badge(label: 'Premium', color: const Color(0xFFF97316)),
+                          const Spacer(),
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: AppColors.gray950,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.lock_outline_rounded,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        path.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.baseBold(context).copyWith(color: AppColors.gray950),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        path.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.xsRegular(context).copyWith(color: AppColors.gray500, height: 1.4),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Text('Includes', style: AppTextStyles.baseBold(context).copyWith(color: AppColors.gray950)),
+            const SizedBox(height: 12),
+            ...List.generate(_includes.length, (index) {
+              return Padding(
+                padding: EdgeInsets.only(left: 12, bottom: index == _includes.length - 1 ? 0 : 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.check, size: 18, color: AppColors.primary700),
+                    const SizedBox(width: 8),
+                    Text(
+                      _includes[index],
+                      style: AppTextStyles.smMedium(context).copyWith(color: AppColors.primary700),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ButtonFactory.blackButton(
+                mainAxisAlignment: MainAxisAlignment.center,
+                onPressed: onSubscribe,
+                text: 'Unlock Premium',
+              ),
+            ),
           ],
         ),
       ),

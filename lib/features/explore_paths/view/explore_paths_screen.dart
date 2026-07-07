@@ -270,6 +270,8 @@ class _PathCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 path.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.baseBold(
                   context,
                 ).copyWith(color: AppColors.gray950),
@@ -277,6 +279,8 @@ class _PathCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 path.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.xsRegular(
                   context,
                 ).copyWith(color: AppColors.gray500, height: 1.4),
@@ -435,7 +439,7 @@ class _LearningPathPaywallDialog extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         path.description,
-                        maxLines: 3,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.xsRegular(
                           context,

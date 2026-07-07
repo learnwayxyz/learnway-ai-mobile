@@ -15,10 +15,6 @@ class MyPathsScreen extends StatefulWidget {
 }
 
 class _MyPathsScreenState extends State<MyPathsScreen> {
-  int _selectedTabIndex = 0;
-
-  static const _tabs = ['All Path', 'Foundation', 'Specialization'];
-
   @override
   void initState() {
     super.initState();
@@ -26,7 +22,7 @@ class _MyPathsScreenState extends State<MyPathsScreen> {
   }
 
   void _onPathTap(RoadmapPath path, RoadmapModel roadmap) {
-    final locked = path.hasPremiumCourse && !roadmap.userHasAccess;
+    final locked = path.type == 'specialization' && !roadmap.userHasAccess;
     if (!locked) {
       context.router.push(
         PathCoursesRoute(learningPathId: path.id, pathTitle: path.title),
@@ -50,17 +46,6 @@ class _MyPathsScreenState extends State<MyPathsScreen> {
     );
   }
 
-  List<RoadmapPath> _filterPaths(List<RoadmapPath> paths, int tab) {
-    switch (tab) {
-      case 1:
-        return paths.where((p) => p.type == 'foundation').toList();
-      case 2:
-        return paths.where((p) => p.type == 'specialization').toList();
-      default:
-        return paths;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +55,6 @@ class _MyPathsScreenState extends State<MyPathsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(context),
-            _buildTabBar(),
             Expanded(child: _buildPathList()),
           ],
         ),
@@ -112,39 +96,6 @@ class _MyPathsScreenState extends State<MyPathsScreen> {
     );
   }
 
-  Widget _buildTabBar() {
-    return SizedBox(
-      height: 44,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: _tabs.length,
-        separatorBuilder: (context, i) => const SizedBox(width: 10),
-        itemBuilder: (_, i) {
-          final selected = i == _selectedTabIndex;
-          return GestureDetector(
-            onTap: () => setState(() => _selectedTabIndex = i),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                color: selected ? AppColors.gray950 : AppColors.gray200,
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Center(
-                child: Text(
-                  _tabs[i],
-                  style: AppTextStyles.smMedium(context).copyWith(
-                    color: selected ? Colors.white : AppColors.gray600,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   Widget _buildPathList() {
     return BlocBuilder<RoadmapCubit, RoadmapState>(
       bloc: locator<RoadmapCubit>(),
@@ -168,7 +119,7 @@ class _MyPathsScreenState extends State<MyPathsScreen> {
           );
         }
 
-        final paths = _filterPaths(roadmap.paths, _selectedTabIndex);
+        final paths = roadmap.paths;
 
         if (paths.isEmpty) {
           return Center(
@@ -187,7 +138,7 @@ class _MyPathsScreenState extends State<MyPathsScreen> {
           separatorBuilder: (context, i) => const SizedBox(height: 16),
           itemBuilder: (_, i) => _PathCard(
             path: paths[i],
-            locked: paths[i].hasPremiumCourse && !roadmap.userHasAccess,
+            locked: paths[i].type == 'specialization' && !roadmap.userHasAccess,
             onTap: () => _onPathTap(paths[i], roadmap),
           ),
         );
@@ -253,8 +204,8 @@ class _PathCard extends StatelessWidget {
               Row(
                 children: [
                   _Badge(
-                    label: path.hasPremiumCourse ? 'Premium' : 'Free',
-                    color: path.hasPremiumCourse
+                    label: locked || path.hasPremiumCourse ? 'Premium' : 'Free',
+                    color: locked || path.hasPremiumCourse
                         ? const Color(0xFFF97316)
                         : const Color(0xFF16A34A),
                   ),
