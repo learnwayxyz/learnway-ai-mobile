@@ -126,7 +126,21 @@ class _SetUpAccountViewScreenState extends State<SetUpAccountViewScreen> {
         }
       }
     } else {
-      message = 'Please select an avatar to continue';
+      // The avatar page can also be blocked by missing user details (e.g.
+      // state was reset after a failed attempt) — report the real blocker
+      // and take the user back to that page.
+      if (state != null && !state.hasUserDetails) {
+        message = state.userName.trim().isEmpty
+            ? 'Please fill in your username'
+            : 'Please select a country';
+        pageController.animateToPage(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        message = 'Please select an avatar to continue';
+      }
     }
 
     ScaffoldMessenger.of(context).showSnackBar(

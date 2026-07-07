@@ -59,6 +59,16 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
   AccountSetupCubit() : super(AccountSetupInitial());
   final SetUpRepository _setUpRepository = SetUpRepository();
 
+  /// Snapshot of the details used for the last setup attempt, so retrySetup
+  /// works even though the state machine has moved to progress/error states.
+  SetAccountDetails? _lastAttemptDetails;
+
+  /// True when the backend already has a profile with a username for this
+  /// user (a previous registration attempt got past account creation). The
+  /// username can no longer be changed through setup, so the UI should lock
+  /// the field instead of letting the user pick a name that won't stick.
+  bool hasServerProfile = false;
+
   void setUserDetails({
     required String userName,
     required String country,
@@ -76,6 +86,12 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
       currentPassPhrase = currentState.passPhrase.isNotEmpty
           ? currentState.passPhrase
           : (passPhrase ?? '');
+      // Preserve previously entered values when the caller passes empty ones
+      // (e.g. the setup view re-initializing after a failed attempt), so
+      // retrying users don't have to re-enter username/country.
+      if (userName.isEmpty) userName = currentState.userName;
+      if (country.isEmpty) country = currentState.country;
+      referralCode ??= currentState.referralCode;
     }
 
     log('Setting user details - Username: "$userName", Country: "$country"');
@@ -268,12 +284,17 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
   }
 
   Future<void> completeAccountSetup({String? userEmail}) async {
-    final currentState = state;
+    // Fall back to the last attempt's details so a retry after a failure
+    // (state is then AccountSetupProgress/AccountSetupError) still works.
+    final currentState = state is SetAccountDetails
+        ? state as SetAccountDetails
+        : _lastAttemptDetails;
 
-    if (currentState is! SetAccountDetails) {
+    if (currentState == null) {
       emit(AccountSetupError('Invalid state for account setup'));
       return;
     }
+    _lastAttemptDetails = currentState;
 
     try {
       emit(
@@ -394,10 +415,9 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
               ),
             ),
           );
-
-          Future.delayed(Duration(seconds: 2)).then((_) {
-            emit(AccountSetupError(error.message));
-          });
+          // Stay on the progress-error state: the loader screen shows
+          // Go Back / Retry there. Emitting AccountSetupError would bounce
+          // the user back to registration.
         },
         (success) async {
           if (success.$2 != null) {
@@ -441,7 +461,17 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
               'Account setup completed successfully for: ${currentState.userName}',
             );
           } else {
-            emit(AccountSetupError('Smart wallet creation failed'));
+            emit(
+              AccountSetupProgress(
+                SetupProgress(
+                  currentStep: SetupStep.generatingWallet,
+                  message: 'Setup failed',
+                  progress: 0.6,
+                  isError: true,
+                  errorMessage: _getErrorMessage('wallet creation failed'),
+                ),
+              ),
+            );
           }
         },
       );
@@ -459,9 +489,8 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
           ),
         ),
       );
-
-      await Future.delayed(Duration(seconds: 2));
-      emit(AccountSetupError(_getErrorMessage(e.toString())));
+      // Keep the progress-error state so the loader's Go Back / Retry
+      // buttons remain usable.
     }
   }
 
@@ -507,6 +536,8 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
   }
 
   void clearState() {
+    hasServerProfile = false;
+    _lastAttemptDetails = null;
     emit(AccountSetupInitial());
   }
 
@@ -551,6 +582,7 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
       result.fold(
         (error) {
           log('Failed to fetch user profile: ${error.message}');
+          hasServerProfile = false;
 
           emit(
             SetAccountDetails(
@@ -579,6 +611,8 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
         },
         (userProfile) {
           log('User profile fetched successfully: ${userProfile.username}');
+          hasServerProfile =
+              userProfile.username != null && userProfile.username!.isNotEmpty;
           emit(
             SetAccountDetails(
               userName: userProfile.username ?? '',
@@ -662,5 +696,12 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
 
   void retrySetup({String? userEmail}) {
     completeAccountSetup(userEmail: userEmail);
+  }
+
+  /// Restores the details form state after a failed setup attempt so the
+  /// setup screens show what the user already entered.
+  void restoreDetailsAfterFailure() {
+    final details = _lastAttemptDetails;
+    if (details != null) emit(details);
   }
 }

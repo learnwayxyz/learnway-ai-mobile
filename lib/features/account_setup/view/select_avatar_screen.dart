@@ -164,6 +164,8 @@ class _SelectAvatarScreenState extends State<SelectAvatarScreen>
                                   state.prefferedImage.startsWith('assets/')
                                   ? AssetImage(state.prefferedImage)
                                         as ImageProvider
+                                  : state.prefferedImage.startsWith('http')
+                                  ? NetworkImage(state.prefferedImage)
                                   : FileImage(File(state.prefferedImage)),
                             ),
                             if (_isValidatingImage)
@@ -203,7 +205,8 @@ class _SelectAvatarScreenState extends State<SelectAvatarScreen>
                                 AppLocalizations.of(context)!.canChangeBelow,
                                 style: AppTextStyles.sm(context),
                               ),
-                              if (!state.prefferedImage.startsWith('assets/'))
+                              if (!state.prefferedImage.startsWith('assets/') &&
+                                  !state.prefferedImage.startsWith('http'))
                                 FutureBuilder<double>(
                                   future: ImageHelper.getFileSizeInMB(
                                     File(state.prefferedImage),
@@ -385,9 +388,13 @@ class _SelectAvatarScreenState extends State<SelectAvatarScreen>
                                 children: [
                                   CircleAvatar(
                                     radius: 80,
-                                    backgroundImage: FileImage(
-                                      File(state.prefferedImage),
-                                    ),
+                                    backgroundImage:
+                                        state.prefferedImage.startsWith('http')
+                                        ? NetworkImage(state.prefferedImage)
+                                              as ImageProvider
+                                        : FileImage(
+                                            File(state.prefferedImage),
+                                          ),
                                   ),
                                   if (_isValidatingImage)
                                     Positioned.fill(
@@ -414,6 +421,7 @@ class _SelectAvatarScreenState extends State<SelectAvatarScreen>
                               ).copyWith(color: AppColors.primaryColor),
                             ),
                             VSpace(8),
+                            if (!state.prefferedImage.startsWith('http'))
                             FutureBuilder<double>(
                               future: ImageHelper.getFileSizeInMB(
                                 File(state.prefferedImage),
