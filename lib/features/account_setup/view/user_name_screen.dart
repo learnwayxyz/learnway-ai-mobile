@@ -88,9 +88,21 @@ class _UserNameScreenState extends State<UserNameScreen>
     }
   }
 
+  bool get _isUsernameLocked =>
+      context.read<AccountSetupCubit>().hasServerProfile;
+
   void _fetchRemoteDataIfRegistered() async {
     final cubit = context.read<AccountSetupCubit>();
     await cubit.fetchUserProfile();
+    // The profile prefill may have landed after _initializeFromState ran.
+    if (mounted) {
+      final state = cubit.state;
+      if (state is SetAccountDetails) {
+        _syncControllersWithState(state);
+        _isInitialized = true;
+        setState(() {});
+      }
+    }
   }
 
   void _loadUserEmail() async {
@@ -193,6 +205,7 @@ class _UserNameScreenState extends State<UserNameScreen>
                         controller: _userNameController,
                         config: TextFieldConfig(
                           hintText: AppLocalizations.of(context)!.enterPreferredUsername,
+                          readOnly: _isUsernameLocked,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) =>
                               BaseValidators.validateUsername(value ?? ''),
@@ -220,7 +233,15 @@ class _UserNameScreenState extends State<UserNameScreen>
                       ),
                     ],
                   ),
-                  if (state.isUsernameAvailable == false) ...[
+                  if (_isUsernameLocked) ...[
+                    VSpace(2),
+                    Text(
+                      'This username was saved from your previous registration and can\'t be changed here.',
+                      style: AppTextStyles.sm(
+                        context,
+                      ).copyWith(color: AppColors.gray600),
+                    ),
+                  ] else if (state.isUsernameAvailable == false) ...[
                     VSpace(2),
                     Text(
                       AppLocalizations.of(context)!.usernameAlreadyExists,

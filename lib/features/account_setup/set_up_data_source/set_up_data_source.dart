@@ -44,7 +44,17 @@ class SetUpDataSource {
 
       http.Response response;
 
-      if (profileImagePath.startsWith('assets/')) {
+      if (profileImagePath.isEmpty || profileImagePath.startsWith('http')) {
+        // Re-entry after a failed attempt: the avatar was prefilled from the
+        // server profile as a URL — the image is already stored, so send the
+        // fields without re-attaching a file.
+        response = await baseApi.postMultipartWithBytes(
+          Endpoints.setUpAccount,
+          fields: fields,
+          fileBytes: const {},
+          fileNames: const {},
+        );
+      } else if (profileImagePath.startsWith('assets/')) {
         final prepared = await ProfileImageHelper.prepareImage(
           profileImagePath,
         );

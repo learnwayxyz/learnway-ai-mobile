@@ -191,6 +191,9 @@ class _AccountSetupLoaderScreenState extends State<AccountSetupLoaderScreen>
                               mainAxisAlignment: MainAxisAlignment.center,
                               text: AppLocalizations.of(context)!.goBack,
                               onPressed: () {
+                                context
+                                    .read<AccountSetupCubit>()
+                                    .restoreDetailsAfterFailure();
                                 context.router.pop();
                               },
                             ),
