@@ -3,6 +3,7 @@ import 'package:learnwayv2/features/explore_paths/widgets/explore_paths_shimmer.
 import 'package:learnwayv2/features/play/cubit/roadmap_cubit.dart';
 import 'package:learnwayv2/features/play/models/roadmap_model.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
+import 'package:learnwayv2/l10n/app_localizations.dart';
 import 'package:learnwayv2/shared/widgets/back_button.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
@@ -172,11 +173,6 @@ class _PathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = path.courses.length;
-    final completed = path.completedCourses;
-    final progress = total == 0 ? 0.0 : (completed / total).clamp(0.0, 1.0);
-    final percent = (progress * 100).round();
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -259,37 +255,23 @@ class _PathCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
-                    '$completed of $total courses completed',
+                    path.description,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.xsRegular(
                       context,
                     ).copyWith(color: AppColors.gray500),
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            minHeight: 6,
-                            backgroundColor: AppColors.gray200,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFF2563EB),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '$percent%',
-                        style: AppTextStyles.xsSemiBold(
-                          context,
-                        ).copyWith(color: const Color(0xFF2563EB)),
-                      ),
-                    ],
+                  const SizedBox(height: 4),
+                  Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.coursesCount(path.courses.length),
+                    style: AppTextStyles.xsSemiBold(
+                      context,
+                    ).copyWith(color: AppColors.primary700),
                   ),
                 ],
               ),
