@@ -160,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen>
                   final user = LocalStorageService.getUserSync();
                   LennyChatSheet.show(
                     context,
+                    userProfileUrl: user?.profileImageUrl ?? '',
                     userId: user?.id ?? '',
                     username: user?.username?.split(' ').first ?? 'there',
                     lennyAvatarAssetPath: Assets.images.lennyStarePose.path,
@@ -328,7 +329,9 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                       const VSpace(4),
                       AutoSizeText(
-                        AppLocalizations.of(context)!.exploreLearningPathSubtitle,
+                        AppLocalizations.of(
+                          context,
+                        )!.exploreLearningPathSubtitle,
                         style: AppTextStyles.mdRegular(context),
                         maxLines: 2,
                         minFontSize: 8,
