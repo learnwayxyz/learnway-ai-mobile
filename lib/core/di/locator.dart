@@ -269,7 +269,10 @@ Future<void> setupLocator() async {
   );
 
   locator.registerLazySingleton<RoadmapDataSource>(
-    () => RoadmapDataSource(locator<BaseApiClients>()),
+    () => RoadmapDataSource(
+      locator<BaseApiClients>(),
+      locator<BaseApiClients>(instanceName: 'aiTutorApiClient'),
+    ),
   );
   locator.registerLazySingleton<RoadmapRepository>(
     () => RoadmapRepository(locator()),
