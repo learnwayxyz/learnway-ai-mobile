@@ -45,12 +45,14 @@ class FetchedCourseLessons extends LearnAndEarnState {
   const FetchedCourseLessons(
     this.courseLessons, {
     this.showSuccessSnackbar = false,
+    this.lessonInfo,
   });
   final CourseLesson courseLessons;
+  final LessonInfoDetails? lessonInfo;
   final bool showSuccessSnackbar;
 
   @override
-  List<Object?> get props => [courseLessons, showSuccessSnackbar];
+  List<Object?> get props => [courseLessons, lessonInfo, showSuccessSnackbar];
 }
 
 class FetchCourseLessonsError extends LearnAndEarnState {
@@ -324,4 +326,24 @@ class AiTutorDailyLimitReached extends LearnAndEarnState {
   const AiTutorDailyLimitReached();
   @override
   List<Object?> get props => [];
+}
+
+class LoadingLessonInfo extends LearnAndEarnState {
+  const LoadingLessonInfo();
+  @override
+  List<Object?> get props => [];
+}
+
+class LoadedLessonInfo extends LearnAndEarnState {
+  const LoadedLessonInfo(this.data);
+  final LessonInfoDetails data;
+  @override
+  List<Object?> get props => [data];
+}
+
+class LoadedLessonInfoError extends LearnAndEarnState {
+  const LoadedLessonInfoError(this.message);
+  final String message;
+  @override
+  List<Object?> get props => [message];
 }

@@ -160,3 +160,11 @@ class AskAiTutorWithCustomQuestion extends LearnAndEarnEvent {
   @override
   List<Object> get props => [lessonId, customQuestion];
 }
+
+class LoadLessonInfo extends LearnAndEarnEvent {
+  const LoadLessonInfo({required this.lessonId});
+  final String lessonId;
+
+  @override
+  List<Object> get props => [lessonId];
+}

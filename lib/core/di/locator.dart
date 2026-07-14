@@ -17,9 +17,11 @@ import 'package:learnwayv2/features/contest/repository/contest_repository.dart';
 import 'package:learnwayv2/features/home/home_bloc/home_bloc.dart';
 import 'package:learnwayv2/features/invite_friends/cubit/invite_friends_cubit.dart';
 import 'package:learnwayv2/features/home/home_repository/home_repository.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/course_bloc.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/registered_course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/learn_and_earn_data_source.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_repository/learn_and_earn_repository.dart';
 import 'package:learnwayv2/features/notifications/data/notification_data_source.dart';
 import 'package:learnwayv2/features/notifications/repository/notification_repository.dart';
 import 'package:learnwayv2/features/notifications/cubit/notification_cubit.dart';
@@ -66,6 +68,9 @@ import 'package:learnwayv2/services/local_storage_service/local_storage_service.
 final locator = GetIt.instance;
 
 Future<void> setupLocator() async {
+  // ─────────────────────────────────────────────────────────────
+  // API CLIENTS & CONFIG
+  // ─────────────────────────────────────────────────────────────
   final baseApi = BaseApiClients(baseUrl: Env.baseUrl);
   locator.registerSingleton<BaseApiClients>(baseApi);
 
@@ -76,9 +81,198 @@ Future<void> setupLocator() async {
     learnWayTokenAddress: '',
     learnWayFaucetAddress: '',
   );
-
   locator.registerSingleton<ChainConfiguration>(chainConfig);
 
+  locator.registerLazySingleton<BaseApiClients>(
+    () => BaseApiClients(
+      baseUrl: Env.kotanBaseUrl,
+      headers: {
+        'Authorization': 'Bearer ${Env.kotanApiKey}',
+        'Content-Type': 'application/json',
+      },
+    ),
+    instanceName: 'kotaniApiClient',
+  );
+
+  locator.registerLazySingleton<BaseApiClients>(() {
+    final config = locator.get<ApiConfigResponse>();
+    return BaseApiClients(
+      baseUrl: Env.didItBaseUrl,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': config.didItApiKey,
+        'accept': 'application/json',
+      },
+    );
+  }, instanceName: 'didItApiClient');
+
+  locator.registerLazySingleton<BaseApiClients>(
+    () => BaseApiClients(baseUrl: Env.aiTutorBaseUrl),
+    instanceName: 'aiTutorApiClient',
+  );
+
+  // ─────────────────────────────────────────────────────────────
+  // DATA SOURCES
+  // ─────────────────────────────────────────────────────────────
+  locator.registerLazySingleton(() => WalletDataSource());
+  locator.registerLazySingleton<LearnAndEarnDataSource>(
+    () => LearnAndEarnDataSource(),
+  );
+
+  locator.registerLazySingleton<BattleDataSource>(() => BattleDataSource());
+
+  locator.registerLazySingleton<StreakRemoteDataSource>(
+    () => StreakRemoteDataSource(),
+  );
+
+  locator.registerLazySingleton<NotificationDataSource>(
+    () => NotificationDataSourceImpl(locator<BaseApiClients>()),
+  );
+
+  locator.registerLazySingleton<CareerGoalDataSource>(
+    () => CareerGoalDataSource(
+      locator<BaseApiClients>(instanceName: 'aiTutorApiClient'),
+    ),
+  );
+
+  locator.registerLazySingleton<RoadmapDataSource>(
+    () => RoadmapDataSource(locator<BaseApiClients>()),
+  );
+
+  locator.registerLazySingleton<DashboardDataSource>(
+    () => DashboardDataSource(
+      locator<BaseApiClients>(instanceName: 'aiTutorApiClient'),
+    ),
+  );
+
+  locator.registerLazySingleton<LearningPathDataSource>(
+    () => LearningPathDataSource(locator<BaseApiClients>()),
+  );
+
+  // ─────────────────────────────────────────────────────────────
+  // REPOSITORIES
+  // ─────────────────────────────────────────────────────────────
+  locator.registerLazySingleton(() => HomeRepository());
+  locator.registerLazySingleton(() => QuizRepository());
+  locator.registerLazySingleton(() => WalletRepository());
+  locator.registerLazySingleton(
+    () => LearnAndEarnRepository(locator<LearnAndEarnDataSource>()),
+  );
+
+  locator.registerLazySingleton<ContestRepository>(
+    () => ContestRepository(ContestRemoteDataSource()),
+  );
+
+  locator.registerLazySingleton<BattleRepository>(
+    () => BattleRepository(locator()),
+  );
+
+  locator.registerLazySingleton<StreakRepository>(
+    () => StreakRepositoryImpl(locator()),
+  );
+
+  locator.registerLazySingleton<LeaderboardRepository>(
+    () => LeaderboardRepositoryImpl(locator()),
+  );
+
+  locator.registerLazySingleton(() => PromotionsRepository());
+
+  locator.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepository(locator()),
+  );
+
+  locator.registerLazySingleton<CareerGoalRepository>(
+    () => CareerGoalRepository(locator()),
+  );
+
+  locator.registerLazySingleton<RoadmapRepository>(
+    () => RoadmapRepository(locator()),
+  );
+
+  locator.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepository(locator()),
+  );
+
+  locator.registerLazySingleton<LearningPathRepository>(
+    () => LearningPathRepository(locator()),
+  );
+
+  // ─────────────────────────────────────────────────────────────
+  // USE CASES
+  // ─────────────────────────────────────────────────────────────
+  locator.registerLazySingleton(() => ClaimDailyRewardUseCase(locator()));
+
+  // ─────────────────────────────────────────────────────────────
+  // BLOCS / CUBITS
+  // ─────────────────────────────────────────────────────────────
+  locator.registerFactory(() => AccountSetupCubit());
+  locator.registerFactory(() => VerifyEmailCubit());
+  locator.registerLazySingleton<MainActivityCubit>(() => MainActivityCubit());
+  locator.registerSingleton<GoogleAuthCubit>(GoogleAuthCubit());
+  locator.registerSingleton<AppleAuthCubit>(AppleAuthCubit());
+
+  locator.registerLazySingleton<HomeBloc>(
+    () => HomeBloc(homeRepository: locator()),
+  );
+  locator.registerLazySingleton<QuizBloc>(() => QuizBloc());
+  locator.registerLazySingleton<LearnAndEarnBloc>(() => LearnAndEarnBloc());
+  locator.registerLazySingleton<CourseTabsBloc>(() => CourseTabsBloc());
+  locator.registerLazySingleton<RegisteredCoursesBloc>(
+    () => RegisteredCoursesBloc(),
+  );
+  locator.registerLazySingleton<CoursesBloc>(() => CoursesBloc());
+  locator.registerLazySingleton<ProfileCubit>(() => ProfileCubit());
+  locator.registerLazySingleton<WalletCubit>(() => WalletCubit());
+  locator.registerLazySingleton<ContestBloc>(() => ContestBloc());
+  locator.registerLazySingleton<InviteFriendsCubit>(() => InviteFriendsCubit());
+
+  locator.registerLazySingleton<KycCubit>(
+    () => KycCubit(verificationService: locator()),
+  );
+
+  locator.registerLazySingleton<BadgeBloc>(() => BadgeBloc());
+
+  locator.registerLazySingleton<BattlesBloc>(() => BattlesBloc(locator()));
+  locator.registerFactory<BattleHistoryBloc>(
+    () => BattleHistoryBloc(locator()),
+  );
+
+  locator.registerFactory(() => LeaderBoardCubit(locator()));
+
+  locator.registerLazySingleton<NotificationCubit>(
+    () => NotificationCubit(locator()),
+  );
+
+  locator.registerLazySingleton<PromotionsCubit>(
+    () => PromotionsCubit(promotionsRepository: locator()),
+  );
+
+  locator.registerLazySingleton<CareerGoalCubit>(
+    () => CareerGoalCubit(locator()),
+  );
+  locator.registerLazySingleton<WeeklyGoalCubit>(
+    () => WeeklyGoalCubit(
+      repository: locator(),
+      getUserId: () => LocalStorageService.getUserSync()?.id ?? '',
+    ),
+  );
+
+  locator.registerLazySingleton<RoadmapCubit>(() => RoadmapCubit(locator()));
+
+  locator.registerLazySingleton<DashboardCubit>(
+    () => DashboardCubit(
+      repository: locator(),
+      getUserId: () => LocalStorageService.getUserSync()?.id ?? '',
+    ),
+  );
+
+  locator.registerLazySingleton<LearningPathCubit>(
+    () => LearningPathCubit(locator()),
+  );
+
+  // ─────────────────────────────────────────────────────────────
+  // SERVICES
+  // ─────────────────────────────────────────────────────────────
   locator.registerFactoryParam<AAServices, AuthProvider?, void>((
     authProvider,
     _,
@@ -100,56 +294,6 @@ Future<void> setupLocator() async {
     );
   });
 
-  locator.registerLazySingleton(() => HomeRepository());
-  locator.registerLazySingleton(() => QuizRepository());
-  locator.registerLazySingleton(() => WalletRepository());
-  locator.registerLazySingleton(() => WalletDataSource());
-  locator.registerLazySingleton<ContestRepository>(
-    () => ContestRepository(ContestRemoteDataSource()),
-  );
-
-  locator.registerLazySingleton<BattleDataSource>(() => BattleDataSource());
-  locator.registerLazySingleton<BattleRepository>(
-    () => BattleRepository(locator()),
-  );
-  locator.registerLazySingleton<BattlesBloc>(() => BattlesBloc(locator()));
-  locator.registerFactory<BattleHistoryBloc>(
-    () => BattleHistoryBloc(locator()),
-  );
-
-  locator.registerLazySingleton<StreakRemoteDataSource>(
-    () => StreakRemoteDataSource(),
-  );
-  locator.registerLazySingleton<StreakRepository>(
-    () => StreakRepositoryImpl(locator()),
-  );
-  locator.registerLazySingleton(() => ClaimDailyRewardUseCase(locator()));
-
-  locator.registerLazySingleton<LeaderboardRepository>(
-    () => LeaderboardRepositoryImpl(locator()),
-  );
-  locator.registerFactory(() => LeaderBoardCubit(locator()));
-
-  locator.registerFactory(() => AccountSetupCubit());
-  locator.registerFactory(() => VerifyEmailCubit());
-  locator.registerLazySingleton<MainActivityCubit>(() => MainActivityCubit());
-  locator.registerSingleton<GoogleAuthCubit>(GoogleAuthCubit());
-  locator.registerSingleton<AppleAuthCubit>(AppleAuthCubit());
-  locator.registerLazySingleton<HomeBloc>(
-    () => HomeBloc(homeRepository: locator()),
-  );
-  locator.registerLazySingleton<QuizBloc>(() => QuizBloc());
-  locator.registerLazySingleton<LearnAndEarnBloc>(() => LearnAndEarnBloc());
-  locator.registerLazySingleton<CourseTabsBloc>(() => CourseTabsBloc());
-  locator.registerLazySingleton<RegisteredCoursesBloc>(
-    () => RegisteredCoursesBloc(),
-  );
-  locator.registerLazySingleton<CoursesBloc>(() => CoursesBloc());
-  locator.registerLazySingleton<ProfileCubit>(() => ProfileCubit());
-  locator.registerLazySingleton<WalletCubit>(() => WalletCubit());
-  locator.registerLazySingleton<ContestBloc>(() => ContestBloc());
-  locator.registerLazySingleton<InviteFriendsCubit>(() => InviteFriendsCubit());
-
   locator.registerLazySingleton<BiometricService>(() => BiometricService());
 
   locator.registerLazySingleton<CryptographyService>(
@@ -158,36 +302,6 @@ Future<void> setupLocator() async {
 
   locator.registerLazySingleton<FirebaseStoreService>(
     () => FirebaseStoreService(),
-  );
-
-  locator.registerLazySingleton<BaseApiClients>(
-    () => BaseApiClients(
-      baseUrl: Env.kotanBaseUrl,
-      headers: {
-        'Authorization': 'Bearer ${Env.kotanApiKey}',
-        'Content-Type': 'application/json',
-      },
-    ),
-    instanceName: 'kotaniApiClient',
-  );
-
-  // dev.log('KOTANI2 API KEY: ${Env.kotanApiKey}');
-
-  locator.registerLazySingleton<BaseApiClients>(() {
-    final config = locator.get<ApiConfigResponse>();
-    return BaseApiClients(
-      baseUrl: Env.didItBaseUrl,
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': config.didItApiKey,
-        'accept': 'application/json',
-      },
-    );
-  }, instanceName: 'didItApiClient');
-
-  locator.registerLazySingleton<BaseApiClients>(
-    () => BaseApiClients(baseUrl: Env.aiTutorBaseUrl),
-    instanceName: 'aiTutorApiClient',
   );
 
   locator.registerLazySingleton<VerificationService>(
@@ -199,13 +313,7 @@ Future<void> setupLocator() async {
     () => VerificationManager(),
   );
 
-  locator.registerLazySingleton<KycCubit>(
-    () => KycCubit(verificationService: locator()),
-  );
-
   locator.registerLazySingleton<BalanceNotifier>(() => BalanceNotifier());
-
-  locator.registerLazySingleton<BadgeBloc>(() => BadgeBloc());
 
   locator.registerLazySingleton<AnalyticsService>(() => AnalyticsService());
 
@@ -220,20 +328,9 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<BotBattleEventService>(
     () => BotBattleEventService(WebsocketService()),
   );
-  locator.registerLazySingleton<NotificationDataSource>(
-    () => NotificationDataSourceImpl(locator<BaseApiClients>()),
-  );
-  locator.registerLazySingleton<NotificationRepository>(
-    () => NotificationRepository(locator()),
-  );
-  locator.registerLazySingleton<NotificationCubit>(
-    () => NotificationCubit(locator()),
-  );
 
   locator.registerLazySingleton<AdmobService>(() => AdmobService());
-
   locator.registerLazySingleton<LevelPlayService>(() => LevelPlayService());
-
   locator.registerLazySingleton<IAdService>(() {
     final config = locator.isRegistered<RevenueConfigResponse>()
         ? locator.get<RevenueConfigResponse>()
@@ -244,60 +341,4 @@ Future<void> setupLocator() async {
   });
 
   locator.registerLazySingleton<AppVersionInfo>(() => AppVersionInfo());
-
-  locator.registerLazySingleton(() => PromotionsRepository());
-  locator.registerLazySingleton<PromotionsCubit>(
-    () => PromotionsCubit(promotionsRepository: locator()),
-  );
-
-  locator.registerLazySingleton<CareerGoalDataSource>(
-    () => CareerGoalDataSource(
-      locator<BaseApiClients>(instanceName: 'aiTutorApiClient'),
-    ),
-  );
-  locator.registerLazySingleton<CareerGoalRepository>(
-    () => CareerGoalRepository(locator()),
-  );
-  locator.registerLazySingleton<CareerGoalCubit>(
-    () => CareerGoalCubit(locator()),
-  );
-  locator.registerLazySingleton<WeeklyGoalCubit>(
-    () => WeeklyGoalCubit(
-      repository: locator(),
-      getUserId: () => LocalStorageService.getUserSync()?.id ?? '',
-    ),
-  );
-
-  locator.registerLazySingleton<RoadmapDataSource>(
-    () => RoadmapDataSource(locator<BaseApiClients>()),
-  );
-  locator.registerLazySingleton<RoadmapRepository>(
-    () => RoadmapRepository(locator()),
-  );
-  locator.registerLazySingleton<RoadmapCubit>(() => RoadmapCubit(locator()));
-
-  locator.registerLazySingleton<DashboardDataSource>(
-    () => DashboardDataSource(
-      locator<BaseApiClients>(instanceName: 'aiTutorApiClient'),
-    ),
-  );
-  locator.registerLazySingleton<DashboardRepository>(
-    () => DashboardRepository(locator()),
-  );
-  locator.registerLazySingleton<DashboardCubit>(
-    () => DashboardCubit(
-      repository: locator(),
-      getUserId: () => LocalStorageService.getUserSync()?.id ?? '',
-    ),
-  );
-
-  locator.registerLazySingleton<LearningPathDataSource>(
-    () => LearningPathDataSource(locator<BaseApiClients>()),
-  );
-  locator.registerLazySingleton<LearningPathRepository>(
-    () => LearningPathRepository(locator()),
-  );
-  locator.registerLazySingleton<LearningPathCubit>(
-    () => LearningPathCubit(locator()),
-  );
 }

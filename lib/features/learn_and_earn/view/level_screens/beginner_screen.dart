@@ -4,8 +4,8 @@ import 'dart:io' show Platform;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:core/src/config/env/api_config_service.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/course_bloc.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/registered_course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart'
     as learn_and_earn;
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';

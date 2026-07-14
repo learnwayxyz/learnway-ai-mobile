@@ -7,6 +7,8 @@ import 'package:learnwayv2/features/badges/bloc/badge_bloc.dart';
 import 'package:learnwayv2/features/bookmarks/cubit/bookmark_cubit.dart';
 import 'package:learnwayv2/features/contest/bloc/contest_bloc.dart';
 import 'package:learnwayv2/features/leader_board/cubit/leader_board_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_repository/learn_and_earn_repository.dart';
 import 'package:learnwayv2/features/statistics/cubit/statistics_cubit.dart';
 import 'package:learnwayv2/features/invite_friends/cubit/invite_friends_cubit.dart';
 import 'package:learnwayv2/features/notifications/cubit/notification_cubit.dart';
@@ -17,8 +19,8 @@ import 'package:learnwayv2/features/home/bloc/streak_bloc.dart';
 import 'package:learnwayv2/features/home/home_bloc/home_bloc.dart';
 import 'package:learnwayv2/features/streak/domain/repositories/streak_repository.dart';
 import 'package:learnwayv2/features/streak/domain/usecases/claim_daily_reward_usecase.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/course_bloc.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/registered_course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart';
 import 'package:learnwayv2/features/quiz/bloc/quiz_bloc.dart';
 import 'package:learnwayv2/features/wallet/balance_notifier.dart';
@@ -128,6 +130,11 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         BlocProvider(create: (_) => locator.get<LeaderBoardCubit>()),
         BlocProvider(create: (_) => locator.get<NotificationCubit>()),
         BlocProvider(create: (_) => locator.get<PromotionsCubit>()),
+        BlocProvider(
+          create: (_) => CourseInfoCubit(
+            repository: locator.get<LearnAndEarnRepository>(),
+          ),
+        ),
       ],
       child: BlocListener<ProfileCubit, ProfileState>(
         listenWhen: (prev, curr) =>
@@ -144,38 +151,38 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
             return MaterialApp.router(
-            routerConfig: appRouter.config(
-              navigatorObservers: () => [AutoRouteObserver(), observer],
-            ),
-            debugShowCheckedModeBanner: false,
-            scaffoldMessengerKey: NotificationService.scaffoldMessengerKey,
-            theme: AppTheme.lightTheme.copyWith(
-              pageTransitionsTheme: const PageTransitionsTheme(
-                builders: {
-                  TargetPlatform.android: ZoomPageTransitionsBuilder(),
-                  TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-                },
+              routerConfig: appRouter.config(
+                navigatorObservers: () => [AutoRouteObserver(), observer],
               ),
-            ),
-            themeMode: ThemeMode.light,
-            title: 'Learnway',
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            locale: _locale,
-            builder: (context, child) {
-              return MediaQuery(
-                data: MediaQuery.of(
-                  context,
-                ).copyWith(textScaler: const TextScaler.linear(1.0)),
-                child: VersionGate(
-                  child: ConnectivityWrapper(
-                    child: child ?? const SizedBox.shrink(),
-                  ),
+              debugShowCheckedModeBanner: false,
+              scaffoldMessengerKey: NotificationService.scaffoldMessengerKey,
+              theme: AppTheme.lightTheme.copyWith(
+                pageTransitionsTheme: const PageTransitionsTheme(
+                  builders: {
+                    TargetPlatform.android: ZoomPageTransitionsBuilder(),
+                    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                  },
                 ),
-              );
-            },
-          );
-        },
+              ),
+              themeMode: ThemeMode.light,
+              title: 'Learnway',
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: _locale,
+              builder: (context, child) {
+                return MediaQuery(
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(textScaler: const TextScaler.linear(1.0)),
+                  child: VersionGate(
+                    child: ConnectivityWrapper(
+                      child: child ?? const SizedBox.shrink(),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
         ),
       ),
     );

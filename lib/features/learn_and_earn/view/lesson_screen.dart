@@ -1,7 +1,8 @@
 import 'dart:developer';
 import 'package:learnwayv2/app/app_barrel.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/registered_course_bloc.dart'
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart'
     as rb;
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';
@@ -17,9 +18,11 @@ import 'package:learnwayv2/shared/widgets/card_component/lesson_cards_factory.da
 import 'package:learnwayv2/shared/widgets/overlay_loader.dart';
 import 'package:learnwayv2/shared/widgets/screen_connectivity_wrapper.dart';
 
+import '../learn_and_earn_data_source/models/lesson_info_details.dart'
+    show LessonInfoDetails;
+
 enum LockState { unlocked, sequentialLocked, dailyLimitReached }
 
-@RoutePage()
 class LessonScreen extends StatefulWidget {
   const LessonScreen({super.key, required this.levelType});
   final LevelType levelType;
@@ -31,7 +34,8 @@ class LessonScreen extends StatefulWidget {
 class _LessonScreenState extends State<LessonScreen>
     with
         AutoRouteAwareStateMixin<LessonScreen>,
-        ScreenLoadStateMixin<LessonScreen> {
+        ScreenLoadStateMixin<LessonScreen>,
+        SingleTickerProviderStateMixin {
   @override
   String get routeName => '/lesson/${widget.levelType.name}';
 
@@ -41,15 +45,21 @@ class _LessonScreenState extends State<LessonScreen>
   static const _adKey = 'lessonScreen2';
   final AdService _adService = AdService.instance;
 
+  late final TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+
     final courseId = checkCourseLevelType();
 
     context.read<LearnAndEarnBloc>().add(
       FetchCourseLessons(id: courseId, forceRefresh: false),
     );
     context.read<LearnAndEarnBloc>().add(const FetchDailyLessonsRemaining());
+
+    context.read<CourseInfoCubit>().fetchCourseInfo(courseId);
 
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -72,6 +82,7 @@ class _LessonScreenState extends State<LessonScreen>
 
   @override
   void dispose() {
+    _tabController.dispose();
     _cleanupRegisteredInstances();
     super.dispose();
   }
@@ -122,6 +133,7 @@ class _LessonScreenState extends State<LessonScreen>
         context.read<LearnAndEarnBloc>().add(
           FetchCourseLessons(id: checkCourseLevelType(), forceRefresh: true),
         );
+        context.read<CourseInfoCubit>().fetchCourseInfo(checkCourseLevelType());
       },
       child: PopScope(
         canPop: true,
@@ -142,12 +154,13 @@ class _LessonScreenState extends State<LessonScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                VSpace(20),
                 BlocBuilder<LearnAndEarnBloc, LearnAndEarnState>(
                   builder: (context, state) {
                     final lessons = _getLessons(state);
-                    return CardFactory.activeLessonCard(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                    return CardFactory.aiLessonCard(
+                      margin: const EdgeInsets.symmetric(horizontal: 0),
+                      borderRadius: BorderRadius.zero,
+                      hasShadow: false,
                       title: lessons?.title ?? courseData.courseTitle,
                       subtitle:
                           lessons?.description ?? courseData.courseDescription,
@@ -165,9 +178,44 @@ class _LessonScreenState extends State<LessonScreen>
                   const VSpace(10),
                   const BannerAdSlot(slotKey: _adKey),
                 ],
-                VSpace(20),
+
+                const VSpace(16),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF2F2F7),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: TabBar(
+                      controller: _tabController,
+                      indicator: BoxDecoration(
+                        color: AppColors.gray900,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      labelColor: Colors.white,
+                      unselectedLabelColor: AppColors.gray600,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      dividerHeight: 0,
+                      labelStyle: AppTextStyles.smMedium(context),
+                      unselectedLabelStyle: AppTextStyles.smRegular(context),
+                      labelPadding: EdgeInsets.zero,
+                      tabs: const [
+                        Tab(text: 'Information'),
+                        Tab(text: 'Lessons'),
+                        Tab(text: 'Project'),
+                        Tab(text: 'Certificate'),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const VSpace(8),
+
                 Expanded(
-                  child: BlocConsumer<LearnAndEarnBloc, LearnAndEarnState>(
+                  child: BlocListener<LearnAndEarnBloc, LearnAndEarnState>(
                     listener: (context, state) {
                       if (state is FetchedCourseLessons &&
                           state.showSuccessSnackbar &&
@@ -179,48 +227,60 @@ class _LessonScreenState extends State<LessonScreen>
                         markAsLoaded();
                       }
                     },
-                    builder: (context, state) {
-                      if (state is FetchCourseLessonsError &&
-                          state.courseLessons == null) {
-                        return _ErrorState(
-                          message:
-                              state.error.toLowerCase().contains(
-                                'network error',
-                              )
-                              ? AppLocalizations.of(
-                                  context,
-                                )!.noInternetConnection
-                              : AppLocalizations.of(context)!.noLessonsYet,
-                        );
-                      }
+                    child: BlocBuilder<LearnAndEarnBloc, LearnAndEarnState>(
+                      builder: (context, state) {
+                        if (state is FetchCourseLessonsError &&
+                            state.courseLessons == null) {
+                          return _ErrorState(
+                            message:
+                                state.error.toLowerCase().contains(
+                                  'network error',
+                                )
+                                ? AppLocalizations.of(
+                                    context,
+                                  )!.noInternetConnection
+                                : AppLocalizations.of(context)!.noLessonsYet,
+                          );
+                        }
 
-                      final lessons = _getLessons(state);
+                        final lessons = _getLessons(state);
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        return TabBarView(
+                          controller: _tabController,
                           children: [
-                            Text(
-                              AppLocalizations.of(context)!.lessons,
-                              style: AppTextStyles.mdBold(context),
+                            BlocBuilder<CourseInfoCubit, CourseInfoState>(
+                              builder: (context, infoState) {
+                                if (infoState is CourseInfoLoading) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else if (infoState is CourseInfoLoaded) {
+                                  return _InformationTab(
+                                    courseData: infoState.data,
+                                  );
+                                } else if (infoState is CourseInfoError) {
+                                  return Center(
+                                    child: Text(
+                                      infoState.error,
+                                      style: AppTextStyles.smRegular(context),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox();
+                              },
                             ),
-                            VSpace(4),
-                            Text(
-                              AppLocalizations.of(context)!.takeALessonAndEarn,
-                              style: AppTextStyles.xsRegular(context),
+                            _LessonsTab(
+                              lessons: lessons?.lessons ?? [],
+                              levelType: widget.levelType,
                             ),
-                            VSpace(20),
-                            Expanded(
-                              child: LessonBuilder(
-                                lessons: lessons?.lessons ?? [],
-                                levelType: widget.levelType,
-                              ),
-                            ),
+
+                            const _ProjectTab(),
+
+                            const _CertificateTab(),
                           ],
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -256,6 +316,365 @@ class _ErrorState extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               AppLocalizations.of(context)!.browseCoursesToGetStarted,
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray500),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InformationTab extends StatelessWidget {
+  const _InformationTab({required this.courseData});
+  final LessonInfoDetails courseData;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('About course', style: AppTextStyles.mdBold(context)),
+          const VSpace(8),
+          Text(
+            courseData.description,
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray600),
+          ),
+          const VSpace(8),
+          GestureDetector(
+            onTap: () {},
+            child: Text(
+              'Show more...',
+              style: AppTextStyles.smMedium(
+                context,
+              ).copyWith(color: AppColors.primary25),
+            ),
+          ),
+          const VSpace(24),
+
+          Row(
+            children: [
+              Expanded(
+                child: _InfoCard(
+                  label: 'Difficulty',
+                  value: courseData.difficultyLabel,
+                ),
+              ),
+              const HSpace(12),
+              Expanded(
+                child: _InfoCard(
+                  label: 'Estimated Time',
+                  value: '${courseData.estimatedCompletionMinutes}',
+                ),
+              ),
+            ],
+          ),
+          const VSpace(24),
+
+          Text('Skills you\'ll gain', style: AppTextStyles.mdBold(context)),
+          const VSpace(12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: courseData.skillsGained
+                .map((tag) => _SkillChip(tag))
+                .toList(),
+          ),
+          const VSpace(24),
+
+          Text('Prerequisite', style: AppTextStyles.mdBold(context)),
+          const VSpace(12),
+          ...courseData.prerequisites.map(
+            (prerequisite) => _PrerequisiteItem(prerequisite),
+          ),
+          const VSpace(24),
+
+          Text('Who this course is for', style: AppTextStyles.mdBold(context)),
+          const VSpace(8),
+          Text(
+            courseData.targetAudience ?? '',
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray600),
+          ),
+          const VSpace(24),
+
+          Text('Career Opportunities', style: AppTextStyles.mdBold(context)),
+          const VSpace(12),
+          ...courseData.careerOpportunities.map((opp) {
+            return _CareerItem(opp, '');
+          }),
+          const VSpace(24),
+          Text('Recommended Next', style: AppTextStyles.mdBold(context)),
+          const VSpace(12),
+          _RecommendedNextCard(title: courseData.recommendedNextCourse ?? ''),
+          const VSpace(24),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: AppTextStyles.xsRegular(
+              context,
+            ).copyWith(color: AppColors.gray500),
+          ),
+          const VSpace(4),
+          Text(value, style: AppTextStyles.baseMedium(context)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SkillChip extends StatelessWidget {
+  const _SkillChip(this.label);
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEBE9FE),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: AppTextStyles.xsMedium(
+          context,
+        ).copyWith(color: const Color(0xFF4F46E5)),
+      ),
+    );
+  }
+}
+
+class _PrerequisiteItem extends StatelessWidget {
+  const _PrerequisiteItem(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.check, color: AppColors.success200, size: 18),
+          const HSpace(8),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CareerItem extends StatelessWidget {
+  const _CareerItem(this.title, this.badge);
+  final String title;
+  final String badge;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray700),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF2F2F7),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              badge,
+              style: AppTextStyles.xsMedium(
+                context,
+              ).copyWith(color: AppColors.gray600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecommendedNextCard extends StatelessWidget {
+  const _RecommendedNextCard({required this.title});
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.gray100,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.school, color: AppColors.gray400),
+          ),
+          const HSpace(12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Next Course',
+                  style: AppTextStyles.xsRegular(
+                    context,
+                  ).copyWith(color: AppColors.gray500),
+                ),
+                const VSpace(2),
+                Text(title, style: AppTextStyles.smMedium(context)),
+              ],
+            ),
+          ),
+          Icon(Icons.chevron_right, color: AppColors.gray400),
+        ],
+      ),
+    );
+  }
+}
+
+class _LessonsTab extends StatelessWidget {
+  const _LessonsTab({required this.lessons, required this.levelType});
+  final List<Lesson> lessons;
+  final LevelType levelType;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppLocalizations.of(context)!.lessons,
+            style: AppTextStyles.mdBold(context),
+          ),
+          const VSpace(4),
+          Text(
+            AppLocalizations.of(context)!.takeALessonAndEarn,
+            style: AppTextStyles.xsRegular(context),
+          ),
+          const VSpace(20),
+          Expanded(
+            child: LessonBuilder(lessons: lessons, levelType: levelType),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProjectTab extends StatelessWidget {
+  const _ProjectTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.construction, size: 48, color: AppColors.gray300),
+            const VSpace(16),
+            Text(
+              'Project details coming soon',
+              style: AppTextStyles.mdBold(
+                context,
+              ).copyWith(color: AppColors.gray600),
+              textAlign: TextAlign.center,
+            ),
+            const VSpace(8),
+            Text(
+              'Build something amazing once you finish the lessons.',
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray500),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CertificateTab extends StatelessWidget {
+  const _CertificateTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.card_membership, size: 48, color: AppColors.gray300),
+            const VSpace(16),
+            Text(
+              'Complete the course to unlock your certificate',
+              style: AppTextStyles.mdBold(
+                context,
+              ).copyWith(color: AppColors.gray600),
+              textAlign: TextAlign.center,
+            ),
+            const VSpace(8),
+            Text(
+              'A verifiable certificate will be minted directly to your wallet.',
               style: AppTextStyles.smRegular(
                 context,
               ).copyWith(color: AppColors.gray500),
@@ -319,9 +738,6 @@ class _LessonBuilderState extends State<LessonBuilder> {
   LockState _getLockState(Lesson lesson) {
     if (lesson.isCompleted) return LockState.unlocked;
 
-    // Sequential check first — lessons that aren't next in line stay
-    // sequentialLocked regardless of the daily limit, so only one tile
-    // (the next available lesson) ever shows dailyLimitReached.
     if (lesson.order != 1) {
       final prevLessons = widget.lessons
           .where((l) => l.order == lesson.order - 1)
@@ -331,8 +747,6 @@ class _LessonBuilderState extends State<LessonBuilder> {
       }
     }
 
-    // This lesson is next in line (order == 1, or previous lesson is done).
-    // Now apply the global daily cap — covers all courses, not just the current one.
     final isPremium = !AdService.instance.shouldShowAds;
     if (!isPremium) {
       final remaining = LocalStorageService.dailyLessonsNotifier.value;
@@ -511,9 +925,9 @@ class LessonBuilderCard extends StatelessWidget {
       icon = Icons.lock_outline;
       iconColor = Colors.white;
     } else if (lockState == LockState.dailyLimitReached) {
-      iconBg = Color(0xFFFFF3E0);
+      iconBg = const Color(0xFFFFF3E0);
       icon = Icons.lock_clock;
-      iconColor = Color(0xFFF57C00);
+      iconColor = const Color(0xFFF57C00);
     } else {
       iconBg = AppColors.gray900;
       icon = Icons.play_arrow;

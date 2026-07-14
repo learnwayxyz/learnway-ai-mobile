@@ -483,6 +483,9 @@ class $AssetsImagesGen {
   String get a1c60d3e2e212c1a14417da35b4b05b31bf4309bd =>
       'assets/images/1c60d3e2e212c1a14417da35b4b05b31bf4309bd.svg';
 
+  /// File path: assets/images/3d_book.png
+  AssetGenImage get a3dBook => const AssetGenImage('assets/images/3d_book.png');
+
   /// File path: assets/images/404.png
   AssetGenImage get a404 => const AssetGenImage('assets/images/404.png');
 
@@ -980,6 +983,7 @@ class $AssetsImagesGen {
   /// List of all assets
   List<dynamic> get values => [
     a1c60d3e2e212c1a14417da35b4b05b31bf4309bd,
+    a3dBook,
     a404,
     ads1,
     adsImage,

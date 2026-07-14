@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:learnwayv2/app/app.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/registered_course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/base_course_models.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/advanced_registered_courses.dart';
@@ -10,6 +10,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/learnway_courses.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/enrollment_response.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/registered_courses.dart';
@@ -19,6 +20,8 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_exception.dart
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_repository/learn_and_earn_repository.dart';
 import 'package:learnwayv2/shared/utilities/filters.dart';
 import 'package:learnwayv2/shared/widgets/card_component/lesson_cards_factory.dart';
+
+import '../learn_and_earn_data_source/learn_and_earn_data_source.dart';
 
 part 'learn_and_earn_event.dart';
 part 'learn_and_earn_state.dart';
@@ -41,8 +44,7 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
   List<AiTutorMessage> getAiConversation(String lessonId) =>
       List.unmodifiable(_aiConversations[lessonId] ?? []);
 
-  AiTutorRateLimit? getAiRateLimit(String lessonId) =>
-      _aiRateLimits[lessonId];
+  AiTutorRateLimit? getAiRateLimit(String lessonId) => _aiRateLimits[lessonId];
 
   bool isAiLessonLimited(String lessonId) =>
       _lessonLimitedLessons.contains(lessonId);
@@ -50,7 +52,9 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
   bool get isAiDailyLimitReached => _aiDailyLimitReached;
 
   LearnAndEarnBloc({LearnAndEarnRepository? repository})
-    : repository = repository ?? LearnAndEarnRepository(),
+    : repository =
+          repository ??
+          LearnAndEarnRepository(locator<LearnAndEarnDataSource>()),
       super(LearnAndEarnInitial()) {
     on<EnrollBeginnerCourse>(_onEnrollBeginnerCourse);
     on<EnrollIntermediateCourse>(_onEnrollIntermediateCourse);
@@ -63,6 +67,7 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
     on<FetchDailyLessonsRemaining>(_onFetchDailyLessonsRemaining);
     on<AskAiTutorWithQuickPrompt>(_onAskAiTutorWithQuickPrompt);
     on<AskAiTutorWithCustomQuestion>(_onAskAiTutorWithCustomQuestion);
+    on<LoadLessonInfo>(_onLoadLessonInfo);
   }
 
   Future<void> _onEnrollBeginnerCourse(
@@ -348,13 +353,15 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
     String? customQuestion,
     String? displayLabel,
   }) async {
-    _aiConversations.putIfAbsent(lessonId, () => []).add(
-      AiTutorMessage(
-        text: customQuestion ?? displayLabel ?? promptType.apiValue,
-        isUser: true,
-        timestamp: DateTime.now(),
-      ),
-    );
+    _aiConversations
+        .putIfAbsent(lessonId, () => [])
+        .add(
+          AiTutorMessage(
+            text: customQuestion ?? displayLabel ?? promptType.apiValue,
+            isUser: true,
+            timestamp: DateTime.now(),
+          ),
+        );
 
     emit(const AiTutorLoading());
     final result = await repository.askAiTutor(
@@ -394,6 +401,18 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
         _aiRateLimits[lessonId] = data.rateLimitRemaining;
         emit(AiTutorResponseReceived(data));
       },
+    );
+  }
+
+  Future<void> _onLoadLessonInfo(
+    LoadLessonInfo event,
+    Emitter<LearnAndEarnState> emit,
+  ) async {
+    emit(const LoadingLessonInfo());
+    final result = await repository.fetchLessonInfoDetails(event.lessonId);
+    result.fold(
+      (failure) => emit(LoadedLessonInfoError(failure.message)),
+      (data) => emit(LoadedLessonInfo(data)),
     );
   }
 

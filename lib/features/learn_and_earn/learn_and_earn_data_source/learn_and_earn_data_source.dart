@@ -10,6 +10,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/enrollment_response.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/intermediate_registered_course.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/ai_tutor_response.dart';
@@ -464,6 +465,35 @@ class LearnAndEarnDataSource {
           0;
       LocalStorageService.updateDailyLessonsRemaining(remaining);
       return remaining;
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<LessonInfoDetails> fetchLessonInfoDetails(String lessonId) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.get(
+        Endpoints.lessonInfoDetails(lessonId),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw LearnAndEarnFailure('Error fetching lesson info details');
+      }
+      final decoded = jsonDecode(response.body);
+      log('fetchLessonInfoDetails(): $decoded');
+      final data = decoded is Map<String, dynamic>
+          ? (decoded['data'] ?? decoded) as Map<String, dynamic>
+          : decoded as Map<String, dynamic>;
+      final lessonInfoDetails = LessonInfoDetails.fromJson(data);
+      return lessonInfoDetails;
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
     } on HttpException catch (e) {

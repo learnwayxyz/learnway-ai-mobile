@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:learnwayv2/core/di/locator.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/learn_and_earn_data_source.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/learnway_courses.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_repository/learn_and_earn_repository.dart';
 import 'package:learnwayv2/shared/widgets/card_component/lesson_cards_factory.dart';
@@ -21,7 +23,9 @@ class CoursesBloc extends Bloc<CoursesEvent, CoursesState> {
   DateTime? lastAdvancedFetch;
 
   CoursesBloc({LearnAndEarnRepository? repository})
-    : repository = repository ?? LearnAndEarnRepository(),
+    : repository =
+          repository ??
+          LearnAndEarnRepository(locator<LearnAndEarnDataSource>()),
       super(CoursesInitial()) {
     on<FetchBeginnerCourses>(_onFetchBeginnerCourses);
     on<FetchIntermediateCourses>(_onFetchIntermediateCourses);

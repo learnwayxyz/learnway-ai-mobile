@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:learnwayv2/core/di/locator.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/learn_and_earn_data_source.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/advanced_registered_courses.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/beginner_registered_courses.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/intermediate_registered_course.dart';
@@ -21,7 +23,9 @@ class RegisteredCoursesBloc
   List<LearnWayCourses> cachedAdvancedCourses = [];
 
   RegisteredCoursesBloc({LearnAndEarnRepository? repository})
-    : repository = repository ?? LearnAndEarnRepository(),
+    : repository =
+          repository ??
+          LearnAndEarnRepository(locator<LearnAndEarnDataSource>()),
       super(RegisteredCoursesInitial()) {
     on<LoadBeginnerRegisteredCourses>(_onLoadBeginnerRegisteredCourses);
     on<LoadIntermediateRegisteredCourses>(_onLoadIntermediateRegisteredCourses);

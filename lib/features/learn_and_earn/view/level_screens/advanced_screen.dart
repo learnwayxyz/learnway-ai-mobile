@@ -1,7 +1,7 @@
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/course_bloc.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/registered_course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart'
     as learn_and_earn;
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';
@@ -81,7 +81,10 @@ class _AdvancedScreenState extends State<AdvancedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarFactory.standardAppBar(title: AppLocalizations.of(context)!.advanced, barHeight: 10),
+      appBar: AppBarFactory.standardAppBar(
+        title: AppLocalizations.of(context)!.advanced,
+        barHeight: 10,
+      ),
       body: SafeArea(
         child:
             BlocConsumer<
@@ -104,7 +107,9 @@ class _AdvancedScreenState extends State<AdvancedScreen> {
                             style: AppTextStyles.lgBold(context),
                           ),
                           Text(
-                            AppLocalizations.of(context)!.learnFutureReadySkills,
+                            AppLocalizations.of(
+                              context,
+                            )!.learnFutureReadySkills,
                             style: AppTextStyles.md(
                               context,
                             ).copyWith(color: AppColors.gray700),

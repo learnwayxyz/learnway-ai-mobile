@@ -35,6 +35,8 @@ class BaseCard extends StatelessWidget {
   final String? characterImageAsset;
   final Gradient? gradient;
   final EdgeInsetsGeometry? margin;
+  final BorderRadiusGeometry? borderRadius;
+  final bool hasShadow;
 
   const BaseCard({
     super.key,
@@ -43,6 +45,8 @@ class BaseCard extends StatelessWidget {
     this.characterImageAsset,
     this.gradient,
     this.margin,
+    this.borderRadius,
+    this.hasShadow = true,
   });
 
   @override
@@ -57,14 +61,16 @@ class BaseCard extends StatelessWidget {
           margin: margin,
           decoration: BoxDecoration(
             gradient: gradient ?? AppColors.startLessonGradient,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            borderRadius: borderRadius ?? BorderRadius.circular(24),
+            boxShadow: hasShadow
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ]
+                : null,
           ),
           child: contentStrategy.buildContent(context, screenWidth),
         ),
@@ -217,6 +223,39 @@ class CardFactory {
       characterImageAsset: characterImageAsset,
       gradient: gradient,
       margin: margin,
+    );
+  }
+
+  static Widget aiLessonCard({
+    required String title,
+    required String subtitle,
+    required String progressLabel,
+    required double progressValue,
+    required int completedLessons,
+    required int totalLessons,
+    String? characterImageAsset,
+    Gradient? gradient,
+    EdgeInsetsGeometry? margin,
+    BorderRadiusGeometry? borderRadius,
+    bool hasShadow = true,
+  }) {
+    return BaseCard(
+      contentStrategy: AIActiveLessonContentStrategy(
+        title: title,
+        completedLessons: completedLessons,
+        progressLabel: progressLabel,
+        progressValue: progressValue,
+
+        buttonText: '',
+        subtitle: subtitle,
+        totaLessons: totalLessons,
+      ),
+      overlayStrategy: EmptyOverlayStrategy(),
+      characterImageAsset: characterImageAsset,
+      gradient: gradient,
+      margin: margin,
+      borderRadius: borderRadius,
+      hasShadow: hasShadow,
     );
   }
 

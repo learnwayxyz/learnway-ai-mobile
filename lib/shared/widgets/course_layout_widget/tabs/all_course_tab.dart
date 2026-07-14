@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/course_bloc.dart';
-import 'package:learnwayv2/features/learn_and_earn/bloc/bloc/registered_course_bloc.dart'
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/course_bloc.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart'
     as registered_course_bloc;
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';
