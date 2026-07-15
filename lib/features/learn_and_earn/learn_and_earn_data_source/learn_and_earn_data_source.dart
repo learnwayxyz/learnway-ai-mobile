@@ -489,10 +489,7 @@ class LearnAndEarnDataSource {
       }
       final decoded = jsonDecode(response.body);
       log('fetchLessonInfoDetails(): $decoded');
-      final data = decoded is Map<String, dynamic>
-          ? (decoded['data'] ?? decoded) as Map<String, dynamic>
-          : decoded as Map<String, dynamic>;
-      final lessonInfoDetails = LessonInfoDetails.fromJson(data);
+      final lessonInfoDetails = LessonInfoDetails.fromJson(decoded);
       return lessonInfoDetails;
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));

@@ -755,6 +755,10 @@ class $AssetsImagesGen {
   AssetGenImage get learnway =>
       const AssetGenImage('assets/images/learnway.png');
 
+  /// File path: assets/images/learnway_cert.png
+  AssetGenImage get learnwayCert =>
+      const AssetGenImage('assets/images/learnway_cert.png');
+
   /// File path: assets/images/learnway_logo_pop.jpg
   AssetGenImage get learnwayLogoPopJpg =>
       const AssetGenImage('assets/images/learnway_logo_pop.jpg');
@@ -1058,6 +1062,7 @@ class $AssetsImagesGen {
     learnWayLogoPng,
     learnWayLogoSvg,
     learnway,
+    learnwayCert,
     learnwayLogoPopJpg,
     learnwayLogoPopPng,
     lennyHappy,

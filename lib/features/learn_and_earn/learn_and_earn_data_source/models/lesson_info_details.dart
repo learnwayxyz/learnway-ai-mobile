@@ -33,7 +33,7 @@ class LessonInfoDetails {
   final List<String> prerequisites;
   final String? targetAudience;
   final List<String> careerOpportunities;
-  final String? recommendedNextCourse;
+  final RecommendedCourse? recommendedNextCourse;
 
   Map<String, dynamic> toJson() => _$LessonInfoDetailsToJson(this);
 
@@ -55,4 +55,22 @@ class LessonInfoDetails {
         ? '${hours.toInt()}hrs'
         : '${hours.toStringAsFixed(1)}hrs';
   }
+}
+
+@JsonSerializable()
+class RecommendedCourse {
+  const RecommendedCourse({
+    required this.id,
+    required this.title,
+    this.coverImageUrl,
+  });
+
+  factory RecommendedCourse.fromJson(Map<String, dynamic> json) =>
+      _$RecommendedCourseFromJson(json);
+
+  final String id;
+  final String title;
+  final String? coverImageUrl;
+
+  Map<String, dynamic> toJson() => _$RecommendedCourseToJson(this);
 }

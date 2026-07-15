@@ -1,6 +1,9 @@
 import 'dart:developer';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/widget/expandable_text_widget.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_certificate_tab.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_project_tab.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart'
     as rb;
@@ -15,6 +18,7 @@ import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:learnwayv2/shared/widgets/banner_ad_slot.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 import 'package:learnwayv2/shared/widgets/card_component/lesson_cards_factory.dart';
+import 'package:learnwayv2/shared/widgets/custom_tabs.dart';
 import 'package:learnwayv2/shared/widgets/overlay_loader.dart';
 import 'package:learnwayv2/shared/widgets/screen_connectivity_wrapper.dart';
 
@@ -22,6 +26,8 @@ import '../learn_and_earn_data_source/models/lesson_info_details.dart'
     show LessonInfoDetails;
 
 enum LockState { unlocked, sequentialLocked, dailyLimitReached }
+
+enum LessonScreenTab { information, lessons, project, certificate }
 
 class LessonScreen extends StatefulWidget {
   const LessonScreen({super.key, required this.levelType});
@@ -34,8 +40,7 @@ class LessonScreen extends StatefulWidget {
 class _LessonScreenState extends State<LessonScreen>
     with
         AutoRouteAwareStateMixin<LessonScreen>,
-        ScreenLoadStateMixin<LessonScreen>,
-        SingleTickerProviderStateMixin {
+        ScreenLoadStateMixin<LessonScreen> {
   @override
   String get routeName => '/lesson/${widget.levelType.name}';
 
@@ -45,12 +50,11 @@ class _LessonScreenState extends State<LessonScreen>
   static const _adKey = 'lessonScreen2';
   final AdService _adService = AdService.instance;
 
-  late final TabController _tabController;
+  LessonScreenTab _selectedTab = LessonScreenTab.information;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
 
     final courseId = checkCourseLevelType();
 
@@ -82,7 +86,6 @@ class _LessonScreenState extends State<LessonScreen>
 
   @override
   void dispose() {
-    _tabController.dispose();
     _cleanupRegisteredInstances();
     super.dispose();
   }
@@ -174,41 +177,54 @@ class _LessonScreenState extends State<LessonScreen>
                   },
                 ),
 
-                if (_adService.shouldShowAds) ...[
-                  const VSpace(10),
-                  const BannerAdSlot(slotKey: _adKey),
-                ],
-
-                const VSpace(16),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF2F2F7),
-                      borderRadius: BorderRadius.circular(24),
+                Visibility(
+                  visible: _adService.shouldShowAds,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const BannerAdSlot(slotKey: _adKey),
+                      const VSpace(20),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: AppColors.gray200),
                     ),
-                    child: TabBar(
-                      controller: _tabController,
-                      indicator: BoxDecoration(
-                        color: AppColors.gray900,
-                        borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: CustomTabs<LessonScreenTab>(
+                    selectedValue: _selectedTab,
+                    onTabSelected: (value) =>
+                        setState(() => _selectedTab = value),
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: false,
+                    padding: EdgeInsets.zero,
+                    spacing: 10,
+                    borderRadius: 24,
+                    showCheckmark: false,
+                    defaultPadding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
+                    defaultSelectedColor: AppColors.gray900,
+                    defaultUnselectedColor: AppColors.gray100v2,
+                    defaultSelectedTextColor: Colors.white,
+                    defaultUnselectedTextColor: AppColors.gray600,
+                    defaultTextStyle: AppTextStyles.smMedium(context),
+                    tabs: const [
+                      TabItem(
+                        value: LessonScreenTab.information,
+                        label: 'Information',
                       ),
-                      labelColor: Colors.white,
-                      unselectedLabelColor: AppColors.gray600,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      dividerHeight: 0,
-                      labelStyle: AppTextStyles.smMedium(context),
-                      unselectedLabelStyle: AppTextStyles.smRegular(context),
-                      labelPadding: EdgeInsets.zero,
-                      tabs: const [
-                        Tab(text: 'Information'),
-                        Tab(text: 'Lessons'),
-                        Tab(text: 'Project'),
-                        Tab(text: 'Certificate'),
-                      ],
-                    ),
+                      TabItem(value: LessonScreenTab.lessons, label: 'Lessons'),
+                      TabItem(value: LessonScreenTab.project, label: 'Project'),
+                      TabItem(
+                        value: LessonScreenTab.certificate,
+                        label: 'Certificate',
+                      ),
+                    ],
                   ),
                 ),
 
@@ -245,8 +261,8 @@ class _LessonScreenState extends State<LessonScreen>
 
                         final lessons = _getLessons(state);
 
-                        return TabBarView(
-                          controller: _tabController,
+                        return IndexedStack(
+                          index: _selectedTab.index,
                           children: [
                             BlocBuilder<CourseInfoCubit, CourseInfoState>(
                               builder: (context, infoState) {
@@ -273,10 +289,8 @@ class _LessonScreenState extends State<LessonScreen>
                               lessons: lessons?.lessons ?? [],
                               levelType: widget.levelType,
                             ),
-
-                            const _ProjectTab(),
-
-                            const _CertificateTab(),
+                            const ProjectTab(),
+                            const CertificateTab(),
                           ],
                         );
                       },
@@ -339,22 +353,19 @@ class _InformationTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('About course', style: AppTextStyles.mdBold(context)),
-          const VSpace(8),
-          Text(
-            courseData.description,
-            style: AppTextStyles.smRegular(
-              context,
-            ).copyWith(color: AppColors.gray600),
-          ),
-          const VSpace(8),
-          GestureDetector(
-            onTap: () {},
-            child: Text(
-              'Show more...',
-              style: AppTextStyles.smMedium(
-                context,
-              ).copyWith(color: AppColors.primary25),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('About course', style: AppTextStyles.mdBold(context)),
+                const VSpace(8),
+                ExpandableDescription(text: courseData.description),
+              ],
             ),
           ),
           const VSpace(24),
@@ -378,43 +389,108 @@ class _InformationTab extends StatelessWidget {
           ),
           const VSpace(24),
 
-          Text('Skills you\'ll gain', style: AppTextStyles.mdBold(context)),
-          const VSpace(12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: courseData.skillsGained
-                .map((tag) => _SkillChip(tag))
-                .toList(),
+          Container(
+            padding: const EdgeInsets.all(16),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Skills you\'ll gain',
+                  style: AppTextStyles.mdBold(context),
+                ),
+                const VSpace(12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: courseData.skillsGained
+                      .map((tag) => _SkillChip(tag))
+                      .toList(),
+                ),
+              ],
+            ),
           ),
+
+          const VSpace(24),
+          Container(
+            padding: const EdgeInsets.all(16),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Prerequisite', style: AppTextStyles.mdBold(context)),
+                const VSpace(12),
+                ...courseData.prerequisites.map(
+                  (prerequisite) => _PrerequisiteItem(prerequisite),
+                ),
+              ],
+            ),
+          ),
+
           const VSpace(24),
 
-          Text('Prerequisite', style: AppTextStyles.mdBold(context)),
-          const VSpace(12),
-          ...courseData.prerequisites.map(
-            (prerequisite) => _PrerequisiteItem(prerequisite),
+          Container(
+            padding: const EdgeInsets.all(16),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Who this course is for',
+                  style: AppTextStyles.mdBold(context),
+                ),
+                const VSpace(8),
+                Text(
+                  courseData.targetAudience ?? '',
+                  style: AppTextStyles.smRegular(
+                    context,
+                  ).copyWith(color: AppColors.gray600),
+                ),
+              ],
+            ),
           ),
-          const VSpace(24),
 
-          Text('Who this course is for', style: AppTextStyles.mdBold(context)),
-          const VSpace(8),
-          Text(
-            courseData.targetAudience ?? '',
-            style: AppTextStyles.smRegular(
-              context,
-            ).copyWith(color: AppColors.gray600),
+          const VSpace(24),
+          Container(
+            padding: const EdgeInsets.all(16),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Career Opportunities',
+                  style: AppTextStyles.mdBold(context),
+                ),
+                const VSpace(12),
+                ...courseData.careerOpportunities.map((opp) {
+                  return _CareerItem(opp, '');
+                }),
+              ],
+            ),
           ),
-          const VSpace(24),
 
-          Text('Career Opportunities', style: AppTextStyles.mdBold(context)),
-          const VSpace(12),
-          ...courseData.careerOpportunities.map((opp) {
-            return _CareerItem(opp, '');
-          }),
           const VSpace(24),
           Text('Recommended Next', style: AppTextStyles.mdBold(context)),
           const VSpace(12),
-          _RecommendedNextCard(title: courseData.recommendedNextCourse ?? ''),
+          _RecommendedNextCard(
+            title: courseData.recommendedNextCourse?.title ?? '',
+          ),
           const VSpace(24),
         ],
       ),
@@ -433,8 +509,7 @@ class _InfoCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.gray200),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -546,11 +621,10 @@ class _RecommendedNextCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.gray200),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
@@ -612,76 +686,6 @@ class _LessonsTab extends StatelessWidget {
             child: LessonBuilder(lessons: lessons, levelType: levelType),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ProjectTab extends StatelessWidget {
-  const _ProjectTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.construction, size: 48, color: AppColors.gray300),
-            const VSpace(16),
-            Text(
-              'Project details coming soon',
-              style: AppTextStyles.mdBold(
-                context,
-              ).copyWith(color: AppColors.gray600),
-              textAlign: TextAlign.center,
-            ),
-            const VSpace(8),
-            Text(
-              'Build something amazing once you finish the lessons.',
-              style: AppTextStyles.smRegular(
-                context,
-              ).copyWith(color: AppColors.gray500),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CertificateTab extends StatelessWidget {
-  const _CertificateTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.card_membership, size: 48, color: AppColors.gray300),
-            const VSpace(16),
-            Text(
-              'Complete the course to unlock your certificate',
-              style: AppTextStyles.mdBold(
-                context,
-              ).copyWith(color: AppColors.gray600),
-              textAlign: TextAlign.center,
-            ),
-            const VSpace(8),
-            Text(
-              'A verifiable certificate will be minted directly to your wallet.',
-              style: AppTextStyles.smRegular(
-                context,
-              ).copyWith(color: AppColors.gray500),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
     );
   }
