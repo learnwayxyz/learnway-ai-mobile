@@ -37,6 +37,13 @@ class LessonInfoDetails {
 
   Map<String, dynamic> toJson() => _$LessonInfoDetailsToJson(this);
 
+  bool get hasInformation =>
+      description.trim().isNotEmpty ||
+      skillsGained.isNotEmpty ||
+      prerequisites.isNotEmpty ||
+      (targetAudience?.trim().isNotEmpty ?? false) ||
+      careerOpportunities.isNotEmpty;
+
   String get difficultyLabel {
     return switch (difficultyLevel) {
       1 => 'Beginner',

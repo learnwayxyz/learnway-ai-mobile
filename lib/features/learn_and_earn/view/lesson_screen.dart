@@ -2,8 +2,6 @@ import 'dart:developer';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/expandable_text_widget.dart';
-import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_certificate_tab.dart';
-import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_project_tab.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart'
     as rb;
@@ -23,7 +21,7 @@ import 'package:learnwayv2/shared/widgets/overlay_loader.dart';
 import 'package:learnwayv2/shared/widgets/screen_connectivity_wrapper.dart';
 
 import '../learn_and_earn_data_source/models/lesson_info_details.dart'
-    show LessonInfoDetails;
+    show LessonInfoDetails, RecommendedCourse;
 
 enum LockState { unlocked, sequentialLocked, dailyLimitReached }
 
@@ -181,10 +179,7 @@ class _LessonScreenState extends State<LessonScreen>
                   visible: _adService.shouldShowAds,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const BannerAdSlot(slotKey: _adKey),
-                      const VSpace(20),
-                    ],
+                    children: [const BannerAdSlot(slotKey: _adKey)],
                   ),
                 ),
                 Container(
@@ -271,6 +266,11 @@ class _LessonScreenState extends State<LessonScreen>
                                     child: CircularProgressIndicator(),
                                   );
                                 } else if (infoState is CourseInfoLoaded) {
+                                  if (!infoState.data.hasInformation) {
+                                    return _InformationEmptyState(
+                                      courseTitle: courseData.courseTitle,
+                                    );
+                                  }
                                   return _InformationTab(
                                     courseData: infoState.data,
                                   );
@@ -282,15 +282,19 @@ class _LessonScreenState extends State<LessonScreen>
                                     ),
                                   );
                                 }
-                                return const SizedBox();
+                                return _InformationEmptyState(
+                                  courseTitle: courseData.courseTitle,
+                                );
                               },
                             ),
                             _LessonsTab(
                               lessons: lessons?.lessons ?? [],
                               levelType: widget.levelType,
                             ),
-                            const ProjectTab(),
-                            const CertificateTab(),
+                            // TODO: restore ProjectTab and CertificateTab
+                            // once their endpoints are implemented.
+                            const _ComingSoonState(),
+                            const _ComingSoonState(),
                           ],
                         );
                       },
@@ -342,33 +346,94 @@ class _ErrorState extends StatelessWidget {
   }
 }
 
+class _ComingSoonState extends StatelessWidget {
+  const _ComingSoonState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(Assets.images.noCompletedCourse.path),
+            const SizedBox(height: 16),
+            Text(
+              'Coming soon',
+              style: AppTextStyles.xxlBold(
+                context,
+              ).copyWith(color: AppColors.gray600),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InformationEmptyState extends StatelessWidget {
+  const _InformationEmptyState({required this.courseTitle});
+  final String courseTitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(Assets.images.noCompletedCourse.path),
+            const SizedBox(height: 16),
+            Text(
+              'No information to show for $courseTitle',
+              style: AppTextStyles.xxlBold(
+                context,
+              ).copyWith(color: AppColors.gray600),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _InformationTab extends StatelessWidget {
   const _InformationTab({required this.courseData});
   final LessonInfoDetails courseData;
 
   @override
   Widget build(BuildContext context) {
+    final recommendedNext = courseData.recommendedNextCourse;
+    final hasRecommendedNext =
+        recommendedNext != null && recommendedNext.id.trim().isNotEmpty;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+          if (courseData.description.trim().isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('About course', style: AppTextStyles.mdBold(context)),
+                  const VSpace(8),
+                  ExpandableDescription(text: courseData.description),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('About course', style: AppTextStyles.mdBold(context)),
-                const VSpace(8),
-                ExpandableDescription(text: courseData.description),
-              ],
-            ),
-          ),
-          const VSpace(24),
+            const VSpace(24),
+          ],
 
           Row(
             children: [
@@ -378,120 +443,129 @@ class _InformationTab extends StatelessWidget {
                   value: courseData.difficultyLabel,
                 ),
               ),
-              const HSpace(12),
-              Expanded(
-                child: _InfoCard(
-                  label: 'Estimated Time',
-                  value: '${courseData.estimatedCompletionMinutes}',
+              if (courseData.estimatedTimeLabel != null) ...[
+                const HSpace(12),
+                Expanded(
+                  child: _InfoCard(
+                    label: 'Estimated Time',
+                    value: courseData.estimatedTimeLabel!,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
           const VSpace(24),
 
-          Container(
-            padding: const EdgeInsets.all(16),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+          if (courseData.skillsGained.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Skills you\'ll gain',
+                    style: AppTextStyles.mdBold(context),
+                  ),
+                  const VSpace(12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: courseData.skillsGained
+                        .map((tag) => _SkillChip(tag))
+                        .toList(),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Skills you\'ll gain',
-                  style: AppTextStyles.mdBold(context),
-                ),
-                const VSpace(12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: courseData.skillsGained
-                      .map((tag) => _SkillChip(tag))
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
+            const VSpace(24),
+          ],
 
-          const VSpace(24),
-          Container(
-            padding: const EdgeInsets.all(16),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+          if (courseData.prerequisites.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Prerequisite', style: AppTextStyles.mdBold(context)),
+                  const VSpace(12),
+                  ...courseData.prerequisites.map(
+                    (prerequisite) => _PrerequisiteItem(prerequisite),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Prerequisite', style: AppTextStyles.mdBold(context)),
-                const VSpace(12),
-                ...courseData.prerequisites.map(
-                  (prerequisite) => _PrerequisiteItem(prerequisite),
-                ),
-              ],
-            ),
-          ),
+            const VSpace(24),
+          ],
 
-          const VSpace(24),
+          if (courseData.targetAudience?.trim().isNotEmpty ?? false) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Who this course is for',
+                    style: AppTextStyles.mdBold(context),
+                  ),
+                  const VSpace(8),
+                  Text(
+                    courseData.targetAudience!,
+                    style: AppTextStyles.smRegular(
+                      context,
+                    ).copyWith(color: AppColors.gray600),
+                  ),
+                ],
+              ),
+            ),
+            const VSpace(24),
+          ],
 
-          Container(
-            padding: const EdgeInsets.all(16),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+          if (courseData.careerOpportunities.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Career Opportunities',
+                    style: AppTextStyles.mdBold(context),
+                  ),
+                  const VSpace(12),
+                  ...courseData.careerOpportunities.map((opp) {
+                    return _CareerItem(opp, '');
+                  }),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Who this course is for',
-                  style: AppTextStyles.mdBold(context),
-                ),
-                const VSpace(8),
-                Text(
-                  courseData.targetAudience ?? '',
-                  style: AppTextStyles.smRegular(
-                    context,
-                  ).copyWith(color: AppColors.gray600),
-                ),
-              ],
-            ),
-          ),
+            const VSpace(24),
+          ],
 
-          const VSpace(24),
-          Container(
-            padding: const EdgeInsets.all(16),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Career Opportunities',
-                  style: AppTextStyles.mdBold(context),
-                ),
-                const VSpace(12),
-                ...courseData.careerOpportunities.map((opp) {
-                  return _CareerItem(opp, '');
-                }),
-              ],
-            ),
-          ),
-
-          const VSpace(24),
-          Text('Recommended Next', style: AppTextStyles.mdBold(context)),
-          const VSpace(12),
-          _RecommendedNextCard(
-            title: courseData.recommendedNextCourse?.title ?? '',
-          ),
-          const VSpace(24),
+          if (hasRecommendedNext) ...[
+            Text('Recommended Next', style: AppTextStyles.mdBold(context)),
+            const VSpace(12),
+            _RecommendedNextCard(course: recommendedNext),
+            const VSpace(24),
+          ],
         ],
       ),
     );
@@ -615,8 +689,8 @@ class _CareerItem extends StatelessWidget {
 }
 
 class _RecommendedNextCard extends StatelessWidget {
-  const _RecommendedNextCard({required this.title});
-  final String title;
+  const _RecommendedNextCard({required this.course});
+  final RecommendedCourse course;
 
   @override
   Widget build(BuildContext context) {
@@ -649,7 +723,7 @@ class _RecommendedNextCard extends StatelessWidget {
                   ).copyWith(color: AppColors.gray500),
                 ),
                 const VSpace(2),
-                Text(title, style: AppTextStyles.smMedium(context)),
+                Text(course.title, style: AppTextStyles.smMedium(context)),
               ],
             ),
           ),
