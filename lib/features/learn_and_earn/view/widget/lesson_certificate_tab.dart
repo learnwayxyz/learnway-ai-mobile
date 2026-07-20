@@ -1,39 +1,212 @@
 import 'package:learnwayv2/app/app_barrel.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/certificate_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/shared/container_extension.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
 class CertificateTab extends StatelessWidget {
-  const CertificateTab({super.key, this.isLocked = true});
+  const CertificateTab({super.key, required this.courseId});
 
-  final bool isLocked;
+  final String courseId;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return BlocListener<CertificateCubit, CertificateState>(
+      listener: (context, state) {
+        if (state is CertificateError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.error)));
+        }
+      },
+      child: BlocBuilder<CertificateCubit, CertificateState>(
+        builder: (context, state) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: switch (state) {
+              CertificateClaimed(:final certificate) => _ClaimedView(
+                certificate: certificate,
+              ),
+              _ => _UnclaimedView(
+                courseId: courseId,
+                isClaiming: state is CertificateClaiming,
+              ),
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _UnclaimedView extends StatelessWidget {
+  const _UnclaimedView({required this.courseId, required this.isClaiming});
+
+  final String courseId;
+  final bool isClaiming;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const _CertificateCard(isLocked: true),
+        const VSpace(24),
+        ButtonFactory.blackButton(
+          mainAxisAlignment: MainAxisAlignment.center,
+          text: 'Claim Certificate',
+          isLoading: isClaiming,
+          onPressed: isClaiming
+              ? () {}
+              : () => _showClaimSheet(context, courseId),
+        ),
+        const VSpace(24),
+      ],
+    );
+  }
+
+  void _showClaimSheet(BuildContext context, String courseId) {
+    final cubit = context.read<CertificateCubit>();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) => BlocProvider.value(
+        value: cubit,
+        child: _ClaimCertificateSheet(courseId: courseId),
+      ),
+    );
+  }
+}
+
+class _ClaimCertificateSheet extends StatefulWidget {
+  const _ClaimCertificateSheet({required this.courseId});
+
+  final String courseId;
+
+  @override
+  State<_ClaimCertificateSheet> createState() => _ClaimCertificateSheetState();
+}
+
+class _ClaimCertificateSheetState extends State<_ClaimCertificateSheet> {
+  final _nameController = TextEditingController();
+  String? _errorText;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      setState(() => _errorText = 'Enter your full name');
+      return;
+    }
+    context.read<CertificateCubit>().claimCertificate(widget.courseId, name);
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        24,
+        24,
+        24,
+        MediaQuery.viewInsetsOf(context).bottom + 24,
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _CertificateCard(isLocked: isLocked),
-          const VSpace(24),
-          Row(
-            children: [
-              Expanded(
-                child: _GradientButton(text: 'Download Pdf', onPressed: () {}),
-              ),
-              const HSpace(16),
-              Expanded(
-                child: ButtonFactory.blackButton(
-                  text: 'Share',
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  onPressed: () {},
-                ),
-              ),
-            ],
+          Text('Claim your certificate', style: AppTextStyles.lgBold(context)),
+          const VSpace(8),
+          Text(
+            "Enter the full name you'd like printed on your certificate.",
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray500),
           ),
-          const VSpace(24),
+          const VSpace(16),
+          TextField(
+            controller: _nameController,
+            textCapitalization: TextCapitalization.words,
+            decoration: InputDecoration(
+              hintText: 'Full name',
+              errorText: _errorText,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.gray200),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.gray200),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.primary500),
+              ),
+            ),
+            onChanged: (_) {
+              if (_errorText != null) setState(() => _errorText = null);
+            },
+          ),
+          const VSpace(20),
+          ButtonFactory.blackButton(
+            mainAxisAlignment: MainAxisAlignment.center,
+            text: 'Submit',
+            onPressed: _submit,
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _ClaimedView extends StatelessWidget {
+  const _ClaimedView({required this.certificate});
+
+  final CertificateClaim certificate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _CertificateCard(isLocked: false, imageUrl: certificate.imageUri),
+        const VSpace(12),
+        Text(
+          '${certificate.courseTitle} · ${certificate.studentName}',
+          style: AppTextStyles.smMedium(
+            context,
+          ).copyWith(color: AppColors.gray600),
+          textAlign: TextAlign.center,
+        ),
+        const VSpace(24),
+        Row(
+          children: [
+            Expanded(
+              child: _GradientButton(text: 'Download Pdf', onPressed: () {}),
+            ),
+            const HSpace(16),
+            Expanded(
+              child: ButtonFactory.blackButton(
+                text: 'Share',
+                mainAxisAlignment: MainAxisAlignment.center,
+                onPressed: () {},
+              ),
+            ),
+          ],
+        ),
+        const VSpace(24),
+      ],
     );
   }
 }
@@ -82,17 +255,20 @@ class _GradientButton extends StatelessWidget {
 }
 
 class _CertificateCard extends StatelessWidget {
-  const _CertificateCard({required this.isLocked});
+  const _CertificateCard({required this.isLocked, this.imageUrl});
 
   final bool isLocked;
+  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
-    final certificate = Image.asset(
-      Assets.images.learnwayCert.path,
-      width: double.infinity,
-      fit: BoxFit.contain,
-    );
+    final certificate = imageUrl != null && imageUrl!.isNotEmpty
+        ? Image.network(imageUrl!, width: double.infinity, fit: BoxFit.contain)
+        : Image.asset(
+            Assets.images.learnwayCert.path,
+            width: double.infinity,
+            fit: BoxFit.contain,
+          );
 
     if (!isLocked) {
       return certificate.cardStyle();
@@ -137,7 +313,7 @@ class _LockedOverlay extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 48),
           child: Text(
-            'Subscribe to Premium to unlock certificate',
+            'Claim your certificate to unlock it',
             style: AppTextStyles.baseMedium(
               context,
             ).copyWith(color: AppColors.gray900),

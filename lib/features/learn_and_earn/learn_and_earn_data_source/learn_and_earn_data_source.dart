@@ -10,6 +10,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/enrollment_response.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/intermediate_registered_course.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
@@ -590,5 +591,49 @@ class LearnAndEarnDataSource {
     } catch (e) {
       return Future.error(LearnAndEarnFailure(e.toString()));
     }
+  }
+
+  Future<CertificateClaim> claimCertificate(
+    String courseId,
+    String studentName,
+  ) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.post(
+        Endpoints.claimCertificate,
+        body: {'courseId': courseId, 'studentName': studentName},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        log('claimCertificate(): ${response.body}');
+        throw LearnAndEarnFailure(_extractErrorMessage(response.body));
+      }
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      log('claimCertificate(): $decoded');
+      return CertificateClaim.fromJson(decoded);
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } on LearnAndEarnFailure catch (e) {
+      return Future.error(e);
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  String _extractErrorMessage(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic> && decoded['message'] is String) {
+        return decoded['message'] as String;
+      }
+    } catch (_) {
+      // Fall through to the generic message below.
+    }
+    return 'Error claiming certificate';
   }
 }

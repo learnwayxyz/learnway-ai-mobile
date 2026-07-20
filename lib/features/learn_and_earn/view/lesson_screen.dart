@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_certificate_tab.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_project_tab.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/expandable_text_widget.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
@@ -317,9 +318,7 @@ class _LessonScreenState extends State<LessonScreen>
                                 };
                               },
                             ),
-                            // TODO: restore CertificateTab once its
-                            // endpoint is implemented.
-                            const _ComingSoonState(),
+                            CertificateTab(courseId: checkCourseLevelType()),
                           ],
                         );
                       },
