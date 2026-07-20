@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/advanced_registered_courses.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/beginner_registered_courses.dart';
@@ -6,6 +8,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/learn_and_earn_data_source.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/intermediate_registered_course.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
@@ -201,6 +204,51 @@ class LearnAndEarnRepository {
   ) async {
     try {
       final result = await _dataSource.fetchLessonInfoDetails(lessonId);
+      return Right(result);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, String>> uploadProjectFile(File file) async {
+    try {
+      final result = await _dataSource.uploadProjectFile(file);
+      return Right(result);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, Unit>> sendCourseProject(
+    String courseId, {
+    required String submissionType,
+    required String content,
+    required bool isDraft,
+  }) async {
+    try {
+      await _dataSource.sendCourseProject(
+        courseId,
+        submissionType: submissionType,
+        content: content,
+        isDraft: isDraft,
+      );
+      return const Right(unit);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, CourseProject?>> fetchCourseProject(
+    String courseId,
+  ) async {
+    try {
+      final result = await _dataSource.fetchCourseProject(courseId);
       return Right(result);
     } on LearnAndEarnFailure catch (e) {
       return Left(LearnAndEarnFailure(e.toString()));

@@ -358,7 +358,9 @@ class _PathCoursesScreenState extends State<PathCoursesScreen> {
         levelType,
       );
       registerCourseData(registered, levelType);
-      context.router.push(LessonRoute(levelType: levelType));
+      context.router.push(
+        LessonRoute(levelType: levelType, pathTitle: widget.pathTitle),
+      );
       return;
     }
 

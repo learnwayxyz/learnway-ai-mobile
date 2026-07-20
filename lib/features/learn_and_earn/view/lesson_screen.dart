@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_project_tab.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/expandable_text_widget.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart'
@@ -27,9 +29,11 @@ enum LockState { unlocked, sequentialLocked, dailyLimitReached }
 
 enum LessonScreenTab { information, lessons, project, certificate }
 
+@RoutePage()
 class LessonScreen extends StatefulWidget {
-  const LessonScreen({super.key, required this.levelType});
+  const LessonScreen({super.key, required this.levelType, this.pathTitle});
   final LevelType levelType;
+  final String? pathTitle;
 
   @override
   State<LessonScreen> createState() => _LessonScreenState();
@@ -62,6 +66,7 @@ class _LessonScreenState extends State<LessonScreen>
     context.read<LearnAndEarnBloc>().add(const FetchDailyLessonsRemaining());
 
     context.read<CourseInfoCubit>().fetchCourseInfo(courseId);
+    context.read<CourseProjectCubit>().fetchCourseProject(courseId);
 
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -135,6 +140,9 @@ class _LessonScreenState extends State<LessonScreen>
           FetchCourseLessons(id: checkCourseLevelType(), forceRefresh: true),
         );
         context.read<CourseInfoCubit>().fetchCourseInfo(checkCourseLevelType());
+        context.read<CourseProjectCubit>().fetchCourseProject(
+          checkCourseLevelType(),
+        );
       },
       child: PopScope(
         canPop: true,
@@ -143,7 +151,7 @@ class _LessonScreenState extends State<LessonScreen>
         },
         child: Scaffold(
           appBar: AppBarFactory.standardAppBar(
-            title: courseData.courseTitle,
+            title: widget.pathTitle ?? courseData.courseTitle,
             barHeight: 0,
             onBackPressed: () {
               checkLevelType();
@@ -291,9 +299,26 @@ class _LessonScreenState extends State<LessonScreen>
                               lessons: lessons?.lessons ?? [],
                               levelType: widget.levelType,
                             ),
-                            // TODO: restore ProjectTab and CertificateTab
-                            // once their endpoints are implemented.
-                            const _ComingSoonState(),
+                            BlocBuilder<CourseProjectCubit, CourseProjectState>(
+                              builder: (context, projectState) {
+                                return switch (projectState) {
+                                  CourseProjectLoading() => const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                  CourseProjectLoaded(:final project) =>
+                                    ProjectTab(project: project),
+                                  CourseProjectError(:final error) => Center(
+                                    child: Text(
+                                      error,
+                                      style: AppTextStyles.smRegular(context),
+                                    ),
+                                  ),
+                                  _ => const _ComingSoonState(),
+                                };
+                              },
+                            ),
+                            // TODO: restore CertificateTab once its
+                            // endpoint is implemented.
                             const _ComingSoonState(),
                           ],
                         );

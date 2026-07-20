@@ -10,6 +10,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/enrollment_response.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/intermediate_registered_course.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
@@ -491,6 +492,97 @@ class LearnAndEarnDataSource {
       log('fetchLessonInfoDetails(): $decoded');
       final lessonInfoDetails = LessonInfoDetails.fromJson(decoded);
       return lessonInfoDetails;
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<CourseProject?> fetchCourseProject(String courseId) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.get(
+        Endpoints.courseProject(courseId),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 404) return null;
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw LearnAndEarnFailure('Error fetching course project');
+      }
+      final decoded = jsonDecode(response.body);
+      log('fetchCourseProject(): $decoded');
+      return CourseProject.fromJson(decoded);
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<String> uploadProjectFile(File file) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.postMultipart(
+        Endpoints.uploadImage,
+        fields: {},
+        files: {'file': file},
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      final decoded = jsonDecode(response.body);
+      log('uploadProjectFile(): $decoded');
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw LearnAndEarnFailure('Error uploading file');
+      }
+      final url =
+          decoded['url'] ??
+          decoded['fileUrl'] ??
+          decoded['secureUrl'] ??
+          (decoded['data'] is Map ? decoded['data']['url'] : null);
+      if (url is! String || url.isEmpty) {
+        throw LearnAndEarnFailure('Upload succeeded but no file URL returned');
+      }
+      return url;
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<void> sendCourseProject(
+    String courseId, {
+    required String submissionType,
+    required String content,
+    required bool isDraft,
+  }) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.post(
+        isDraft
+            ? Endpoints.courseProjectDraft(courseId)
+            : Endpoints.courseProjectSubmit(courseId),
+        body: {'submissionType': submissionType, 'content': content},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        log('sendCourseProject(): ${response.body}');
+        throw LearnAndEarnFailure(
+          isDraft ? 'Error saving project draft' : 'Error submitting project',
+        );
+      }
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
     } on HttpException catch (e) {

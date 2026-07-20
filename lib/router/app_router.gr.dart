@@ -2779,10 +2779,15 @@ class LessonRoute extends PageRouteInfo<LessonRouteArgs> {
   LessonRoute({
     Key? key,
     required LevelType levelType,
+    String? pathTitle,
     List<PageRouteInfo>? children,
   }) : super(
          LessonRoute.name,
-         args: LessonRouteArgs(key: key, levelType: levelType),
+         args: LessonRouteArgs(
+           key: key,
+           levelType: levelType,
+           pathTitle: pathTitle,
+         ),
          initialChildren: children,
        );
 
@@ -2792,32 +2797,40 @@ class LessonRoute extends PageRouteInfo<LessonRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<LessonRouteArgs>();
-      return LessonScreen(key: args.key, levelType: args.levelType);
+      return LessonScreen(
+        key: args.key,
+        levelType: args.levelType,
+        pathTitle: args.pathTitle,
+      );
     },
   );
 }
 
 class LessonRouteArgs {
-  const LessonRouteArgs({this.key, required this.levelType});
+  const LessonRouteArgs({this.key, required this.levelType, this.pathTitle});
 
   final Key? key;
 
   final LevelType levelType;
 
+  final String? pathTitle;
+
   @override
   String toString() {
-    return 'LessonRouteArgs{key: $key, levelType: $levelType}';
+    return 'LessonRouteArgs{key: $key, levelType: $levelType, pathTitle: $pathTitle}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! LessonRouteArgs) return false;
-    return key == other.key && levelType == other.levelType;
+    return key == other.key &&
+        levelType == other.levelType &&
+        pathTitle == other.pathTitle;
   }
 
   @override
-  int get hashCode => key.hashCode ^ levelType.hashCode;
+  int get hashCode => key.hashCode ^ levelType.hashCode ^ pathTitle.hashCode;
 }
 
 /// generated route for

@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/shared/container_extension.dart';
+import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
 enum SubmissionStatus { notSubmitted, submitted, review, completed }
@@ -31,68 +37,201 @@ class ScoreItem {
 class ProjectTab extends StatelessWidget {
   const ProjectTab({
     super.key,
+    required this.project,
     this.phase = ProjectPhase.notSubmitted,
     this.uploadedFiles = const [],
     this.uploadError,
   });
 
+  final CourseProject project;
   final ProjectPhase phase;
   final List<ProjectFile> uploadedFiles;
   final String? uploadError;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: switch (phase) {
-        ProjectPhase.notSubmitted => _NotSubmittedView(
-          uploadedFiles: uploadedFiles,
-          uploadError: uploadError,
-        ),
-        ProjectPhase.evaluating => const _EvaluatingView(),
-        ProjectPhase.evaluated => const _EvaluatedView(),
+    return BlocListener<CourseProjectCubit, CourseProjectState>(
+      listener: (context, state) {
+        final message = switch (state) {
+          CourseProjectDraftSaved() => 'Draft saved',
+          CourseProjectSubmitted() => 'Project submitted',
+          CourseProjectActionError(:final error) => error,
+          _ => null,
+        };
+        if (message != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(message)));
+        }
       },
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: switch (phase) {
+          ProjectPhase.notSubmitted => _NotSubmittedView(
+            project: project,
+            uploadedFiles: uploadedFiles,
+            uploadError: uploadError,
+          ),
+          ProjectPhase.evaluating => const _EvaluatingView(),
+          ProjectPhase.evaluated => const _EvaluatedView(),
+        },
+      ),
     );
   }
 }
 
-class _NotSubmittedView extends StatelessWidget {
-  const _NotSubmittedView({required this.uploadedFiles, this.uploadError});
+class _NotSubmittedView extends StatefulWidget {
+  const _NotSubmittedView({
+    required this.project,
+    required this.uploadedFiles,
+    this.uploadError,
+  });
 
+  final CourseProject project;
   final List<ProjectFile> uploadedFiles;
   final String? uploadError;
 
   @override
+  State<_NotSubmittedView> createState() => _NotSubmittedViewState();
+}
+
+class _NotSubmittedViewState extends State<_NotSubmittedView> {
+  final _contentController = TextEditingController();
+  late String _selectedType;
+  File? _pickedFile;
+  String? _draftFileUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    final types = widget.project.submissionTypes;
+    _selectedType = types.first;
+
+    final draft = LocalStorageService.getProjectDraft(widget.project.courseId);
+    if (draft != null) {
+      if (types.contains(draft.submissionType)) {
+        _selectedType = draft.submissionType;
+      }
+      if (CourseProject.isFileContent(_selectedType)) {
+        _draftFileUrl = draft.content.isEmpty ? null : draft.content;
+      } else {
+        _contentController.text = draft.content;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const _ProjectAssignmentCard(
+        _ProjectAssignmentCard(
           submissionStatus: SubmissionStatus.notSubmitted,
-          assignmentTitle: 'Build a Token Swap Contract',
+          assignmentTitle: widget.project.title,
           assignmentDescriptionText:
-              'Write and deploy a smart contract that lets two ERC-20 '
-              'tokens be exchanged at a fixed rate. Cover the happy path, '
-              'one edge case, and one security guard of your choice',
+              'Passing score: '
+              '${widget.project.passingScore}/${widget.project.maxScore}',
         ),
         const VSpace(16),
-        const _InstructionsCard(
-          instructions: [
-            'Set up your contract with two token addresses',
-            'Implement the swap function with slippage checks',
-            'Add a reentrancy guard',
-            'Write at least 3 unit tests',
-          ],
-        ),
+        _InstructionsCard(instructions: widget.project.instructions),
         const VSpace(16),
-        _UploadWorkCard(uploadedFiles: uploadedFiles, uploadError: uploadError),
+        _UploadWorkCard(
+          project: widget.project,
+          uploadedFiles: widget.uploadedFiles,
+          uploadError: widget.uploadError,
+          contentController: _contentController,
+          selectedType: _selectedType,
+          onTypeSelected: (type) => setState(() => _selectedType = type),
+          pickedFile: _pickedFile,
+          draftFileUrl: _draftFileUrl,
+          onPickFile: _pickFile,
+          onRemoveFile: () => setState(() {
+            _pickedFile = null;
+            _draftFileUrl = null;
+          }),
+        ),
         const VSpace(24),
-        ButtonFactory.blackButton(
-          mainAxisAlignment: MainAxisAlignment.center,
-          text: 'Submit',
-          onPressed: () {},
+        BlocBuilder<CourseProjectCubit, CourseProjectState>(
+          builder: (context, state) {
+            final sending = state is CourseProjectSending ? state : null;
+            final isSending = sending != null;
+            return Column(
+              children: [
+                ButtonFactory.grayButton(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  text: 'Add to draft',
+                  isLoading: sending?.isDraft ?? false,
+                  onPressed: isSending ? () {} : _saveDraft,
+                ),
+                const VSpace(12),
+                ButtonFactory.blackButton(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  text: sending != null && !sending.isDraft
+                      ? 'Submitting...'
+                      : 'Submit',
+                  onPressed: isSending ? () {} : _submit,
+                ),
+              ],
+            );
+          },
         ),
         const VSpace(24),
       ],
+    );
+  }
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.pickFiles(
+      type: _selectedType == 'IMAGE' ? FileType.image : FileType.custom,
+      allowedExtensions: switch (_selectedType) {
+        'PDF' => ['pdf'],
+        'DOCUMENT' => ['pdf', 'doc', 'docx', 'txt'],
+        _ => null,
+      },
+    );
+    final path = result?.files.single.path;
+    if (path == null) return;
+    setState(() {
+      _pickedFile = File(path);
+      _draftFileUrl = null;
+    });
+  }
+
+  bool _isFileType() => CourseProject.isFileContent(_selectedType);
+
+  void _saveDraft() {
+    context.read<CourseProjectCubit>().saveDraft(
+      widget.project.courseId,
+      submissionType: _selectedType,
+      content: _isFileType()
+          ? (_draftFileUrl ?? '')
+          : _contentController.text.trim(),
+      file: _isFileType() ? _pickedFile : null,
+    );
+  }
+
+  void _submit() {
+    final isFile = _isFileType();
+    final content = isFile
+        ? (_draftFileUrl ?? '')
+        : _contentController.text.trim();
+    if (content.isEmpty && (!isFile || _pickedFile == null)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Add your work before submitting')),
+      );
+      return;
+    }
+    context.read<CourseProjectCubit>().submitProject(
+      widget.project.courseId,
+      submissionType: _selectedType,
+      content: content,
+      file: isFile ? _pickedFile : null,
     );
   }
 }
@@ -103,6 +242,7 @@ class _EvaluatingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SubmissionSummaryCard(
           submissionStatus: SubmissionStatus.submitted,
@@ -124,6 +264,7 @@ class _EvaluatedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SubmissionSummaryCard(
           submissionStatus: SubmissionStatus.review,
@@ -207,26 +348,29 @@ class _ProjectAssignmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _SubmissionStatusCapsule(status: submissionStatus),
-        const VSpace(12),
-        Text(
-          assignmentTitle,
-          style: AppTextStyles.lgBold(
-            context,
-          ).copyWith(color: AppColors.gray900),
-        ),
-        const VSpace(8),
-        Text(
-          assignmentDescriptionText,
-          style: AppTextStyles.smRegular(
-            context,
-          ).copyWith(color: AppColors.gray500),
-        ),
-      ],
-    ).cardStyle();
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SubmissionStatusCapsule(status: submissionStatus),
+          const VSpace(12),
+          Text(
+            assignmentTitle,
+            style: AppTextStyles.lgBold(
+              context,
+            ).copyWith(color: AppColors.gray900),
+          ),
+          const VSpace(8),
+          Text(
+            assignmentDescriptionText,
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray500),
+          ),
+        ],
+      ).cardStyle(),
+    );
   }
 }
 
@@ -443,7 +587,7 @@ class _FeedbackCard extends StatelessWidget {
 class _InstructionsCard extends StatelessWidget {
   const _InstructionsCard({required this.instructions});
 
-  final List<String> instructions;
+  final String instructions;
 
   @override
   Widget build(BuildContext context) {
@@ -457,64 +601,48 @@ class _InstructionsCard extends StatelessWidget {
           ).copyWith(color: AppColors.gray900),
         ),
         const VSpace(12),
-        for (var i = 0; i < instructions.length; i++) ...[
-          if (i > 0)
-            Divider(height: 24, thickness: 1, color: AppColors.gray100),
-          _InstructionRow(index: i + 1, text: instructions[i]),
-        ],
+        Text(
+          instructions,
+          style: AppTextStyles.smRegular(
+            context,
+          ).copyWith(color: AppColors.gray700),
+        ),
       ],
     ).cardStyle();
   }
 }
 
-class _InstructionRow extends StatelessWidget {
-  const _InstructionRow({required this.index, required this.text});
-
-  final int index;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 22,
-          height: 22,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppColors.success50,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Text(
-            '$index',
-            style: AppTextStyles.xsMedium(
-              context,
-            ).copyWith(color: AppColors.success700),
-          ),
-        ),
-        const HSpace(12),
-        Expanded(
-          child: Text(
-            text,
-            style: AppTextStyles.smRegular(
-              context,
-            ).copyWith(color: AppColors.gray700),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _UploadWorkCard extends StatelessWidget {
-  const _UploadWorkCard({required this.uploadedFiles, this.uploadError});
+  const _UploadWorkCard({
+    required this.project,
+    required this.uploadedFiles,
+    this.uploadError,
+    required this.contentController,
+    required this.selectedType,
+    required this.onTypeSelected,
+    this.pickedFile,
+    this.draftFileUrl,
+    required this.onPickFile,
+    required this.onRemoveFile,
+  });
 
+  final CourseProject project;
   final List<ProjectFile> uploadedFiles;
   final String? uploadError;
+  final TextEditingController contentController;
+  final String selectedType;
+  final ValueChanged<String> onTypeSelected;
+  final File? pickedFile;
+  final String? draftFileUrl;
+  final VoidCallback onPickFile;
+  final VoidCallback onRemoveFile;
 
   @override
   Widget build(BuildContext context) {
+    final types = project.submissionTypes;
+    final isTyped = CourseProject.isTypedContent(selectedType);
+    final isFile = CourseProject.isFileContent(selectedType);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -524,8 +652,6 @@ class _UploadWorkCard extends StatelessWidget {
             context,
           ).copyWith(color: AppColors.gray900),
         ),
-        const VSpace(16),
-        const _FileDropZone(),
         if (uploadError != null) ...[
           const VSpace(12),
           _UploadFailedBanner(message: uploadError!),
@@ -537,31 +663,92 @@ class _UploadWorkCard extends StatelessWidget {
             _UploadedFileTile(file: uploadedFiles[i]),
           ],
         ],
-        const VSpace(20),
-        Text(
-          'Link to repository (optional)',
-          style: AppTextStyles.smMedium(
-            context,
-          ).copyWith(color: AppColors.gray700),
-        ),
-        const VSpace(8),
-        TextField(
-          decoration: _inputDecoration(context, hint: 'Paste link here'),
-        ),
+        if (types.length > 1) ...[
+          const VSpace(16),
+          Text(
+            'Submit as',
+            style: AppTextStyles.smMedium(
+              context,
+            ).copyWith(color: AppColors.gray700),
+          ),
+          const VSpace(8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final type in types)
+                ChoiceChip(
+                  label: Text(CourseProject.submissionTypeLabel(type)),
+                  selected: type == selectedType,
+                  selectedColor: AppColors.primary100,
+                  labelStyle: AppTextStyles.smMedium(context).copyWith(
+                    color: type == selectedType
+                        ? AppColors.primary700
+                        : AppColors.gray700,
+                  ),
+                  onSelected: (_) => onTypeSelected(type),
+                ),
+            ],
+          ),
+        ],
         const VSpace(16),
-        Text(
-          'Type Assignment here  (optional)',
-          style: AppTextStyles.smMedium(
-            context,
-          ).copyWith(color: AppColors.gray700),
-        ),
-        const VSpace(8),
-        TextField(
-          maxLines: 6,
-          decoration: _inputDecoration(context, hint: 'Type Assignment here'),
-        ),
+        if (isFile) ...[
+          if (pickedFile != null)
+            _UploadedFileTile(
+              file: ProjectFile(
+                name: pickedFile!.path.split('/').last,
+                size: _fileSizeLabel(pickedFile!),
+              ),
+              onRemove: onRemoveFile,
+            )
+          else if (draftFileUrl != null)
+            _UploadedFileTile(
+              file: ProjectFile(
+                name: Uri.tryParse(draftFileUrl!)?.pathSegments.lastOrNull ??
+                    draftFileUrl!,
+                size: 'Uploaded',
+              ),
+              onRemove: onRemoveFile,
+            )
+          else
+            GestureDetector(
+              onTap: onPickFile,
+              child: _FileDropZone(
+                hint: switch (selectedType) {
+                  'PDF' => '.pdf — up to 25MB',
+                  'IMAGE' => '.png · .jpg — up to 25MB',
+                  _ => '.pdf · .doc · .docx · .txt — up to 25MB',
+                },
+              ),
+            ),
+        ] else ...[
+          Text(
+            isTyped
+                ? 'Type your ${CourseProject.submissionTypeLabel(selectedType).toLowerCase()} here'
+                : CourseProject.submissionTypeLabel(selectedType),
+            style: AppTextStyles.smMedium(
+              context,
+            ).copyWith(color: AppColors.gray700),
+          ),
+          const VSpace(8),
+          TextField(
+            controller: contentController,
+            maxLines: isTyped ? 6 : 1,
+            keyboardType: isTyped ? TextInputType.multiline : TextInputType.url,
+            decoration: _inputDecoration(
+              context,
+              hint: isTyped ? 'Type your work here' : 'Paste link here',
+            ),
+          ),
+        ],
       ],
     ).cardStyle();
+  }
+
+  String _fileSizeLabel(File file) {
+    final bytes = file.lengthSync();
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)}KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)}MB';
   }
 
   InputDecoration _inputDecoration(
@@ -591,7 +778,11 @@ class _UploadWorkCard extends StatelessWidget {
 }
 
 class _FileDropZone extends StatelessWidget {
-  const _FileDropZone();
+  const _FileDropZone({
+    this.hint = '.sol · .js · .pdf · .zip — up to 25MB each',
+  });
+
+  final String hint;
 
   @override
   Widget build(BuildContext context) {
@@ -630,7 +821,7 @@ class _FileDropZone extends StatelessWidget {
             ),
             const VSpace(4),
             Text(
-              '.sol · .js · .pdf · .zip — up to 25MB each',
+              hint,
               style: AppTextStyles.xsRegular(
                 context,
               ).copyWith(color: AppColors.gray500),
@@ -643,9 +834,10 @@ class _FileDropZone extends StatelessWidget {
 }
 
 class _UploadedFileTile extends StatelessWidget {
-  const _UploadedFileTile({required this.file});
+  const _UploadedFileTile({required this.file, this.onRemove});
 
   final ProjectFile file;
+  final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -688,7 +880,14 @@ class _UploadedFileTile extends StatelessWidget {
             ).copyWith(color: AppColors.gray500),
           ),
           const HSpace(10),
-          Icon(Icons.cancel_outlined, size: 20, color: AppColors.gray700),
+          GestureDetector(
+            onTap: onRemove,
+            child: Icon(
+              Icons.cancel_outlined,
+              size: 20,
+              color: AppColors.gray700,
+            ),
+          ),
         ],
       ),
     );

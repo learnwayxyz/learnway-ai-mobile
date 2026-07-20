@@ -123,6 +123,8 @@ class ActiveLessonContentStrategy implements CardContentStrategy {
           const VSpace(4),
           Text(
             subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: AppTextStyles.xsRegular(
               context,
             ).copyWith(color: Colors.white),
@@ -203,6 +205,8 @@ class AIActiveLessonContentStrategy implements CardContentStrategy {
           const VSpace(4),
           Text(
             subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: AppTextStyles.xsRegular(
               context,
             ).copyWith(color: Colors.white),

@@ -21,6 +21,38 @@ class LocalStorageService {
     await Hive.openBox(boxName);
     await Hive.openBox(timestampBoxName);
     await Hive.openBox(exchangeRatesBoxName);
+    await Hive.openBox(projectDraftsBoxName);
+  }
+
+  static const String projectDraftsBoxName = 'project_drafts';
+
+  static Future<void> saveProjectDraft(
+    String courseId, {
+    required String submissionType,
+    required String content,
+  }) async {
+    final box = Hive.box(projectDraftsBoxName);
+    await box.put(courseId, {
+      'submissionType': submissionType,
+      'content': content,
+    });
+  }
+
+  static ({String submissionType, String content})? getProjectDraft(
+    String courseId,
+  ) {
+    final box = Hive.box(projectDraftsBoxName);
+    final draft = box.get(courseId);
+    if (draft == null) return null;
+    return (
+      submissionType: draft['submissionType'] as String? ?? '',
+      content: draft['content'] as String? ?? '',
+    );
+  }
+
+  static Future<void> clearProjectDraft(String courseId) async {
+    final box = Hive.box(projectDraftsBoxName);
+    await box.delete(courseId);
   }
 
   static Future<void> saveWalletAddress(String walletAddress) async {

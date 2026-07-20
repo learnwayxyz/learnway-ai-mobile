@@ -288,6 +288,7 @@ class ButtonFactory {
     bool isFullWidth = true,
     Widget? leadingIcon,
     Widget? trailingIcon,
+    MainAxisAlignment? mainAxisAlignment,
     double? height,
   }) {
     return Builder(
@@ -302,6 +303,7 @@ class ButtonFactory {
 
         return _baseButton(
           text: text,
+          mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
           onPressed: onPressed,
           backgroundColor: buttonColor,
           textColor: textColor,
