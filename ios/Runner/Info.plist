@@ -54,6 +54,8 @@
 	<string>Microphone access is needed for identity verification</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>App needs access to photo library for profile images</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>LearnWay saves your earned certificates to your photo library</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.com.learnway.way</key>

@@ -1,7 +1,9 @@
+import 'package:gal/gal.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/certificate_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/shared/container_extension.dart';
+import 'package:learnwayv2/features/quiz/services/lesson_share_service.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
@@ -22,6 +24,9 @@ class CertificateTab extends StatelessWidget {
       },
       child: BlocBuilder<CertificateCubit, CertificateState>(
         builder: (context, state) {
+          if (state is CertificateInitial || state is CertificateLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: switch (state) {
@@ -171,19 +176,34 @@ class _ClaimCertificateSheetState extends State<_ClaimCertificateSheet> {
   }
 }
 
-class _ClaimedView extends StatelessWidget {
+class _ClaimedView extends StatefulWidget {
   const _ClaimedView({required this.certificate});
 
   final CertificateClaim certificate;
 
   @override
+  State<_ClaimedView> createState() => _ClaimedViewState();
+}
+
+class _ClaimedViewState extends State<_ClaimedView> {
+  final _certificateKey = GlobalKey();
+  bool _isSaving = false;
+  bool _isSharing = false;
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _CertificateCard(isLocked: false, imageUrl: certificate.imageUri),
+        RepaintBoundary(
+          key: _certificateKey,
+          child: _CertificateCard(
+            isLocked: false,
+            imageUrl: widget.certificate.imageUri,
+          ),
+        ),
         const VSpace(12),
         Text(
-          '${certificate.courseTitle} · ${certificate.studentName}',
+          '${widget.certificate.courseTitle} · ${widget.certificate.studentName}',
           style: AppTextStyles.smMedium(
             context,
           ).copyWith(color: AppColors.gray600),
@@ -193,14 +213,19 @@ class _ClaimedView extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _GradientButton(text: 'Download Pdf', onPressed: () {}),
+              child: _GradientButton(
+                text: 'Download',
+                isLoading: _isSaving,
+                onPressed: _isSaving ? null : _download,
+              ),
             ),
             const HSpace(16),
             Expanded(
               child: ButtonFactory.blackButton(
                 text: 'Share',
                 mainAxisAlignment: MainAxisAlignment.center,
-                onPressed: () {},
+                isLoading: _isSharing,
+                onPressed: _isSharing ? () {} : _share,
               ),
             ),
           ],
@@ -209,13 +234,95 @@ class _ClaimedView extends StatelessWidget {
       ],
     );
   }
+
+  Future<void> _download() async {
+    setState(() => _isSaving = true);
+    try {
+      if (!await Gal.hasAccess()) {
+        final granted = await Gal.requestAccess();
+        if (!granted) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Photo library access is needed to save the certificate',
+                ),
+              ),
+            );
+          }
+          return;
+        }
+      }
+
+      // The certificate is an SVG (imageUri); rasterize the already-rendered
+      // widget instead of re-decoding/parsing the SVG ourselves.
+      final bytes = await LessonShareService.captureWidgetAsImage(
+        repaintBoundaryKey: _certificateKey,
+      );
+      if (bytes == null) throw Exception('Failed to render certificate');
+
+      await Gal.putImageBytes(
+        bytes,
+        name: 'certificate_${widget.certificate.certificateNumber}',
+        album: 'LearnWay',
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Certificate saved to your photos')),
+        );
+      }
+    } on GalException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not save certificate: ${e.type.message}'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not save certificate: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _share() async {
+    setState(() => _isSharing = true);
+    try {
+      await LessonShareService.shareWidget(
+        repaintBoundaryKey: _certificateKey,
+        text:
+            'I just earned my ${widget.certificate.courseTitle} '
+            'certificate on LearnWay!',
+        subject: 'My LearnWay certificate',
+        context: context,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not share certificate: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSharing = false);
+    }
+  }
 }
 
 class _GradientButton extends StatelessWidget {
-  const _GradientButton({required this.text, required this.onPressed});
+  const _GradientButton({
+    required this.text,
+    required this.onPressed,
+    this.isLoading = false,
+  });
 
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool isLoading;
 
   // LearnWay gradient: #215AEB (AppColors.primaryMain) → #133385 (no
   // AppColors match).
@@ -240,12 +347,21 @@ class _GradientButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Center(
-              child: Text(
-                text,
-                style: AppTextStyles.buttonText(
-                  context,
-                ).copyWith(color: Colors.white),
-              ),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      text,
+                      style: AppTextStyles.buttonText(
+                        context,
+                      ).copyWith(color: Colors.white),
+                    ),
             ),
           ),
         ),
@@ -262,13 +378,22 @@ class _CertificateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final certificate = imageUrl != null && imageUrl!.isNotEmpty
-        ? Image.network(imageUrl!, width: double.infinity, fit: BoxFit.contain)
-        : Image.asset(
-            Assets.images.learnwayCert.path,
-            width: double.infinity,
-            fit: BoxFit.contain,
-          );
+    final url = imageUrl;
+    final Widget image;
+    if (url != null && url.isNotEmpty) {
+      image = url.toLowerCase().endsWith('.svg')
+          ? SvgPicture.network(url, width: double.infinity, fit: BoxFit.contain)
+          : Image.network(url, width: double.infinity, fit: BoxFit.contain);
+    } else {
+      image = Image.asset(
+        Assets.images.learnwayCert.path,
+        width: double.infinity,
+        fit: BoxFit.contain,
+      );
+    }
+    // SvgPicture (unlike Image) needs a bounded height to lay out — the
+    // surrounding Column doesn't constrain one, so derive it from width.
+    final certificate = AspectRatio(aspectRatio: 4 / 3, child: image);
 
     if (!isLocked) {
       return certificate.cardStyle();

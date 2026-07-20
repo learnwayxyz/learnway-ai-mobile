@@ -213,22 +213,12 @@ class LearnAndEarnRepository {
     }
   }
 
-  Future<Either<Failure, String>> uploadProjectFile(File file) async {
-    try {
-      final result = await _dataSource.uploadProjectFile(file);
-      return Right(result);
-    } on LearnAndEarnFailure catch (e) {
-      return Left(LearnAndEarnFailure(e.toString()));
-    } on Exception catch (e) {
-      return Left(LearnAndEarnFailure(e.toString()));
-    }
-  }
-
   Future<Either<Failure, Unit>> sendCourseProject(
     String courseId, {
     required String submissionType,
     required String content,
     required bool isDraft,
+    File? file,
   }) async {
     try {
       await _dataSource.sendCourseProject(
@@ -236,6 +226,7 @@ class LearnAndEarnRepository {
         submissionType: submissionType,
         content: content,
         isDraft: isDraft,
+        file: file,
       );
       return const Right(unit);
     } on LearnAndEarnFailure catch (e) {
@@ -264,6 +255,17 @@ class LearnAndEarnRepository {
   ) async {
     try {
       final result = await _dataSource.claimCertificate(courseId, studentName);
+      return Right(result);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(e);
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, List<CertificateClaim>>> fetchMyCertificates() async {
+    try {
+      final result = await _dataSource.fetchMyCertificates();
       return Right(result);
     } on LearnAndEarnFailure catch (e) {
       return Left(e);

@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:learnwayv2/app/app_barrel.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/certificate_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_certificate_tab.dart';
@@ -68,6 +69,7 @@ class _LessonScreenState extends State<LessonScreen>
 
     context.read<CourseInfoCubit>().fetchCourseInfo(courseId);
     context.read<CourseProjectCubit>().fetchCourseProject(courseId);
+    context.read<CertificateCubit>().fetchCertificate(courseId);
 
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -142,6 +144,9 @@ class _LessonScreenState extends State<LessonScreen>
         );
         context.read<CourseInfoCubit>().fetchCourseInfo(checkCourseLevelType());
         context.read<CourseProjectCubit>().fetchCourseProject(
+          checkCourseLevelType(),
+        );
+        context.read<CertificateCubit>().fetchCertificate(
           checkCourseLevelType(),
         );
       },

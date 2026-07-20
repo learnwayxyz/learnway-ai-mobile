@@ -9,6 +9,10 @@ sealed class CertificateState extends Equatable {
 
 final class CertificateInitial extends CertificateState {}
 
+final class CertificateLoading extends CertificateState {}
+
+final class CertificateNotClaimed extends CertificateState {}
+
 final class CertificateClaiming extends CertificateState {}
 
 final class CertificateClaimed extends CertificateState {

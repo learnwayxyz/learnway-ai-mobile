@@ -44,21 +44,19 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
 
     emit(CourseProjectSending(project, isDraft: true));
 
-    final resolvedContent = await _resolveContent(project, content, file);
-    if (resolvedContent == null) return;
-
     // Persist locally so the draft survives even if the request fails.
     await LocalStorageService.saveProjectDraft(
       courseId,
       submissionType: submissionType,
-      content: resolvedContent,
+      content: content,
     );
 
     final result = await repository.sendCourseProject(
       courseId,
       submissionType: submissionType,
-      content: resolvedContent,
+      content: content,
       isDraft: true,
+      file: file,
     );
     result.fold(
       (failure) => emit(CourseProjectActionError(project, failure.message)),
@@ -78,14 +76,12 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
 
     emit(CourseProjectSending(project, isDraft: false));
 
-    final resolvedContent = await _resolveContent(project, content, file);
-    if (resolvedContent == null) return;
-
     final result = await repository.sendCourseProject(
       courseId,
       submissionType: submissionType,
-      content: resolvedContent,
+      content: content,
       isDraft: false,
+      file: file,
     );
     await result.fold(
       (failure) async =>
@@ -95,21 +91,5 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
         emit(CourseProjectSubmitted(project));
       },
     );
-  }
-
-  /// Uploads [file] and returns its URL as the submission content, or
-  /// returns [content] unchanged when there is no file. Returns null
-  /// (after emitting an error state) when the upload fails.
-  Future<String?> _resolveContent(
-    CourseProject project,
-    String content,
-    File? file,
-  ) async {
-    if (file == null) return content;
-    final uploaded = await repository.uploadProjectFile(file);
-    return uploaded.fold((failure) {
-      emit(CourseProjectActionError(project, failure.message));
-      return null;
-    }, (url) => url);
   }
 }

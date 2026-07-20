@@ -528,55 +528,27 @@ class LearnAndEarnDataSource {
     }
   }
 
-  Future<String> uploadProjectFile(File file) async {
-    try {
-      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
-      final response = await client.postMultipart(
-        Endpoints.uploadImage,
-        fields: {},
-        files: {'file': file},
-        headers: {'Authorization': 'Bearer $token'},
-      );
-      final decoded = jsonDecode(response.body);
-      log('uploadProjectFile(): $decoded');
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw LearnAndEarnFailure('Error uploading file');
-      }
-      final url =
-          decoded['url'] ??
-          decoded['fileUrl'] ??
-          decoded['secureUrl'] ??
-          (decoded['data'] is Map ? decoded['data']['url'] : null);
-      if (url is! String || url.isEmpty) {
-        throw LearnAndEarnFailure('Upload succeeded but no file URL returned');
-      }
-      return url;
-    } on SocketException catch (e) {
-      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
-    } on HttpException catch (e) {
-      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
-    } catch (e) {
-      return Future.error(LearnAndEarnFailure(e.toString()));
-    }
-  }
-
   Future<void> sendCourseProject(
     String courseId, {
     required String submissionType,
     required String content,
     required bool isDraft,
+    File? file,
   }) async {
     try {
       final token = await SharedPreferencesStore.getUserToken(userTokenKey);
-      final response = await client.post(
+      log('courseId: $courseId');
+      log('submissionType: $submissionType');
+      log('content: $content');
+      log('isDraft: $isDraft');
+      log('file: $file');
+      final response = await client.postMultipart(
         isDraft
             ? Endpoints.courseProjectDraft(courseId)
             : Endpoints.courseProjectSubmit(courseId),
-        body: {'submissionType': submissionType, 'content': content},
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
+        fields: {'submissionType': submissionType, 'content': content},
+        files: file != null ? {'file': file} : null,
+        headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode != 200 && response.statusCode != 201) {
         log('sendCourseProject(): ${response.body}');
@@ -614,6 +586,39 @@ class LearnAndEarnDataSource {
       final decoded = jsonDecode(response.body) as Map<String, dynamic>;
       log('claimCertificate(): $decoded');
       return CertificateClaim.fromJson(decoded);
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } on LearnAndEarnFailure catch (e) {
+      return Future.error(e);
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<List<CertificateClaim>> fetchMyCertificates() async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.get(
+        Endpoints.myCertificates,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        log('fetchMyCertificates(): ${response.body}');
+        throw LearnAndEarnFailure('Error fetching certificates');
+      }
+      final decoded = jsonDecode(response.body);
+      log('fetchMyCertificates(): $decoded');
+      final list = decoded is Map<String, dynamic>
+          ? (decoded['data'] ?? decoded['certificates'] ?? [])
+          : decoded;
+      return (list as List)
+          .map((e) => CertificateClaim.fromJson(e as Map<String, dynamic>))
+          .toList();
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
     } on HttpException catch (e) {
