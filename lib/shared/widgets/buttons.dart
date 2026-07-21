@@ -280,6 +280,58 @@ class ButtonFactory {
     );
   }
 
+  // LearnWay gradient: #215AEB (AppColors.primaryMain) → #133385 (no
+  // AppColors match).
+  static final Gradient _learnwayGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [AppColors.primaryMain, const Color(0xFF133385)],
+  );
+
+  static Widget gradientButton({
+    required String text,
+    required VoidCallback? onPressed,
+    bool isLoading = false,
+  }) {
+    return Builder(
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: _learnwayGradient,
+            borderRadius: BorderRadius.circular(_defaultBorderRadius),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(_defaultBorderRadius),
+              onTap: isLoading ? null : onPressed,
+              child: Padding(
+                padding: const EdgeInsets.all(_defaultPadding),
+                child: Center(
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          text,
+                          style: AppTextStyles.buttonText(
+                            context,
+                          ).copyWith(color: Colors.white),
+                        ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // Keep existing methods unchanged for backward compatibility
   static Widget grayButton({
     required String text,

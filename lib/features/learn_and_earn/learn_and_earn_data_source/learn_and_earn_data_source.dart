@@ -12,6 +12,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/intermediate_registered_course.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
@@ -528,7 +529,7 @@ class LearnAndEarnDataSource {
     }
   }
 
-  Future<void> sendCourseProject(
+  Future<CourseProjectSubmissionResult> sendCourseProject(
     String courseId, {
     required String submissionType,
     required String content,
@@ -546,7 +547,7 @@ class LearnAndEarnDataSource {
         isDraft
             ? Endpoints.courseProjectDraft(courseId)
             : Endpoints.courseProjectSubmit(courseId),
-        fields: {'submissionType': submissionType, 'content': content},
+        fields: {'submissionType': submissionType, 'textContent': content},
         files: file != null ? {'file': file} : null,
         headers: {'Authorization': 'Bearer $token'},
       );
@@ -556,6 +557,9 @@ class LearnAndEarnDataSource {
           isDraft ? 'Error saving project draft' : 'Error submitting project',
         );
       }
+      final decoded = jsonDecode(response.body);
+      log('sendCourseProject(): $decoded');
+      return CourseProjectSubmissionResult.fromJson(decoded);
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
     } on HttpException catch (e) {

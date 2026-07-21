@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_repository/learn_and_earn_repository.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
 
@@ -86,9 +87,9 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
     await result.fold(
       (failure) async =>
           emit(CourseProjectActionError(project, failure.message)),
-      (_) async {
+      (submissionResult) async {
         await LocalStorageService.clearProjectDraft(courseId);
-        emit(CourseProjectSubmitted(project));
+        emit(CourseProjectSubmitted(project, submissionResult));
       },
     );
   }

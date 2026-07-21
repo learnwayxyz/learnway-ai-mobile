@@ -10,6 +10,7 @@ class LessonInfoDetails {
     required this.id,
     required this.title,
     required this.description,
+    this.longDescription,
     required this.difficultyLevel,
     this.estimatedCompletionMinutes,
     this.skillsGained = const [],
@@ -25,6 +26,7 @@ class LessonInfoDetails {
   final String id;
   final String title;
   final String description;
+  final String? longDescription;
 
   final int difficultyLevel;
 
@@ -37,8 +39,15 @@ class LessonInfoDetails {
 
   Map<String, dynamic> toJson() => _$LessonInfoDetailsToJson(this);
 
+  /// Text for the "About course" card — the richer longDescription when the
+  /// API provides one, otherwise the short description.
+  String get aboutText {
+    final long = longDescription?.trim() ?? '';
+    return long.isNotEmpty ? long : description;
+  }
+
   bool get hasInformation =>
-      description.trim().isNotEmpty ||
+      aboutText.trim().isNotEmpty ||
       skillsGained.isNotEmpty ||
       prerequisites.isNotEmpty ||
       (targetAudience?.trim().isNotEmpty ?? false) ||

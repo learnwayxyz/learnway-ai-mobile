@@ -3,7 +3,9 @@ import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/certificate_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/shared/container_extension.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/shared/locked_overlay.dart';
 import 'package:learnwayv2/features/quiz/services/lesson_share_service.dart';
+import 'package:learnwayv2/services/revenue_cat_service.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
@@ -53,20 +55,45 @@ class _UnclaimedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const _CertificateCard(isLocked: true),
-        const VSpace(24),
-        ButtonFactory.blackButton(
-          mainAxisAlignment: MainAxisAlignment.center,
-          text: 'Claim Certificate',
-          isLoading: isClaiming,
-          onPressed: isClaiming
-              ? () {}
-              : () => _showClaimSheet(context, courseId),
-        ),
-        const VSpace(24),
-      ],
+    return ValueListenableBuilder<bool>(
+      valueListenable: RevenueCatService.instance.premiumStatusNotifier,
+      builder: (context, isPremium, _) {
+        final hasPremium =
+            isPremium || RevenueCatService.instance.isPremiumUser;
+        if (!hasPremium) {
+          return Column(
+            children: [
+              _CertificateCard(
+                isLocked: true,
+                overlay: LockedOverlay(
+                  title: 'Certificate Locked',
+                  subtitle: 'Subscribe to premium to get certificate',
+                  action: ButtonFactory.gradientButton(
+                    text: 'Subscribe to get certificate',
+                    onPressed: () => context.router.push(const PayWallRoute()),
+                  ),
+                ),
+              ),
+              const VSpace(24),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            const _CertificateCard(isLocked: true),
+            const VSpace(24),
+            ButtonFactory.blackButton(
+              mainAxisAlignment: MainAxisAlignment.center,
+              text: 'Claim Certificate',
+              isLoading: isClaiming,
+              onPressed: isClaiming
+                  ? () {}
+                  : () => _showClaimSheet(context, courseId),
+            ),
+            const VSpace(24),
+          ],
+        );
+      },
     );
   }
 
@@ -213,7 +240,7 @@ class _ClaimedViewState extends State<_ClaimedView> {
         Row(
           children: [
             Expanded(
-              child: _GradientButton(
+              child: ButtonFactory.gradientButton(
                 text: 'Download',
                 isLoading: _isSaving,
                 onPressed: _isSaving ? null : _download,
@@ -313,68 +340,12 @@ class _ClaimedViewState extends State<_ClaimedView> {
   }
 }
 
-class _GradientButton extends StatelessWidget {
-  const _GradientButton({
-    required this.text,
-    required this.onPressed,
-    this.isLoading = false,
-  });
-
-  final String text;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-
-  // LearnWay gradient: #215AEB (AppColors.primaryMain) → #133385 (no
-  // AppColors match).
-  static final Gradient _gradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [AppColors.primaryMain, const Color(0xFF133385)],
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: _gradient,
-        borderRadius: BorderRadius.circular(60),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(60),
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-              child: isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(
-                      text,
-                      style: AppTextStyles.buttonText(
-                        context,
-                      ).copyWith(color: Colors.white),
-                    ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _CertificateCard extends StatelessWidget {
-  const _CertificateCard({required this.isLocked, this.imageUrl});
+  const _CertificateCard({required this.isLocked, this.imageUrl, this.overlay});
 
   final bool isLocked;
   final String? imageUrl;
+  final Widget? overlay;
 
   @override
   Widget build(BuildContext context) {
@@ -403,49 +374,12 @@ class _CertificateCard extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         Opacity(opacity: 0.2, child: certificate),
-        const _LockedOverlay(),
+        overlay ??
+            const LockedOverlay(
+              title: 'Certificate Locked',
+              subtitle: 'Claim your certificate to unlock it',
+            ),
       ],
     ).cardStyle();
-  }
-}
-
-class _LockedOverlay extends StatelessWidget {
-  const _LockedOverlay();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.gray900,
-          ),
-          // TODO: replace with the exact lock icon asset when available
-          child: const Icon(Icons.lock_outline, color: Colors.white, size: 22),
-        ),
-        const VSpace(12),
-        Text(
-          'Certificate Locked',
-          style: AppTextStyles.mdBold(
-            context,
-          ).copyWith(color: AppColors.gray900),
-        ),
-        const VSpace(8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 48),
-          child: Text(
-            'Claim your certificate to unlock it',
-            style: AppTextStyles.baseMedium(
-              context,
-            ).copyWith(color: AppColors.gray900),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
-    );
   }
 }

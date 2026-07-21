@@ -13,6 +13,7 @@ import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/level_screens/screen_helper.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/shared/premium_locked_gate.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/services/ad_service.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
@@ -172,10 +173,8 @@ class _LessonScreenState extends State<LessonScreen>
                 BlocBuilder<LearnAndEarnBloc, LearnAndEarnState>(
                   builder: (context, state) {
                     final lessons = _getLessons(state);
-                    return CardFactory.aiLessonCard(
-                      margin: const EdgeInsets.symmetric(horizontal: 0),
-                      borderRadius: BorderRadius.zero,
-                      hasShadow: false,
+                    return CardFactory.activeLessonCard(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
                       title: lessons?.title ?? courseData.courseTitle,
                       subtitle:
                           lessons?.description ?? courseData.courseDescription,
@@ -305,23 +304,66 @@ class _LessonScreenState extends State<LessonScreen>
                               lessons: lessons?.lessons ?? [],
                               levelType: widget.levelType,
                             ),
-                            BlocBuilder<CourseProjectCubit, CourseProjectState>(
-                              builder: (context, projectState) {
-                                return switch (projectState) {
-                                  CourseProjectLoading() => const Center(
-                                    child: CircularProgressIndicator(),
+                            PremiumLockedGate(
+                              lockedTitle: 'Project Locked',
+                              lockedSubtitle:
+                                  'Subscribe to Premium to unlock Project',
+                              buttonText: 'Subscribe to unlock Project',
+                              child:
+                                  BlocBuilder<
+                                    LearnAndEarnBloc,
+                                    LearnAndEarnState
+                                  >(
+                                    builder: (context, lessonState) {
+                                      final lessons = _getLessons(lessonState);
+                                      final remaining =
+                                          lessons?.lessons
+                                              .where((l) => !l.isCompleted)
+                                              .length ??
+                                          0;
+                                      if (lessons != null &&
+                                          lessons.lessons.isNotEmpty &&
+                                          remaining > 0) {
+                                        return SingleChildScrollView(
+                                          child: ProjectNotAvailableCard(
+                                            progressValue:
+                                                lessons.progress.toDouble() /
+                                                100,
+                                            lessonsRemaining: remaining,
+                                          ),
+                                        );
+                                      }
+                                      return BlocBuilder<
+                                        CourseProjectCubit,
+                                        CourseProjectState
+                                      >(
+                                        builder: (context, projectState) {
+                                          return switch (projectState) {
+                                            CourseProjectLoading() =>
+                                              const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              ),
+                                            CourseProjectLoaded(
+                                              :final project,
+                                            ) =>
+                                              ProjectTab(project: project),
+                                            CourseProjectError(:final error) =>
+                                              Center(
+                                                child: Text(
+                                                  error,
+                                                  style:
+                                                      AppTextStyles.smRegular(
+                                                        context,
+                                                      ),
+                                                ),
+                                              ),
+                                            _ => const _ComingSoonState(),
+                                          };
+                                        },
+                                      );
+                                    },
                                   ),
-                                  CourseProjectLoaded(:final project) =>
-                                    ProjectTab(project: project),
-                                  CourseProjectError(:final error) => Center(
-                                    child: Text(
-                                      error,
-                                      style: AppTextStyles.smRegular(context),
-                                    ),
-                                  ),
-                                  _ => const _ComingSoonState(),
-                                };
-                              },
                             ),
                             CertificateTab(courseId: checkCourseLevelType()),
                           ],
@@ -445,7 +487,7 @@ class _InformationTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (courseData.description.trim().isNotEmpty) ...[
+          if (courseData.aboutText.trim().isNotEmpty) ...[
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -457,7 +499,7 @@ class _InformationTab extends StatelessWidget {
                 children: [
                   Text('About course', style: AppTextStyles.mdBold(context)),
                   const VSpace(8),
-                  ExpandableDescription(text: courseData.description),
+                  ExpandableDescription(text: courseData.aboutText),
                 ],
               ),
             ),
@@ -775,16 +817,7 @@ class _LessonsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppLocalizations.of(context)!.lessons,
-            style: AppTextStyles.mdBold(context),
-          ),
-          const VSpace(4),
-          Text(
-            AppLocalizations.of(context)!.takeALessonAndEarn,
-            style: AppTextStyles.xsRegular(context),
-          ),
-          const VSpace(20),
+          const VSpace(12),
           Expanded(
             child: LessonBuilder(lessons: lessons, levelType: levelType),
           ),

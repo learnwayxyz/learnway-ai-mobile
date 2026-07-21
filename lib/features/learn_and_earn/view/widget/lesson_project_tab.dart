@@ -5,15 +5,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/shared/container_extension.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
+import 'package:learnwayv2/shared/utilities/markdown_extension.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
 enum SubmissionStatus { notSubmitted, submitted, review, completed }
-
-// TODO: re-enable once the backend returns an evaluation phase for a
-// submitted project (score/feedback data below is currently mocked).
-// enum ProjectPhase { notSubmitted, evaluating, evaluated }
 
 const Color _statusGrayText = Color(0xFF535862);
 const Color _statusGreenBg = Color(0xFFECFDF3);
@@ -28,14 +26,6 @@ class ProjectFile {
   String get extensionLabel =>
       name.contains('.') ? name.split('.').last.toUpperCase() : 'FILE';
 }
-
-// TODO: re-enable once the backend returns AI evaluation score data.
-// class ScoreItem {
-//   const ScoreItem({required this.label, required this.score});
-//
-//   final String label;
-//   final int score;
-// }
 
 class ProjectTab extends StatelessWidget {
   const ProjectTab({super.key, required this.project});
@@ -61,17 +51,99 @@ class ProjectTab extends StatelessWidget {
       builder: (context, state) {
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: state is CourseProjectSubmitted
-              ? const _EvaluatingView()
-              : _NotSubmittedView(
-                  // Rekeyed per course so switching courses always gets a
-                  // fresh State instead of reusing stale typed content,
-                  // picked file, and selected submission type.
-                  key: ValueKey(project.courseId),
-                  project: project,
-                ),
+          child: switch (state) {
+            CourseProjectSending(isDraft: false) => _EvaluatingView(
+              project: project,
+            ),
+            CourseProjectSubmitted(:final result) => _EvaluatedView(
+              project: project,
+              result: result,
+            ),
+            _ => _NotSubmittedView(
+              key: ValueKey(project.courseId),
+              project: project,
+            ),
+          },
         );
       },
+    );
+  }
+}
+
+/// Shown on the Project tab while the course still has unfinished lessons.
+/// Progress values come from the same CourseLesson payload that powers the
+/// aiLessonCard header.
+class ProjectNotAvailableCard extends StatelessWidget {
+  const ProjectNotAvailableCard({
+    super.key,
+    required this.progressValue,
+    required this.lessonsRemaining,
+  });
+
+  final double progressValue;
+  final int lessonsRemaining;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        children: [
+          const VSpace(24),
+          Container(
+            width: 72,
+            height: 72,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primary50,
+            ),
+            child: const Text('🔒', style: TextStyle(fontSize: 34)),
+          ),
+          const VSpace(20),
+          Text(
+            'Project not available yet',
+            style: AppTextStyles.mdBold(
+              context,
+            ).copyWith(color: AppColors.gray900),
+            textAlign: TextAlign.center,
+          ),
+          const VSpace(8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Finish the remaining lessons to unlock the hands-on project.',
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray500),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const VSpace(20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: progressValue.clamp(0, 1),
+                minHeight: 6,
+                color: AppColors.primary500,
+                backgroundColor: AppColors.gray100,
+              ),
+            ),
+          ),
+          const VSpace(10),
+          Text(
+            '$lessonsRemaining '
+            '${lessonsRemaining == 1 ? 'lesson' : 'lessons'} remaining',
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray700),
+            textAlign: TextAlign.center,
+          ),
+          const VSpace(24),
+        ],
+      ).cardStyle(),
     );
   }
 }
@@ -160,9 +232,7 @@ class _NotSubmittedViewState extends State<_NotSubmittedView> {
                 const VSpace(12),
                 ButtonFactory.blackButton(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  text: sending != null && !sending.isDraft
-                      ? 'Submitting...'
-                      : 'Submit',
+                  text: 'Submit',
                   onPressed: isSending ? () {} : _submit,
                 ),
               ],
@@ -225,66 +295,58 @@ class _NotSubmittedViewState extends State<_NotSubmittedView> {
 }
 
 class _EvaluatingView extends StatelessWidget {
-  const _EvaluatingView();
+  const _EvaluatingView({required this.project});
+
+  final CourseProject project;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SubmissionSummaryCard(
           submissionStatus: SubmissionStatus.submitted,
-          title: 'Token Swap Contract',
-          subtitle:
-              'Submitted 14 minutes ago · TokenSwap.sol, tests-bundle.zip',
+          title: project.title,
+          subtitle: project.instructions,
         ),
-        VSpace(16),
-        _EvaluationInProgressCard(),
-        VSpace(24),
+        const VSpace(16),
+        const _EvaluationInProgressCard(),
+        const VSpace(24),
       ],
     );
   }
 }
 
-// TODO: re-enable once the backend returns AI evaluation score/feedback
-// data for a submitted project.
-// class _EvaluatedView extends StatelessWidget {
-//   const _EvaluatedView();
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Column(
-//       crossAxisAlignment: CrossAxisAlignment.stretch,
-//       children: [
-//         _SubmissionSummaryCard(
-//           submissionStatus: SubmissionStatus.review,
-//           title: 'Token Swap Contract',
-//           subtitle:
-//               'Submitted 14 minutes ago · TokenSwap.sol, tests-bundle.zip',
-//         ),
-//         VSpace(16),
-//         _AiScoreCard(
-//           totalScore: 87,
-//           items: [
-//             ScoreItem(label: 'Code  quality', score: 92),
-//             ScoreItem(label: 'Security', score: 78),
-//             ScoreItem(label: 'Gas efficiency', score: 85),
-//             ScoreItem(label: 'Documentation', score: 90),
-//           ],
-//         ),
-//         VSpace(16),
-//         _FeedbackCard(
-//           feedback: [
-//             'Swap logic and slippage checks are correct',
-//             'Test coverage is solid across the happy path',
-//             'Reentrancy guard is missing on the withdraw path',
-//           ],
-//         ),
-//         VSpace(24),
-//       ],
-//     );
-//   }
-// }
+class _EvaluatedView extends StatelessWidget {
+  const _EvaluatedView({required this.project, required this.result});
+
+  final CourseProject project;
+  final CourseProjectSubmissionResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    final assessment = result.assessment;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SubmissionSummaryCard(
+          submissionStatus: assessment?.passed ?? false
+              ? SubmissionStatus.completed
+              : SubmissionStatus.review,
+          title: project.title,
+          subtitle: project.instructions,
+        ),
+        if (assessment != null) ...[
+          const VSpace(16),
+          _AiScoreCard(assessment: assessment),
+          const VSpace(16),
+          _FeedbackCard(assessment: assessment),
+        ],
+        const VSpace(24),
+      ],
+    );
+  }
+}
 
 class _SubmissionStatusCapsule extends StatelessWidget {
   const _SubmissionStatusCapsule({required this.status});
@@ -347,7 +409,7 @@ class _ProjectAssignmentCard extends StatelessWidget {
           const VSpace(12),
           Text(
             assignmentTitle,
-            style: AppTextStyles.lgBold(
+            style: AppTextStyles.smBold(
               context,
             ).copyWith(color: AppColors.gray900),
           ),
@@ -429,7 +491,7 @@ class _EvaluationInProgressCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
             "We're reviewing your code for correctness, security and gas "
-            'efficiency. This usually takes 2–3 minutes',
+            'efficiency. This usually takes 2-3 minutes',
             style: AppTextStyles.smRegular(
               context,
             ).copyWith(color: AppColors.gray500),
@@ -442,139 +504,150 @@ class _EvaluationInProgressCard extends StatelessWidget {
   }
 }
 
-// TODO: re-enable once the backend returns AI evaluation score/feedback
-// data for a submitted project.
-// class _AiScoreCard extends StatelessWidget {
-//   const _AiScoreCard({required this.totalScore, required this.items});
-//
-//   final int totalScore;
-//   final List<ScoreItem> items;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Text(
-//           'AI score card',
-//           style: AppTextStyles.mdBold(
-//             context,
-//           ).copyWith(color: AppColors.gray900),
-//         ),
-//         const VSpace(12),
-//         Row(
-//           crossAxisAlignment: CrossAxisAlignment.baseline,
-//           textBaseline: TextBaseline.alphabetic,
-//           children: [
-//             Text(
-//               '$totalScore/',
-//               style: AppTextStyles.xxlBold(
-//                 context,
-//               ).copyWith(color: _statusGreenText),
-//             ),
-//             Text(
-//               '100',
-//               style: AppTextStyles.mdBold(
-//                 context,
-//               ).copyWith(color: _statusGreenText),
-//             ),
-//           ],
-//         ),
-//         const VSpace(16),
-//         for (var i = 0; i < items.length; i++) ...[
-//           if (i > 0) const VSpace(16),
-//           _ScoreRow(item: items[i]),
-//         ],
-//       ],
-//     ).cardStyle();
-//   }
-// }
-//
-// class _ScoreRow extends StatelessWidget {
-//   const _ScoreRow({required this.item});
-//
-//   final ScoreItem item;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             Text(
-//               item.label,
-//               style: AppTextStyles.smRegular(
-//                 context,
-//               ).copyWith(color: AppColors.gray700),
-//             ),
-//             Text(
-//               '${item.score}',
-//               style: AppTextStyles.smMedium(
-//                 context,
-//               ).copyWith(color: AppColors.gray900),
-//             ),
-//           ],
-//         ),
-//         const VSpace(6),
-//         ClipRRect(
-//           borderRadius: BorderRadius.circular(4),
-//           child: SizedBox(
-//             width: 140,
-//             child: LinearProgressIndicator(
-//               value: item.score / 100,
-//               minHeight: 5,
-//               color: AppColors.primary500,
-//               backgroundColor: AppColors.gray100,
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-//
-// class _FeedbackCard extends StatelessWidget {
-//   const _FeedbackCard({required this.feedback});
-//
-//   final List<String> feedback;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Text(
-//           'Feedback',
-//           style: AppTextStyles.mdBold(
-//             context,
-//           ).copyWith(color: AppColors.gray900),
-//         ),
-//         const VSpace(12),
-//         for (var i = 0; i < feedback.length; i++) ...[
-//           if (i > 0)
-//             Divider(height: 24, thickness: 1, color: AppColors.gray100),
-//           Row(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Icon(Icons.check_circle, size: 16, color: _statusGreenText),
-//               const HSpace(10),
-//               Expanded(
-//                 child: Text(
-//                   feedback[i],
-//                   style: AppTextStyles.smRegular(
-//                     context,
-//                   ).copyWith(color: AppColors.gray700),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ],
-//     ).cardStyle();
-//   }
-// }
+class _AiScoreCard extends StatelessWidget {
+  const _AiScoreCard({required this.assessment});
+
+  final ProjectAssessment assessment;
+
+  @override
+  Widget build(BuildContext context) {
+    final score = assessment.score ?? 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'AI score card',
+          style: AppTextStyles.mdBold(
+            context,
+          ).copyWith(color: AppColors.gray900),
+        ),
+        const VSpace(12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              '$score/',
+              style: AppTextStyles.xxlBold(
+                context,
+              ).copyWith(color: _statusGreenText),
+            ),
+            Text(
+              '100',
+              style: AppTextStyles.mdBold(
+                context,
+              ).copyWith(color: _statusGreenText),
+            ),
+          ],
+        ),
+        const VSpace(16),
+        _ScoreProgressRow(label: 'Score', score: score),
+      ],
+    ).cardStyle();
+  }
+}
+
+class _ScoreProgressRow extends StatelessWidget {
+  const _ScoreProgressRow({required this.label, required this.score});
+
+  final String label;
+  final int score;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray700),
+            ),
+            Text(
+              '$score',
+              style: AppTextStyles.smMedium(
+                context,
+              ).copyWith(color: AppColors.gray700),
+            ),
+          ],
+        ),
+        const VSpace(6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: (score.clamp(0, 100)) / 100,
+            minHeight: 6,
+            color: AppColors.primary500,
+            backgroundColor: AppColors.gray100,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FeedbackCard extends StatelessWidget {
+  const _FeedbackCard({required this.assessment});
+
+  final ProjectAssessment assessment;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      for (final strength in assessment.strengths)
+        (icon: Icons.check_circle, color: _statusGreenText, text: strength),
+      for (final weakness in assessment.weaknesses)
+        (
+          icon: Icons.error_outline,
+          color: AppColors.warning700v2,
+          text: weakness,
+        ),
+      for (final recommendation in assessment.recommendations)
+        (
+          icon: Icons.lightbulb_outline,
+          color: AppColors.primary500,
+          text: recommendation,
+        ),
+    ];
+    if (items.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Feedback',
+          style: AppTextStyles.mdBold(
+            context,
+          ).copyWith(color: AppColors.gray900),
+        ),
+        const VSpace(16),
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0)
+            Divider(height: 24, thickness: 1, color: AppColors.gray100),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(items[i].icon, size: 16, color: items[i].color),
+              const HSpace(10),
+              Expanded(
+                child: Text(
+                  items[i].text,
+                  style: AppTextStyles.smRegular(
+                    context,
+                  ).copyWith(color: AppColors.gray700),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    ).cardStyle();
+  }
+}
 
 class _InstructionsCard extends StatelessWidget {
   const _InstructionsCard({required this.instructions});
@@ -588,14 +661,14 @@ class _InstructionsCard extends StatelessWidget {
       children: [
         Text(
           'Instructions',
-          style: AppTextStyles.mdBold(
+          style: AppTextStyles.smBold(
             context,
           ).copyWith(color: AppColors.gray900),
         ),
         const VSpace(12),
-        Text(
-          instructions,
-          style: AppTextStyles.smRegular(
+        instructions.asMarkdown(
+          context,
+          baseStyle: AppTextStyles.smRegular(
             context,
           ).copyWith(color: AppColors.gray700),
         ),

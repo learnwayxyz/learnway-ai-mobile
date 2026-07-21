@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/ai_tutor_response.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
+import 'package:learnwayv2/shared/utilities/markdown_extension.dart';
 
 
 class _QuickActionConfig {
@@ -564,27 +564,6 @@ class _AiTutorBotBubble extends StatelessWidget {
   final AiTutorMessage message;
   final DateFormat timeFormat;
 
-  MarkdownStyleSheet _markdownStyle(BuildContext context) {
-    final base = AppTextStyles.smRegular(
-      context,
-    ).copyWith(color: AppColors.textPrimary);
-    return MarkdownStyleSheet(
-      p: base,
-      strong: base.copyWith(fontWeight: FontWeight.w700),
-      em: base.copyWith(fontStyle: FontStyle.italic),
-      code: base.copyWith(
-        fontFamily: 'monospace',
-        backgroundColor: AppColors.gray200,
-      ),
-      h1: AppTextStyles.baseBold(context),
-      h2: AppTextStyles.smBold(context),
-      h3: AppTextStyles.smBold(context),
-      listBullet: base,
-      blockSpacing: 6,
-      listIndent: 16,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -613,11 +592,7 @@ class _AiTutorBotBubble extends StatelessWidget {
                     ),
                     border: Border.all(color: AppColors.borderColor),
                   ),
-                  child: MarkdownBody(
-                    data: message.text,
-                    shrinkWrap: true,
-                    styleSheet: _markdownStyle(context),
-                  ),
+                  child: message.text.asMarkdown(context),
                 ),
                 const SizedBox(height: 4),
                 Row(

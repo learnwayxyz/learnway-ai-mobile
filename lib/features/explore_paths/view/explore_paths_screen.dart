@@ -84,14 +84,13 @@ class _ExplorePathsScreenState extends State<ExplorePathsScreen> {
           padding: const EdgeInsets.only(left: 4),
           child: CustomBackButton(onPress: () => context.router.maybePop()),
         ),
-        // const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Explore Paths',
+                'Explore Learning Paths',
                 style: AppTextStyles.xlBold(
                   context,
                 ).copyWith(color: AppColors.gray950),
