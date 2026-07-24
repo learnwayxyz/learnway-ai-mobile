@@ -44,6 +44,17 @@ final class CourseProjectDraftSaved extends CourseProjectLoaded {
   const CourseProjectDraftSaved(super.project);
 }
 
+/// A server-side draft was found for this project; the submit form should
+/// prefill from it.
+final class CourseProjectDraftLoaded extends CourseProjectLoaded {
+  const CourseProjectDraftLoaded(super.project, this.draft);
+
+  final ProjectSubmission draft;
+
+  @override
+  List<Object?> get props => [project, draft];
+}
+
 final class CourseProjectSubmitted extends CourseProjectLoaded {
   const CourseProjectSubmitted(super.project, this.result);
 

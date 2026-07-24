@@ -41,7 +41,55 @@ void main() {
     expect(latest.assessment!.strengths, isNotEmpty);
     expect(latest.assessment!.rawResponse, isNotNull);
   });
+
+  test('parses a DRAFT row (empty textContent, link in linkUrl)', () {
+    final list = (jsonDecode(_draftSample) as List)
+        .cast<Map<String, dynamic>>()
+        .map(parseItem)
+        .whereType<CourseProjectSubmissionResult>()
+        .toList();
+
+    final drafts = list
+        .where((r) => r.submission.status.toUpperCase() == 'DRAFT')
+        .toList();
+    expect(drafts, hasLength(1));
+
+    final draft = drafts.single.submission;
+    expect(draft.id, '8cc007f3-a37d-4b8f-afa0-adbe1023b9fd');
+    expect(drafts.single.assessment, isNull);
+    expect(draft.submittedAt, isNull);
+    expect(draft.textContent, isEmpty);
+    expect(draft.linkUrl, contains('docs.google.com'));
+
+    // The submit form prefills typed fields from textContent, falling back to
+    // linkUrl when textContent is empty (as it is for this draft).
+    final prefill = (draft.textContent?.isNotEmpty ?? false)
+        ? draft.textContent
+        : draft.linkUrl;
+    expect(prefill, draft.linkUrl);
+  });
 }
+
+const _draftSample = '''
+[
+  {
+    "id": "8cc007f3-a37d-4b8f-afa0-adbe1023b9fd",
+    "createdAt": "2026-07-24T17:15:09.979Z",
+    "updatedAt": "2026-07-24T17:15:09.979Z",
+    "deletedAt": null,
+    "userId": "c9b3bf9b-ff3e-4006-9843-94708bfdf96f",
+    "courseProjectId": "8d20b8d5-4d2a-469a-a208-98269414c93f",
+    "submissionType": "TEXT",
+    "status": "DRAFT",
+    "textContent": "",
+    "fileUrl": null,
+    "fileId": null,
+    "linkUrl": "https://docs.google.com/document/d/1D1mchw6D0on_eb7ihI4TgVdZ88Cwg7s6WPiPGaKeuSY/edit?usp=sharing",
+    "submittedAt": null,
+    "assessment": null
+  }
+]
+''';
 
 const _sample = '''
 [

@@ -26,6 +26,12 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
   bool hasPassedProject(String courseId) =>
       _latestResults[courseId]?.assessment?.passed ?? false;
 
+  /// Server-side draft per course (status DRAFT on the submissions list, or
+  /// the row returned by the draft endpoint). Used to prefill the submit form.
+  final Map<String, ProjectSubmission> _serverDrafts = {};
+
+  ProjectSubmission? serverDraftFor(String courseId) => _serverDrafts[courseId];
+
   Future<void> fetchCourseProject(String courseId) async {
     emit(CourseProjectLoading());
     try {
@@ -58,7 +64,27 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
       (submissions) async {
         if (submissions.isEmpty) return;
 
-        final latest = _latestSubmission(submissions);
+        // Drafts live on the same list (status DRAFT, never assessed).
+        // Remember the newest one for form prefill, and keep drafts out of
+        // the submitted/assessed restore below.
+        final drafts = submissions
+            .where((r) => r.submission.status.toUpperCase() == 'DRAFT')
+            .toList();
+        final submitted = submissions
+            .where((r) => r.submission.status.toUpperCase() != 'DRAFT')
+            .toList();
+
+        if (drafts.isNotEmpty) {
+          _serverDrafts[courseId] = _latestSubmission(drafts).submission;
+        }
+
+        if (submitted.isEmpty) {
+          final draft = _serverDrafts[courseId];
+          if (draft != null) emit(CourseProjectDraftLoaded(project, draft));
+          return;
+        }
+
+        final latest = _latestSubmission(submitted);
 
         // The list may already carry the scored assessment. If it doesn't,
         // fetch the full submission for its assessment details.
@@ -126,7 +152,11 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
     );
     result.fold(
       (failure) => emit(CourseProjectActionError(project, failure.message)),
-      (_) => emit(CourseProjectDraftSaved(project)),
+      (draftResult) {
+        // The draft endpoint echoes the created/updated draft row back.
+        _serverDrafts[courseId] = draftResult.submission;
+        emit(CourseProjectDraftSaved(project));
+      },
     );
   }
 

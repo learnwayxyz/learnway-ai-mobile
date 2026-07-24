@@ -59,9 +59,22 @@ class ProjectTab extends StatelessWidget {
               project: project,
               result: result,
             ),
-            _ => _NotSubmittedView(
-              key: ValueKey(project.courseId),
-              project: project,
+            _ => Builder(
+              builder: (context) {
+                // Prefill from the server-side draft when one exists; keying
+                // by the draft id re-initializes the form once a draft is
+                // restored from the backend after this widget first built.
+                final serverDraft = context
+                    .read<CourseProjectCubit>()
+                    .serverDraftFor(project.courseId);
+                return _NotSubmittedView(
+                  key: ValueKey(
+                    '${project.courseId}:${serverDraft?.id ?? 'local'}',
+                  ),
+                  project: project,
+                  serverDraft: serverDraft,
+                );
+              },
             ),
           },
         );
@@ -149,9 +162,10 @@ class ProjectNotAvailableCard extends StatelessWidget {
 }
 
 class _NotSubmittedView extends StatefulWidget {
-  const _NotSubmittedView({super.key, required this.project});
+  const _NotSubmittedView({super.key, required this.project, this.serverDraft});
 
   final CourseProject project;
+  final ProjectSubmission? serverDraft;
 
   @override
   State<_NotSubmittedView> createState() => _NotSubmittedViewState();
@@ -169,15 +183,43 @@ class _NotSubmittedViewState extends State<_NotSubmittedView> {
     final types = widget.project.submissionTypes;
     _selectedType = types.first;
 
-    final draft = LocalStorageService.getProjectDraft(widget.project.courseId);
-    if (draft != null) {
-      if (types.contains(draft.submissionType)) {
-        _selectedType = draft.submissionType;
+    final localDraft = LocalStorageService.getProjectDraft(
+      widget.project.courseId,
+    );
+
+    // The server-side draft (POST course/{id}/project/draft) is the source of
+    // truth; the local Hive draft is a fallback both for saves that never
+    // reached the backend and for a server row that echoes back empty content.
+    final serverDraft = widget.serverDraft;
+    if (serverDraft != null) {
+      final draftType = serverDraft.submissionType.trim().toUpperCase();
+      if (types.contains(draftType)) _selectedType = draftType;
+      if (CourseProject.isFileContent(_selectedType)) {
+        final url = serverDraft.fileUrl;
+        _draftFileUrl = (url == null || url.isEmpty)
+            ? (localDraft?.content.isEmpty ?? true ? null : localDraft!.content)
+            : url;
+      } else {
+        final serverText =
+            ((serverDraft.textContent?.isNotEmpty ?? false)
+                ? serverDraft.textContent
+                : serverDraft.linkUrl) ??
+            '';
+        _contentController.text = serverText.isNotEmpty
+            ? serverText
+            : (localDraft?.content ?? '');
+      }
+      return;
+    }
+
+    if (localDraft != null) {
+      if (types.contains(localDraft.submissionType)) {
+        _selectedType = localDraft.submissionType;
       }
       if (CourseProject.isFileContent(_selectedType)) {
-        _draftFileUrl = draft.content.isEmpty ? null : draft.content;
+        _draftFileUrl = localDraft.content.isEmpty ? null : localDraft.content;
       } else {
-        _contentController.text = draft.content;
+        _contentController.text = localDraft.content;
       }
     }
   }

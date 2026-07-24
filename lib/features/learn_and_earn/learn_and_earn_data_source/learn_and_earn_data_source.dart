@@ -651,7 +651,18 @@ class LearnAndEarnDataSource {
       }
       final decoded = jsonDecode(response.body);
       log('sendCourseProject(): $decoded');
-      return CourseProjectSubmissionResult.fromJson(decoded);
+      // The submit endpoint wraps its payload as {submission, assessment};
+      // the draft endpoint returns the submission row flat with no wrapper.
+      // _parseSubmissionResult normalizes both shapes.
+      final parsed = decoded is Map<String, dynamic>
+          ? _parseSubmissionResult(decoded)
+          : null;
+      if (parsed == null) {
+        throw LearnAndEarnFailure(
+          isDraft ? 'Error saving project draft' : 'Error submitting project',
+        );
+      }
+      return parsed;
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
     } on HttpException catch (e) {
