@@ -1,7 +1,9 @@
 import 'dart:developer';
 import 'package:learnwayv2/app/app_barrel.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/certificate_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_certificate_tab.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/lesson_project_tab.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/expandable_text_widget.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
@@ -11,6 +13,7 @@ import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/level_screens/screen_helper.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/shared/premium_locked_gate.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/services/ad_service.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
@@ -67,6 +70,7 @@ class _LessonScreenState extends State<LessonScreen>
 
     context.read<CourseInfoCubit>().fetchCourseInfo(courseId);
     context.read<CourseProjectCubit>().fetchCourseProject(courseId);
+    context.read<CertificateCubit>().fetchCertificate(courseId);
 
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -93,19 +97,17 @@ class _LessonScreenState extends State<LessonScreen>
     super.dispose();
   }
 
+  /// Re-syncs the level screen's enrollment data on the way out. Resolved via
+  /// the locator rather than `context` because this also runs after the route
+  /// has popped, when the element is no longer safe to look up ancestors from.
   void checkLevelType() {
+    final bloc = locator<rb.RegisteredCoursesBloc>();
     if (widget.levelType == LevelType.beginner) {
-      context.read<rb.RegisteredCoursesBloc>().add(
-        rb.LoadBeginnerRegisteredCourses(),
-      );
+      bloc.add(const rb.LoadBeginnerRegisteredCourses(forceRefresh: true));
     } else if (widget.levelType == LevelType.intermediate) {
-      context.read<rb.RegisteredCoursesBloc>().add(
-        rb.LoadIntermediateRegisteredCourses(),
-      );
+      bloc.add(const rb.LoadIntermediateRegisteredCourses(forceRefresh: true));
     } else if (widget.levelType == LevelType.advanced) {
-      context.read<rb.RegisteredCoursesBloc>().add(
-        rb.LoadAdvancedRegisteredCourses(),
-      );
+      bloc.add(const rb.LoadAdvancedRegisteredCourses(forceRefresh: true));
     }
   }
 
@@ -143,6 +145,9 @@ class _LessonScreenState extends State<LessonScreen>
         context.read<CourseProjectCubit>().fetchCourseProject(
           checkCourseLevelType(),
         );
+        context.read<CertificateCubit>().fetchCertificate(
+          checkCourseLevelType(),
+        );
       },
       child: PopScope(
         canPop: true,
@@ -153,10 +158,9 @@ class _LessonScreenState extends State<LessonScreen>
           appBar: AppBarFactory.standardAppBar(
             title: widget.pathTitle ?? courseData.courseTitle,
             barHeight: 0,
-            onBackPressed: () {
-              checkLevelType();
-              Navigator.pop(context);
-            },
+            // No checkLevelType() here — PopScope above already fires it for
+            // every pop, programmatic or gesture.
+            onBackPressed: () => Navigator.pop(context),
           ),
           body: OverlayLoader(
             isLoading: _isFirstFetch,
@@ -166,10 +170,8 @@ class _LessonScreenState extends State<LessonScreen>
                 BlocBuilder<LearnAndEarnBloc, LearnAndEarnState>(
                   builder: (context, state) {
                     final lessons = _getLessons(state);
-                    return CardFactory.aiLessonCard(
-                      margin: const EdgeInsets.symmetric(horizontal: 0),
-                      borderRadius: BorderRadius.zero,
-                      hasShadow: false,
+                    return CardFactory.activeLessonCard(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
                       title: lessons?.title ?? courseData.courseTitle,
                       subtitle:
                           lessons?.description ?? courseData.courseDescription,
@@ -299,27 +301,68 @@ class _LessonScreenState extends State<LessonScreen>
                               lessons: lessons?.lessons ?? [],
                               levelType: widget.levelType,
                             ),
-                            BlocBuilder<CourseProjectCubit, CourseProjectState>(
-                              builder: (context, projectState) {
-                                return switch (projectState) {
-                                  CourseProjectLoading() => const Center(
-                                    child: CircularProgressIndicator(),
+                            PremiumLockedGate(
+                              lockedTitle: 'Project Locked',
+                              lockedSubtitle:
+                                  'Subscribe to Premium to unlock Project',
+                              buttonText: 'Subscribe to unlock Project',
+                              child:
+                                  BlocBuilder<
+                                    LearnAndEarnBloc,
+                                    LearnAndEarnState
+                                  >(
+                                    builder: (context, lessonState) {
+                                      final lessons = _getLessons(lessonState);
+                                      final remaining =
+                                          lessons?.lessons
+                                              .where((l) => !l.isCompleted)
+                                              .length ??
+                                          0;
+                                      if (lessons != null &&
+                                          lessons.lessons.isNotEmpty &&
+                                          remaining > 0) {
+                                        return SingleChildScrollView(
+                                          child: ProjectNotAvailableCard(
+                                            progressValue:
+                                                lessons.progress.toDouble() /
+                                                100,
+                                            lessonsRemaining: remaining,
+                                          ),
+                                        );
+                                      }
+                                      return BlocBuilder<
+                                        CourseProjectCubit,
+                                        CourseProjectState
+                                      >(
+                                        builder: (context, projectState) {
+                                          return switch (projectState) {
+                                            CourseProjectLoading() =>
+                                              const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              ),
+                                            CourseProjectLoaded(
+                                              :final project,
+                                            ) =>
+                                              ProjectTab(project: project),
+                                            CourseProjectError(:final error) =>
+                                              Center(
+                                                child: Text(
+                                                  error,
+                                                  style:
+                                                      AppTextStyles.smRegular(
+                                                        context,
+                                                      ),
+                                                ),
+                                              ),
+                                            _ => const _ComingSoonState(),
+                                          };
+                                        },
+                                      );
+                                    },
                                   ),
-                                  CourseProjectLoaded(:final project) =>
-                                    ProjectTab(project: project),
-                                  CourseProjectError(:final error) => Center(
-                                    child: Text(
-                                      error,
-                                      style: AppTextStyles.smRegular(context),
-                                    ),
-                                  ),
-                                  _ => const _ComingSoonState(),
-                                };
-                              },
                             ),
-                            // TODO: restore CertificateTab once its
-                            // endpoint is implemented.
-                            const _ComingSoonState(),
+                            CertificateTab(courseId: checkCourseLevelType()),
                           ],
                         );
                       },
@@ -441,7 +484,7 @@ class _InformationTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (courseData.description.trim().isNotEmpty) ...[
+          if (courseData.aboutText.trim().isNotEmpty) ...[
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -453,7 +496,7 @@ class _InformationTab extends StatelessWidget {
                 children: [
                   Text('About course', style: AppTextStyles.mdBold(context)),
                   const VSpace(8),
-                  ExpandableDescription(text: courseData.description),
+                  ExpandableDescription(text: courseData.aboutText),
                 ],
               ),
             ),
@@ -771,16 +814,7 @@ class _LessonsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppLocalizations.of(context)!.lessons,
-            style: AppTextStyles.mdBold(context),
-          ),
-          const VSpace(4),
-          Text(
-            AppLocalizations.of(context)!.takeALessonAndEarn,
-            style: AppTextStyles.xsRegular(context),
-          ),
-          const VSpace(20),
+          const VSpace(12),
           Expanded(
             child: LessonBuilder(lessons: lessons, levelType: levelType),
           ),

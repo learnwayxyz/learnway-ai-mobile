@@ -5,13 +5,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/shared/container_extension.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
+import 'package:learnwayv2/shared/utilities/markdown_extension.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 
 enum SubmissionStatus { notSubmitted, submitted, review, completed }
-
-enum ProjectPhase { notSubmitted, evaluating, evaluated }
 
 const Color _statusGrayText = Color(0xFF535862);
 const Color _statusGreenBg = Color(0xFFECFDF3);
@@ -27,30 +27,14 @@ class ProjectFile {
       name.contains('.') ? name.split('.').last.toUpperCase() : 'FILE';
 }
 
-class ScoreItem {
-  const ScoreItem({required this.label, required this.score});
-
-  final String label;
-  final int score;
-}
-
 class ProjectTab extends StatelessWidget {
-  const ProjectTab({
-    super.key,
-    required this.project,
-    this.phase = ProjectPhase.notSubmitted,
-    this.uploadedFiles = const [],
-    this.uploadError,
-  });
+  const ProjectTab({super.key, required this.project});
 
   final CourseProject project;
-  final ProjectPhase phase;
-  final List<ProjectFile> uploadedFiles;
-  final String? uploadError;
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<CourseProjectCubit, CourseProjectState>(
+    return BlocConsumer<CourseProjectCubit, CourseProjectState>(
       listener: (context, state) {
         final message = switch (state) {
           CourseProjectDraftSaved() => 'Draft saved',
@@ -64,32 +48,110 @@ class ProjectTab extends StatelessWidget {
           ).showSnackBar(SnackBar(content: Text(message)));
         }
       },
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: switch (phase) {
-          ProjectPhase.notSubmitted => _NotSubmittedView(
-            project: project,
-            uploadedFiles: uploadedFiles,
-            uploadError: uploadError,
+      builder: (context, state) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: switch (state) {
+            CourseProjectSending(isDraft: false) => _EvaluatingView(
+              project: project,
+            ),
+            CourseProjectSubmitted(:final result) => _EvaluatedView(
+              project: project,
+              result: result,
+            ),
+            _ => _NotSubmittedView(
+              key: ValueKey(project.courseId),
+              project: project,
+            ),
+          },
+        );
+      },
+    );
+  }
+}
+
+/// Shown on the Project tab while the course still has unfinished lessons.
+/// Progress values come from the same CourseLesson payload that powers the
+/// aiLessonCard header.
+class ProjectNotAvailableCard extends StatelessWidget {
+  const ProjectNotAvailableCard({
+    super.key,
+    required this.progressValue,
+    required this.lessonsRemaining,
+  });
+
+  final double progressValue;
+  final int lessonsRemaining;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        children: [
+          const VSpace(24),
+          Container(
+            width: 72,
+            height: 72,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primary50,
+            ),
+            child: const Text('🔒', style: TextStyle(fontSize: 34)),
           ),
-          ProjectPhase.evaluating => const _EvaluatingView(),
-          ProjectPhase.evaluated => const _EvaluatedView(),
-        },
-      ),
+          const VSpace(20),
+          Text(
+            'Project not available yet',
+            style: AppTextStyles.mdBold(
+              context,
+            ).copyWith(color: AppColors.gray900),
+            textAlign: TextAlign.center,
+          ),
+          const VSpace(8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Finish the remaining lessons to unlock the hands-on project.',
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray500),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const VSpace(20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: progressValue.clamp(0, 1),
+                minHeight: 6,
+                color: AppColors.primary500,
+                backgroundColor: AppColors.gray100,
+              ),
+            ),
+          ),
+          const VSpace(10),
+          Text(
+            '$lessonsRemaining '
+            '${lessonsRemaining == 1 ? 'lesson' : 'lessons'} remaining',
+            style: AppTextStyles.smRegular(
+              context,
+            ).copyWith(color: AppColors.gray700),
+            textAlign: TextAlign.center,
+          ),
+          const VSpace(24),
+        ],
+      ).cardStyle(),
     );
   }
 }
 
 class _NotSubmittedView extends StatefulWidget {
-  const _NotSubmittedView({
-    required this.project,
-    required this.uploadedFiles,
-    this.uploadError,
-  });
+  const _NotSubmittedView({super.key, required this.project});
 
   final CourseProject project;
-  final List<ProjectFile> uploadedFiles;
-  final String? uploadError;
 
   @override
   State<_NotSubmittedView> createState() => _NotSubmittedViewState();
@@ -143,8 +205,6 @@ class _NotSubmittedViewState extends State<_NotSubmittedView> {
         const VSpace(16),
         _UploadWorkCard(
           project: widget.project,
-          uploadedFiles: widget.uploadedFiles,
-          uploadError: widget.uploadError,
           contentController: _contentController,
           selectedType: _selectedType,
           onTypeSelected: (type) => setState(() => _selectedType = type),
@@ -161,21 +221,34 @@ class _NotSubmittedViewState extends State<_NotSubmittedView> {
           builder: (context, state) {
             final sending = state is CourseProjectSending ? state : null;
             final isSending = sending != null;
+            // A project that has already been passed cannot be resubmitted.
+            final hasPassed = context
+                .read<CourseProjectCubit>()
+                .hasPassedProject(widget.project.courseId);
             return Column(
               children: [
+                if (hasPassed) ...[
+                  Text(
+                    "You've already passed this project — resubmission is "
+                    'disabled.',
+                    style: AppTextStyles.smRegular(
+                      context,
+                    ).copyWith(color: AppColors.gray500),
+                    textAlign: TextAlign.center,
+                  ),
+                  const VSpace(12),
+                ],
                 ButtonFactory.grayButton(
                   mainAxisAlignment: MainAxisAlignment.center,
                   text: 'Add to draft',
                   isLoading: sending?.isDraft ?? false,
-                  onPressed: isSending ? () {} : _saveDraft,
+                  onPressed: (isSending || hasPassed) ? () {} : _saveDraft,
                 ),
                 const VSpace(12),
                 ButtonFactory.blackButton(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  text: sending != null && !sending.isDraft
-                      ? 'Submitting...'
-                      : 'Submit',
-                  onPressed: isSending ? () {} : _submit,
+                  text: 'Submit',
+                  onPressed: (isSending || hasPassed) ? () {} : _submit,
                 ),
               ],
             );
@@ -237,60 +310,54 @@ class _NotSubmittedViewState extends State<_NotSubmittedView> {
 }
 
 class _EvaluatingView extends StatelessWidget {
-  const _EvaluatingView();
+  const _EvaluatingView({required this.project});
+
+  final CourseProject project;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SubmissionSummaryCard(
           submissionStatus: SubmissionStatus.submitted,
-          title: 'Token Swap Contract',
-          subtitle:
-              'Submitted 14 minutes ago · TokenSwap.sol, tests-bundle.zip',
+          title: project.title,
+          subtitle: project.instructions,
         ),
-        VSpace(16),
-        _EvaluationInProgressCard(),
-        VSpace(24),
+        const VSpace(16),
+        const _EvaluationInProgressCard(),
+        const VSpace(24),
       ],
     );
   }
 }
 
 class _EvaluatedView extends StatelessWidget {
-  const _EvaluatedView();
+  const _EvaluatedView({required this.project, required this.result});
+
+  final CourseProject project;
+  final CourseProjectSubmissionResult result;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    final assessment = result.assessment;
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SubmissionSummaryCard(
-          submissionStatus: SubmissionStatus.review,
-          title: 'Token Swap Contract',
-          subtitle:
-              'Submitted 14 minutes ago · TokenSwap.sol, tests-bundle.zip',
+          submissionStatus: assessment?.passed ?? false
+              ? SubmissionStatus.completed
+              : SubmissionStatus.review,
+          title: project.title,
+          subtitle: project.instructions,
         ),
-        VSpace(16),
-        _AiScoreCard(
-          totalScore: 87,
-          items: [
-            ScoreItem(label: 'Code  quality', score: 92),
-            ScoreItem(label: 'Security', score: 78),
-            ScoreItem(label: 'Gas efficiency', score: 85),
-            ScoreItem(label: 'Documentation', score: 90),
-          ],
-        ),
-        VSpace(16),
-        _FeedbackCard(
-          feedback: [
-            'Swap logic and slippage checks are correct',
-            'Test coverage is solid across the happy path',
-            'Reentrancy guard is missing on the withdraw path',
-          ],
-        ),
-        VSpace(24),
+        if (assessment != null) ...[
+          const VSpace(16),
+          _AiScoreCard(assessment: assessment),
+          const VSpace(16),
+          _FeedbackCard(assessment: assessment),
+        ],
+        const VSpace(24),
       ],
     );
   }
@@ -357,7 +424,7 @@ class _ProjectAssignmentCard extends StatelessWidget {
           const VSpace(12),
           Text(
             assignmentTitle,
-            style: AppTextStyles.lgBold(
+            style: AppTextStyles.smBold(
               context,
             ).copyWith(color: AppColors.gray900),
           ),
@@ -439,7 +506,7 @@ class _EvaluationInProgressCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
             "We're reviewing your code for correctness, security and gas "
-            'efficiency. This usually takes 2–3 minutes',
+            'efficiency. This usually takes 2-3 minutes',
             style: AppTextStyles.smRegular(
               context,
             ).copyWith(color: AppColors.gray500),
@@ -453,13 +520,13 @@ class _EvaluationInProgressCard extends StatelessWidget {
 }
 
 class _AiScoreCard extends StatelessWidget {
-  const _AiScoreCard({required this.totalScore, required this.items});
+  const _AiScoreCard({required this.assessment});
 
-  final int totalScore;
-  final List<ScoreItem> items;
+  final ProjectAssessment assessment;
 
   @override
   Widget build(BuildContext context) {
+    final score = assessment.score ?? 0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -475,7 +542,7 @@ class _AiScoreCard extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              '$totalScore/',
+              '$score/',
               style: AppTextStyles.xxlBold(
                 context,
               ).copyWith(color: _statusGreenText),
@@ -489,19 +556,17 @@ class _AiScoreCard extends StatelessWidget {
           ],
         ),
         const VSpace(16),
-        for (var i = 0; i < items.length; i++) ...[
-          if (i > 0) const VSpace(16),
-          _ScoreRow(item: items[i]),
-        ],
+        _ScoreProgressRow(label: 'Score', score: score),
       ],
     ).cardStyle();
   }
 }
 
-class _ScoreRow extends StatelessWidget {
-  const _ScoreRow({required this.item});
+class _ScoreProgressRow extends StatelessWidget {
+  const _ScoreProgressRow({required this.label, required this.score});
 
-  final ScoreItem item;
+  final String label;
+  final int score;
 
   @override
   Widget build(BuildContext context) {
@@ -512,30 +577,27 @@ class _ScoreRow extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              item.label,
+              label,
               style: AppTextStyles.smRegular(
                 context,
               ).copyWith(color: AppColors.gray700),
             ),
             Text(
-              '${item.score}',
+              '$score',
               style: AppTextStyles.smMedium(
                 context,
-              ).copyWith(color: AppColors.gray900),
+              ).copyWith(color: AppColors.gray700),
             ),
           ],
         ),
         const VSpace(6),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
-          child: SizedBox(
-            width: 140,
-            child: LinearProgressIndicator(
-              value: item.score / 100,
-              minHeight: 5,
-              color: AppColors.primary500,
-              backgroundColor: AppColors.gray100,
-            ),
+          child: LinearProgressIndicator(
+            value: (score.clamp(0, 100)) / 100,
+            minHeight: 6,
+            color: AppColors.primary500,
+            backgroundColor: AppColors.gray100,
           ),
         ),
       ],
@@ -544,12 +606,37 @@ class _ScoreRow extends StatelessWidget {
 }
 
 class _FeedbackCard extends StatelessWidget {
-  const _FeedbackCard({required this.feedback});
+  const _FeedbackCard({required this.assessment});
 
-  final List<String> feedback;
+  final ProjectAssessment assessment;
 
   @override
   Widget build(BuildContext context) {
+    final items = [
+      for (final strength in assessment.strengths)
+        (
+          icon: Icons.check_circle,
+          color: AppColors.success75,
+          checkColor: _statusGreenText,
+          text: strength,
+        ),
+      for (final weakness in assessment.weaknesses)
+        (
+          icon: Icons.error_outline,
+          color: AppColors.warning700v2,
+          checkColor: null,
+          text: weakness,
+        ),
+      for (final recommendation in assessment.recommendations)
+        (
+          icon: Icons.lightbulb_outline,
+          color: AppColors.primary500,
+          checkColor: null,
+          text: recommendation,
+        ),
+    ];
+    if (items.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -559,18 +646,33 @@ class _FeedbackCard extends StatelessWidget {
             context,
           ).copyWith(color: AppColors.gray900),
         ),
-        const VSpace(12),
-        for (var i = 0; i < feedback.length; i++) ...[
+        const VSpace(16),
+        for (var i = 0; i < items.length; i++) ...[
           if (i > 0)
-            Divider(height: 24, thickness: 1, color: AppColors.gray100),
+            Divider(height: 24, thickness: 1, color: AppColors.gray200v2),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.check_circle, size: 16, color: _statusGreenText),
+              items[i].checkColor != null
+                  ? Container(
+                      width: 16,
+                      height: 16,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: items[i].color,
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        size: 11,
+                        color: items[i].checkColor,
+                      ),
+                    )
+                  : Icon(items[i].icon, size: 16, color: items[i].color),
               const HSpace(10),
               Expanded(
                 child: Text(
-                  feedback[i],
+                  items[i].text,
                   style: AppTextStyles.smRegular(
                     context,
                   ).copyWith(color: AppColors.gray700),
@@ -596,14 +698,14 @@ class _InstructionsCard extends StatelessWidget {
       children: [
         Text(
           'Instructions',
-          style: AppTextStyles.mdBold(
+          style: AppTextStyles.smBold(
             context,
           ).copyWith(color: AppColors.gray900),
         ),
         const VSpace(12),
-        Text(
-          instructions,
-          style: AppTextStyles.smRegular(
+        instructions.asMarkdown(
+          context,
+          baseStyle: AppTextStyles.smRegular(
             context,
           ).copyWith(color: AppColors.gray700),
         ),
@@ -615,8 +717,6 @@ class _InstructionsCard extends StatelessWidget {
 class _UploadWorkCard extends StatelessWidget {
   const _UploadWorkCard({
     required this.project,
-    required this.uploadedFiles,
-    this.uploadError,
     required this.contentController,
     required this.selectedType,
     required this.onTypeSelected,
@@ -627,8 +727,6 @@ class _UploadWorkCard extends StatelessWidget {
   });
 
   final CourseProject project;
-  final List<ProjectFile> uploadedFiles;
-  final String? uploadError;
   final TextEditingController contentController;
   final String selectedType;
   final ValueChanged<String> onTypeSelected;
@@ -652,17 +750,6 @@ class _UploadWorkCard extends StatelessWidget {
             context,
           ).copyWith(color: AppColors.gray900),
         ),
-        if (uploadError != null) ...[
-          const VSpace(12),
-          _UploadFailedBanner(message: uploadError!),
-        ],
-        if (uploadedFiles.isNotEmpty) ...[
-          const VSpace(12),
-          for (var i = 0; i < uploadedFiles.length; i++) ...[
-            if (i > 0) const VSpace(8),
-            _UploadedFileTile(file: uploadedFiles[i]),
-          ],
-        ],
         if (types.length > 1) ...[
           const VSpace(16),
           Text(
@@ -704,7 +791,8 @@ class _UploadWorkCard extends StatelessWidget {
           else if (draftFileUrl != null)
             _UploadedFileTile(
               file: ProjectFile(
-                name: Uri.tryParse(draftFileUrl!)?.pathSegments.lastOrNull ??
+                name:
+                    Uri.tryParse(draftFileUrl!)?.pathSegments.lastOrNull ??
                     draftFileUrl!,
                 size: 'Uploaded',
               ),
@@ -894,56 +982,57 @@ class _UploadedFileTile extends StatelessWidget {
   }
 }
 
-class _UploadFailedBanner extends StatelessWidget {
-  const _UploadFailedBanner({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return DottedBorder(
-      options: RoundedRectDottedBorderOptions(
-        dashPattern: const [6, 6],
-        strokeWidth: 1.5,
-        radius: const Radius.circular(16),
-        color: AppColors.error300,
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        decoration: BoxDecoration(
-          color: AppColors.error50,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          children: [
-            // TODO: replace with the exact warning icon asset when available
-            Icon(
-              Icons.warning_amber_rounded,
-              color: AppColors.error500,
-              size: 28,
-            ),
-            const VSpace(12),
-            Text(
-              'Upload Failed',
-              style: AppTextStyles.smMedium(
-                context,
-              ).copyWith(color: AppColors.gray900),
-            ),
-            const VSpace(4),
-            Text(
-              message,
-              style: AppTextStyles.xsRegular(
-                context,
-              ).copyWith(color: AppColors.gray500),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// TODO: re-enable once file uploads report per-file failure state.
+// class _UploadFailedBanner extends StatelessWidget {
+//   const _UploadFailedBanner({required this.message});
+//
+//   final String message;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return DottedBorder(
+//       options: RoundedRectDottedBorderOptions(
+//         dashPattern: const [6, 6],
+//         strokeWidth: 1.5,
+//         radius: const Radius.circular(16),
+//         color: AppColors.error300,
+//       ),
+//       child: Container(
+//         width: double.infinity,
+//         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+//         decoration: BoxDecoration(
+//           color: AppColors.error50,
+//           borderRadius: BorderRadius.circular(16),
+//         ),
+//         child: Column(
+//           children: [
+//             // TODO: replace with the exact warning icon asset when available
+//             Icon(
+//               Icons.warning_amber_rounded,
+//               color: AppColors.error500,
+//               size: 28,
+//             ),
+//             const VSpace(12),
+//             Text(
+//               'Upload Failed',
+//               style: AppTextStyles.smMedium(
+//                 context,
+//               ).copyWith(color: AppColors.gray900),
+//             ),
+//             const VSpace(4),
+//             Text(
+//               message,
+//               style: AppTextStyles.xsRegular(
+//                 context,
+//               ).copyWith(color: AppColors.gray500),
+//               textAlign: TextAlign.center,
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 ({Color background, Color foreground, String label}) _getSubmissionStyle(
   SubmissionStatus status,

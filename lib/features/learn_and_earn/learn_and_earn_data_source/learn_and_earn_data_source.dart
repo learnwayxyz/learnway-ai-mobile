@@ -10,7 +10,9 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/enrollment_response.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/intermediate_registered_course.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
@@ -527,29 +529,27 @@ class LearnAndEarnDataSource {
     }
   }
 
-  Future<String> uploadProjectFile(File file) async {
+  Future<List<CourseProjectSubmissionResult>> fetchCourseProjectSubmissions(
+    String courseId,
+  ) async {
     try {
       final token = await SharedPreferencesStore.getUserToken(userTokenKey);
-      final response = await client.postMultipart(
-        Endpoints.uploadImage,
-        fields: {},
-        files: {'file': file},
-        headers: {'Authorization': 'Bearer $token'},
+      final response = await client.get(
+        Endpoints.courseProjectSubmissions(courseId),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
       );
-      final decoded = jsonDecode(response.body);
-      log('uploadProjectFile(): $decoded');
+      if (response.statusCode == 404) return [];
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw LearnAndEarnFailure('Error uploading file');
+        throw LearnAndEarnFailure('Error fetching project submissions');
       }
-      final url =
-          decoded['url'] ??
-          decoded['fileUrl'] ??
-          decoded['secureUrl'] ??
-          (decoded['data'] is Map ? decoded['data']['url'] : null);
-      if (url is! String || url.isEmpty) {
-        throw LearnAndEarnFailure('Upload succeeded but no file URL returned');
-      }
-      return url;
+      final decoded = jsonDecode(response.body);
+      log('fetchCourseProjectSubmissions(): $decoded');
+      return _extractSubmissionList(
+        decoded,
+      ).map(_parseSubmissionResult).whereType<CourseProjectSubmissionResult>().toList();
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
     } on HttpException catch (e) {
@@ -559,30 +559,59 @@ class LearnAndEarnDataSource {
     }
   }
 
-  Future<void> sendCourseProject(
-    String courseId, {
-    required String submissionType,
-    required String content,
-    required bool isDraft,
-  }) async {
+  /// The submissions list endpoint may return a bare JSON array or wrap it
+  /// under a `data`/`submissions`/`results` key. Normalize to a list of maps.
+  List<Map<String, dynamic>> _extractSubmissionList(dynamic decoded) {
+    final dynamic raw = decoded is Map<String, dynamic>
+        ? (decoded['data'] ??
+              decoded['submissions'] ??
+              decoded['results'] ??
+              const [])
+        : decoded;
+    if (raw is! List) return const [];
+    return raw.whereType<Map<String, dynamic>>().toList();
+  }
+
+  /// Each list item is either already `{submission, assessment}` shaped (the
+  /// same model the submit endpoint returns) or a flat submission row with an
+  /// optional nested `assessment`. Normalize both into a result model.
+  CourseProjectSubmissionResult? _parseSubmissionResult(
+    Map<String, dynamic> item,
+  ) {
+    try {
+      if (item.containsKey('submission')) {
+        return CourseProjectSubmissionResult.fromJson(item);
+      }
+      return CourseProjectSubmissionResult.fromJson({
+        'submission': item,
+        'assessment': item['assessment'],
+      });
+    } catch (e) {
+      log('_parseSubmissionResult() skipped malformed item: $e');
+      return null;
+    }
+  }
+
+  Future<CourseProjectSubmissionResult?> fetchCourseProjectSubmission(
+    String courseId,
+    String submissionId,
+  ) async {
     try {
       final token = await SharedPreferencesStore.getUserToken(userTokenKey);
-      final response = await client.post(
-        isDraft
-            ? Endpoints.courseProjectDraft(courseId)
-            : Endpoints.courseProjectSubmit(courseId),
-        body: {'submissionType': submissionType, 'content': content},
+      final response = await client.get(
+        Endpoints.courseProjectSubmission(courseId, submissionId),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
+      if (response.statusCode == 404) return null;
       if (response.statusCode != 200 && response.statusCode != 201) {
-        log('sendCourseProject(): ${response.body}');
-        throw LearnAndEarnFailure(
-          isDraft ? 'Error saving project draft' : 'Error submitting project',
-        );
+        throw LearnAndEarnFailure('Error fetching project submission');
       }
+      final decoded = jsonDecode(response.body);
+      log('fetchCourseProjectSubmission(): $decoded');
+      return CourseProjectSubmissionResult.fromJson(decoded);
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
     } on HttpException catch (e) {
@@ -590,5 +619,122 @@ class LearnAndEarnDataSource {
     } catch (e) {
       return Future.error(LearnAndEarnFailure(e.toString()));
     }
+  }
+
+  Future<CourseProjectSubmissionResult> sendCourseProject(
+    String courseId, {
+    required String submissionType,
+    required String content,
+    required bool isDraft,
+    File? file,
+  }) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      log('courseId: $courseId');
+      log('submissionType: $submissionType');
+      log('content: $content');
+      log('isDraft: $isDraft');
+      log('file: $file');
+      final response = await client.postMultipart(
+        isDraft
+            ? Endpoints.courseProjectDraft(courseId)
+            : Endpoints.courseProjectSubmit(courseId),
+        fields: {'submissionType': submissionType, 'textContent': content},
+        files: file != null ? {'file': file} : null,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        log('sendCourseProject(): ${response.body}');
+        throw LearnAndEarnFailure(
+          isDraft ? 'Error saving project draft' : 'Error submitting project',
+        );
+      }
+      final decoded = jsonDecode(response.body);
+      log('sendCourseProject(): $decoded');
+      return CourseProjectSubmissionResult.fromJson(decoded);
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<CertificateClaim> claimCertificate(
+    String courseId,
+    String studentName,
+  ) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.post(
+        Endpoints.claimCertificate,
+        body: {'courseId': courseId, 'studentName': studentName},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        log('claimCertificate(): ${response.body}');
+        throw LearnAndEarnFailure(_extractErrorMessage(response.body));
+      }
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      log('claimCertificate(): $decoded');
+      return CertificateClaim.fromJson(decoded);
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } on LearnAndEarnFailure catch (e) {
+      return Future.error(e);
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<List<CertificateClaim>> fetchMyCertificates() async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.get(
+        Endpoints.myCertificates,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        log('fetchMyCertificates(): ${response.body}');
+        throw LearnAndEarnFailure('Error fetching certificates');
+      }
+      final decoded = jsonDecode(response.body);
+      log('fetchMyCertificates(): $decoded');
+      final list = decoded is Map<String, dynamic>
+          ? (decoded['data'] ?? decoded['certificates'] ?? [])
+          : decoded;
+      return (list as List)
+          .map((e) => CertificateClaim.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } on LearnAndEarnFailure catch (e) {
+      return Future.error(e);
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  String _extractErrorMessage(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic> && decoded['message'] is String) {
+        return decoded['message'] as String;
+      }
+    } catch (_) {
+      // Fall through to the generic message below.
+    }
+    return 'Error claiming certificate';
   }
 }

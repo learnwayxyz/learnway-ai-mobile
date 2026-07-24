@@ -31,7 +31,6 @@ final class CourseProjectError extends CourseProjectState {
   List<Object?> get props => [error];
 }
 
-/// The project is loaded and a draft/submit request is in flight.
 final class CourseProjectSending extends CourseProjectLoaded {
   const CourseProjectSending(super.project, {required this.isDraft});
 
@@ -46,7 +45,12 @@ final class CourseProjectDraftSaved extends CourseProjectLoaded {
 }
 
 final class CourseProjectSubmitted extends CourseProjectLoaded {
-  const CourseProjectSubmitted(super.project);
+  const CourseProjectSubmitted(super.project, this.result);
+
+  final CourseProjectSubmissionResult result;
+
+  @override
+  List<Object?> get props => [project, result];
 }
 
 final class CourseProjectActionError extends CourseProjectLoaded {

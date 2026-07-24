@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
-import 'package:core/src/config/env/api_config_service.dart';
 import 'package:learnwayv2/services/ad_service.dart';
 import 'package:learnwayv2/services/ads_service.dart';
 import 'package:learnwayv2/shared/interfaces/ad_service_interface.dart';
@@ -25,14 +26,29 @@ class _NativeAdScreen extends State<NativeAdScreen>
   final LevelPlayTemplateType _templateType = LevelPlayTemplateType.MEDIUM;
   int _adViewKey = 0;
 
+  static const _dismissDelaySeconds = 5;
+  int _secondsRemaining = _dismissDelaySeconds;
+  Timer? _dismissTimer;
+
+  bool get _canDismiss => _secondsRemaining <= 0;
+
   @override
   void initState() {
     super.initState();
     _createNativeAd();
+    _dismissTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining <= 1) {
+        timer.cancel();
+        setState(() => _secondsRemaining = 0);
+      } else {
+        setState(() => _secondsRemaining--);
+      }
+    });
   }
 
   @override
   void dispose() {
+    _dismissTimer?.cancel();
     super.dispose();
   }
 
@@ -70,61 +86,76 @@ class _NativeAdScreen extends State<NativeAdScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarFactory.dismissableAppBar(
-        title: 'Advertising helps fund\nLearnWay\'s mission',
-        onDismiss: () => Navigator.of(context).pop(),
-      ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: SizedBox(
-                    width: _width,
-                    height: _height,
-                    child: locator<IAdService>() is AdmobService
-                        ? AdService.instance.nativeAd != null
-                              ? AdWidget(ad: AdService.instance.nativeAd!)
-                              : SizedBox.shrink()
-                        : LevelPlayNativeAdView(
-                            key: ValueKey(_adViewKey),
-                            height: _height,
-                            width: _width,
-                            nativeAd: _nativeAd,
-                            templateType: _templateType,
-                            onPlatformViewCreated: _initAndLoadAd,
-                          ),
+    return PopScope(
+      canPop: _canDismiss,
+      child: Scaffold(
+        appBar: AppBarFactory.dismissableAppBar(
+          title: 'Advertising helps fund\nLearnWay\'s mission',
+          onDismiss: _canDismiss ? () => Navigator.of(context).pop() : () {},
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                if (!_canDismiss)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      'You can leave this screen in ${_secondsRemaining}s',
+                      style: AppTextStyles.smRegular(context),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: SizedBox(
+                      width: _width,
+                      height: _height,
+                      child: locator<IAdService>() is AdmobService
+                          ? AdService.instance.nativeAd != null
+                                ? AdWidget(ad: AdService.instance.nativeAd!)
+                                : SizedBox.shrink()
+                          : LevelPlayNativeAdView(
+                              key: ValueKey(_adViewKey),
+                              height: _height,
+                              width: _width,
+                              nativeAd: _nativeAd,
+                              templateType: _templateType,
+                              onPlatformViewCreated: _initAndLoadAd,
+                            ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.2,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              color: Color(0xff12c2e8),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ButtonFactory.primaryButton(
-                    onPressed: () {
-                      context.router.push(PayWallRoute());
-                    },
-                    text: 'Remove Ads',
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  ),
-                ],
+              ],
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.2,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                color: Color(0xff12c2e8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ButtonFactory.primaryButton(
+                      onPressed: () {
+                        context.router.push(PayWallRoute());
+                      },
+                      text: 'Remove Ads',
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

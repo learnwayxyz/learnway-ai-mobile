@@ -8,7 +8,9 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/learn_and_earn_data_source.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/intermediate_registered_course.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
@@ -212,9 +214,21 @@ class LearnAndEarnRepository {
     }
   }
 
-  Future<Either<Failure, String>> uploadProjectFile(File file) async {
+  Future<Either<Failure, CourseProjectSubmissionResult>> sendCourseProject(
+    String courseId, {
+    required String submissionType,
+    required String content,
+    required bool isDraft,
+    File? file,
+  }) async {
     try {
-      final result = await _dataSource.uploadProjectFile(file);
+      final result = await _dataSource.sendCourseProject(
+        courseId,
+        submissionType: submissionType,
+        content: content,
+        isDraft: isDraft,
+        file: file,
+      );
       return Right(result);
     } on LearnAndEarnFailure catch (e) {
       return Left(LearnAndEarnFailure(e.toString()));
@@ -223,20 +237,26 @@ class LearnAndEarnRepository {
     }
   }
 
-  Future<Either<Failure, Unit>> sendCourseProject(
-    String courseId, {
-    required String submissionType,
-    required String content,
-    required bool isDraft,
-  }) async {
+  Future<Either<Failure, List<CourseProjectSubmissionResult>>>
+  fetchCourseProjectSubmissions(String courseId) async {
     try {
-      await _dataSource.sendCourseProject(
+      final result = await _dataSource.fetchCourseProjectSubmissions(courseId);
+      return Right(result);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, CourseProjectSubmissionResult?>>
+  fetchCourseProjectSubmission(String courseId, String submissionId) async {
+    try {
+      final result = await _dataSource.fetchCourseProjectSubmission(
         courseId,
-        submissionType: submissionType,
-        content: content,
-        isDraft: isDraft,
+        submissionId,
       );
-      return const Right(unit);
+      return Right(result);
     } on LearnAndEarnFailure catch (e) {
       return Left(LearnAndEarnFailure(e.toString()));
     } on Exception catch (e) {
@@ -252,6 +272,31 @@ class LearnAndEarnRepository {
       return Right(result);
     } on LearnAndEarnFailure catch (e) {
       return Left(LearnAndEarnFailure(e.toString()));
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, CertificateClaim>> claimCertificate(
+    String courseId,
+    String studentName,
+  ) async {
+    try {
+      final result = await _dataSource.claimCertificate(courseId, studentName);
+      return Right(result);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(e);
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, List<CertificateClaim>>> fetchMyCertificates() async {
+    try {
+      final result = await _dataSource.fetchMyCertificates();
+      return Right(result);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(e);
     } on Exception catch (e) {
       return Left(LearnAndEarnFailure(e.toString()));
     }

@@ -7,6 +7,7 @@ import 'package:learnwayv2/features/badges/bloc/badge_bloc.dart';
 import 'package:learnwayv2/features/bookmarks/cubit/bookmark_cubit.dart';
 import 'package:learnwayv2/features/contest/bloc/contest_bloc.dart';
 import 'package:learnwayv2/features/leader_board/cubit/leader_board_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/certificate_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_info_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_repository/learn_and_earn_repository.dart';
@@ -138,6 +139,11 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (_) => CourseProjectCubit(
+            repository: locator.get<LearnAndEarnRepository>(),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => CertificateCubit(
             repository: locator.get<LearnAndEarnRepository>(),
           ),
         ),

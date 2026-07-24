@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_repository/learn_and_earn_repository.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
 
@@ -14,22 +15,87 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
 
   final LearnAndEarnRepository repository;
 
+  /// Latest submission result per course, kept outside the state so views
+  /// (e.g. the submit form) can tell whether a project is already passed even
+  /// while the state is transient (draft saved, action error, ...).
+  final Map<String, CourseProjectSubmissionResult> _latestResults = {};
+
+  CourseProjectSubmissionResult? latestResultFor(String courseId) =>
+      _latestResults[courseId];
+
+  bool hasPassedProject(String courseId) =>
+      _latestResults[courseId]?.assessment?.passed ?? false;
+
   Future<void> fetchCourseProject(String courseId) async {
     emit(CourseProjectLoading());
     try {
       final result = await repository.fetchCourseProject(courseId);
-      result.fold((failure) => emit(CourseProjectError(failure.message)), (
-        project,
-      ) {
-        if (project == null || !project.isActive) {
-          emit(CourseProjectEmpty());
-        } else {
-          emit(CourseProjectLoaded(project));
-        }
-      });
+      await result.fold(
+        (failure) async => emit(CourseProjectError(failure.message)),
+        (project) async {
+          if (project == null || !project.isActive) {
+            emit(CourseProjectEmpty());
+          } else {
+            emit(CourseProjectLoaded(project));
+            // The score/assessment lives only in the in-memory submitted
+            // state, so restore it from the backend if this course already
+            // has a submission on record.
+            await _restoreSubmission(courseId, project);
+          }
+        },
+      );
     } catch (e) {
       emit(CourseProjectError(e.toString()));
     }
+  }
+
+  Future<void> _restoreSubmission(String courseId, CourseProject project) async {
+    final listResult = await repository.fetchCourseProjectSubmissions(courseId);
+
+    await listResult.fold(
+      // Leave the loaded state in place; nothing to restore on failure.
+      (_) async {},
+      (submissions) async {
+        if (submissions.isEmpty) return;
+
+        final latest = _latestSubmission(submissions);
+
+        // The list may already carry the scored assessment. If it doesn't,
+        // fetch the full submission for its assessment details.
+        if (latest.assessment != null) {
+          _latestResults[courseId] = latest;
+          emit(CourseProjectSubmitted(project, latest));
+          return;
+        }
+
+        final detail = await repository.fetchCourseProjectSubmission(
+          courseId,
+          latest.submission.id,
+        );
+        detail.fold(
+          (_) {
+            _latestResults[courseId] = latest;
+            emit(CourseProjectSubmitted(project, latest));
+          },
+          (full) {
+            _latestResults[courseId] = full ?? latest;
+            emit(CourseProjectSubmitted(project, full ?? latest));
+          },
+        );
+      },
+    );
+  }
+
+  /// Most recent submission by submitted/created time, so a re-submission
+  /// always supersedes older attempts.
+  CourseProjectSubmissionResult _latestSubmission(
+    List<CourseProjectSubmissionResult> submissions,
+  ) {
+    DateTime keyOf(CourseProjectSubmissionResult r) =>
+        r.submission.submittedAt ?? r.submission.createdAt;
+    return submissions.reduce(
+      (a, b) => keyOf(b).isAfter(keyOf(a)) ? b : a,
+    );
   }
 
   Future<void> saveDraft(
@@ -44,21 +110,19 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
 
     emit(CourseProjectSending(project, isDraft: true));
 
-    final resolvedContent = await _resolveContent(project, content, file);
-    if (resolvedContent == null) return;
-
     // Persist locally so the draft survives even if the request fails.
     await LocalStorageService.saveProjectDraft(
       courseId,
       submissionType: submissionType,
-      content: resolvedContent,
+      content: content,
     );
 
     final result = await repository.sendCourseProject(
       courseId,
       submissionType: submissionType,
-      content: resolvedContent,
+      content: content,
       isDraft: true,
+      file: file,
     );
     result.fold(
       (failure) => emit(CourseProjectActionError(project, failure.message)),
@@ -78,38 +142,21 @@ class CourseProjectCubit extends Cubit<CourseProjectState> {
 
     emit(CourseProjectSending(project, isDraft: false));
 
-    final resolvedContent = await _resolveContent(project, content, file);
-    if (resolvedContent == null) return;
-
     final result = await repository.sendCourseProject(
       courseId,
       submissionType: submissionType,
-      content: resolvedContent,
+      content: content,
       isDraft: false,
+      file: file,
     );
     await result.fold(
       (failure) async =>
           emit(CourseProjectActionError(project, failure.message)),
-      (_) async {
+      (submissionResult) async {
         await LocalStorageService.clearProjectDraft(courseId);
-        emit(CourseProjectSubmitted(project));
+        _latestResults[courseId] = submissionResult;
+        emit(CourseProjectSubmitted(project, submissionResult));
       },
     );
-  }
-
-  /// Uploads [file] and returns its URL as the submission content, or
-  /// returns [content] unchanged when there is no file. Returns null
-  /// (after emitting an error state) when the upload fails.
-  Future<String?> _resolveContent(
-    CourseProject project,
-    String content,
-    File? file,
-  ) async {
-    if (file == null) return content;
-    final uploaded = await repository.uploadProjectFile(file);
-    return uploaded.fold((failure) {
-      emit(CourseProjectActionError(project, failure.message));
-      return null;
-    }, (url) => url);
   }
 }
