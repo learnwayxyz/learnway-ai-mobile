@@ -229,7 +229,13 @@ class _AllCoursesTabState extends State<AllCoursesTab>
                   }
 
                   final updatedCourses = courses.map((course) {
-                    final isEnrolled = enrolledCourseIds.contains(course.id);
+                    // The course list endpoint already tells us whether the user
+                    // is enrolled. Treat that as the source of truth and use the
+                    // registered-courses list only to add newly enrolled courses
+                    // the list endpoint hasn't caught up with yet.
+                    final isEnrolled =
+                        course.isEnrolled ||
+                        enrolledCourseIds.contains(course.id);
                     return LearnWayCourses(
                       id: course.id,
                       createdAt: course.createdAt,
@@ -244,7 +250,9 @@ class _AllCoursesTabState extends State<AllCoursesTab>
                       enrolledUsersCount: course.enrolledUsersCount,
                       latestEnrolledUsers: course.latestEnrolledUsers,
                       isEnrolled: isEnrolled,
-                      enrolledAt: isEnrolled ? DateTime.now() : null,
+                      enrolledAt:
+                          course.enrolledAt ??
+                          (isEnrolled ? DateTime.now() : null),
                       isCompleted: course.isCompleted,
                       completedAt: course.completedAt,
                       progress: course.progress,
@@ -410,6 +418,20 @@ class _AllCoursesTabState extends State<AllCoursesTab>
     }
   }
 
+  bool _isRegisteredDataReady(BuildContext context, LevelType levelType) {
+    final state = context
+        .read<registered_course_bloc.RegisteredCoursesBloc>()
+        .state;
+    return switch (levelType) {
+      LevelType.beginner =>
+        state is registered_course_bloc.LoadedBeginnerRegisteredCourses,
+      LevelType.intermediate =>
+        state is registered_course_bloc.LoadedIntermediateRegisteredCourses,
+      LevelType.advanced =>
+        state is registered_course_bloc.LoadedAdvancedRegisteredCourses,
+    };
+  }
+
   void _handleCourseEnrollment(
     BuildContext context,
     LearnWayCourses course,
@@ -428,6 +450,15 @@ class _AllCoursesTabState extends State<AllCoursesTab>
       }
       return;
     }
+
+    // Enrollment data may still be loading (or have failed), in which case every
+    // course looks un-enrolled. Re-sync instead of offering to enroll again.
+    if (!_isRegisteredDataReady(context, levelType)) {
+      _refetchCoursesAfterEnrollment();
+      NotificationService.showInfo('Checking your enrollments, try again');
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {

@@ -529,6 +529,98 @@ class LearnAndEarnDataSource {
     }
   }
 
+  Future<List<CourseProjectSubmissionResult>> fetchCourseProjectSubmissions(
+    String courseId,
+  ) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.get(
+        Endpoints.courseProjectSubmissions(courseId),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 404) return [];
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw LearnAndEarnFailure('Error fetching project submissions');
+      }
+      final decoded = jsonDecode(response.body);
+      log('fetchCourseProjectSubmissions(): $decoded');
+      return _extractSubmissionList(
+        decoded,
+      ).map(_parseSubmissionResult).whereType<CourseProjectSubmissionResult>().toList();
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  /// The submissions list endpoint may return a bare JSON array or wrap it
+  /// under a `data`/`submissions`/`results` key. Normalize to a list of maps.
+  List<Map<String, dynamic>> _extractSubmissionList(dynamic decoded) {
+    final dynamic raw = decoded is Map<String, dynamic>
+        ? (decoded['data'] ??
+              decoded['submissions'] ??
+              decoded['results'] ??
+              const [])
+        : decoded;
+    if (raw is! List) return const [];
+    return raw.whereType<Map<String, dynamic>>().toList();
+  }
+
+  /// Each list item is either already `{submission, assessment}` shaped (the
+  /// same model the submit endpoint returns) or a flat submission row with an
+  /// optional nested `assessment`. Normalize both into a result model.
+  CourseProjectSubmissionResult? _parseSubmissionResult(
+    Map<String, dynamic> item,
+  ) {
+    try {
+      if (item.containsKey('submission')) {
+        return CourseProjectSubmissionResult.fromJson(item);
+      }
+      return CourseProjectSubmissionResult.fromJson({
+        'submission': item,
+        'assessment': item['assessment'],
+      });
+    } catch (e) {
+      log('_parseSubmissionResult() skipped malformed item: $e');
+      return null;
+    }
+  }
+
+  Future<CourseProjectSubmissionResult?> fetchCourseProjectSubmission(
+    String courseId,
+    String submissionId,
+  ) async {
+    try {
+      final token = await SharedPreferencesStore.getUserToken(userTokenKey);
+      final response = await client.get(
+        Endpoints.courseProjectSubmission(courseId, submissionId),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 404) return null;
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw LearnAndEarnFailure('Error fetching project submission');
+      }
+      final decoded = jsonDecode(response.body);
+      log('fetchCourseProjectSubmission(): $decoded');
+      return CourseProjectSubmissionResult.fromJson(decoded);
+    } on SocketException catch (e) {
+      return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
+    } on HttpException catch (e) {
+      return Future.error(LearnAndEarnFailure('Server error: ${e.message}'));
+    } catch (e) {
+      return Future.error(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
   Future<CourseProjectSubmissionResult> sendCourseProject(
     String courseId, {
     required String submissionType,

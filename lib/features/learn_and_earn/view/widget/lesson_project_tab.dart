@@ -221,19 +221,34 @@ class _NotSubmittedViewState extends State<_NotSubmittedView> {
           builder: (context, state) {
             final sending = state is CourseProjectSending ? state : null;
             final isSending = sending != null;
+            // A project that has already been passed cannot be resubmitted.
+            final hasPassed = context
+                .read<CourseProjectCubit>()
+                .hasPassedProject(widget.project.courseId);
             return Column(
               children: [
+                if (hasPassed) ...[
+                  Text(
+                    "You've already passed this project — resubmission is "
+                    'disabled.',
+                    style: AppTextStyles.smRegular(
+                      context,
+                    ).copyWith(color: AppColors.gray500),
+                    textAlign: TextAlign.center,
+                  ),
+                  const VSpace(12),
+                ],
                 ButtonFactory.grayButton(
                   mainAxisAlignment: MainAxisAlignment.center,
                   text: 'Add to draft',
                   isLoading: sending?.isDraft ?? false,
-                  onPressed: isSending ? () {} : _saveDraft,
+                  onPressed: (isSending || hasPassed) ? () {} : _saveDraft,
                 ),
                 const VSpace(12),
                 ButtonFactory.blackButton(
                   mainAxisAlignment: MainAxisAlignment.center,
                   text: 'Submit',
-                  onPressed: isSending ? () {} : _submit,
+                  onPressed: (isSending || hasPassed) ? () {} : _submit,
                 ),
               ],
             );
@@ -599,17 +614,24 @@ class _FeedbackCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       for (final strength in assessment.strengths)
-        (icon: Icons.check_circle, color: _statusGreenText, text: strength),
+        (
+          icon: Icons.check_circle,
+          color: AppColors.success75,
+          checkColor: _statusGreenText,
+          text: strength,
+        ),
       for (final weakness in assessment.weaknesses)
         (
           icon: Icons.error_outline,
           color: AppColors.warning700v2,
+          checkColor: null,
           text: weakness,
         ),
       for (final recommendation in assessment.recommendations)
         (
           icon: Icons.lightbulb_outline,
           color: AppColors.primary500,
+          checkColor: null,
           text: recommendation,
         ),
     ];
@@ -627,11 +649,26 @@ class _FeedbackCard extends StatelessWidget {
         const VSpace(16),
         for (var i = 0; i < items.length; i++) ...[
           if (i > 0)
-            Divider(height: 24, thickness: 1, color: AppColors.gray100),
+            Divider(height: 24, thickness: 1, color: AppColors.gray200v2),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(items[i].icon, size: 16, color: items[i].color),
+              items[i].checkColor != null
+                  ? Container(
+                      width: 16,
+                      height: 16,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: items[i].color,
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        size: 11,
+                        color: items[i].checkColor,
+                      ),
+                    )
+                  : Icon(items[i].icon, size: 16, color: items[i].color),
               const HSpace(10),
               Expanded(
                 child: Text(

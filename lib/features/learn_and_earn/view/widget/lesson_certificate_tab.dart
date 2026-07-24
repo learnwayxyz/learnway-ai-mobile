@@ -1,6 +1,7 @@
 import 'package:gal/gal.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/certificate_cubit.dart';
+import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course_project_cubit.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/shared/container_extension.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/shared/locked_overlay.dart';
@@ -24,24 +25,86 @@ class CertificateTab extends StatelessWidget {
           ).showSnackBar(SnackBar(content: Text(state.error)));
         }
       },
-      child: BlocBuilder<CertificateCubit, CertificateState>(
-        builder: (context, state) {
-          if (state is CertificateInitial || state is CertificateLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: switch (state) {
-              CertificateClaimed(:final certificate) => _ClaimedView(
-                certificate: certificate,
-              ),
-              _ => _UnclaimedView(
-                courseId: courseId,
-                isClaiming: state is CertificateClaiming,
-              ),
+      child: ValueListenableBuilder<bool>(
+        valueListenable: RevenueCatService.instance.premiumStatusNotifier,
+        builder: (context, isPremium, _) {
+          final hasPremium =
+              isPremium || RevenueCatService.instance.isPremiumUser;
+          return BlocBuilder<CourseProjectCubit, CourseProjectState>(
+            builder: (context, projectState) {
+              // The certificate is earned by passing the course project:
+              // the backend's assessment verdict is the source of truth.
+              final passedProject =
+                  projectState is CourseProjectSubmitted &&
+                  (projectState.result.assessment?.passed ?? false);
+
+              if (!hasPremium || !passedProject) {
+                return _LockedCertificateView(showSubscribeCta: !hasPremium);
+              }
+
+              return BlocBuilder<CertificateCubit, CertificateState>(
+                builder: (context, state) {
+                  if (state is CertificateInitial ||
+                      state is CertificateLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: switch (state) {
+                      CertificateClaimed(:final certificate) => _ClaimedView(
+                        certificate: certificate,
+                      ),
+                      _ => _UnclaimedView(
+                        courseId: courseId,
+                        isClaiming: state is CertificateClaiming,
+                      ),
+                    },
+                  );
+                },
+              );
             },
           );
         },
+      ),
+    );
+  }
+}
+
+/// Locked state for the whole certificate tab: free users get a subscribe
+/// CTA; premium users whose latest project assessment isn't `passed` are
+/// told to finish it first.
+class _LockedCertificateView extends StatelessWidget {
+  const _LockedCertificateView({required this.showSubscribeCta});
+
+  final bool showSubscribeCta;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        children: [
+          _CertificateCard(
+            isLocked: true,
+            overlay: LockedOverlay(
+              title: 'Certificate Locked',
+              subtitle: showSubscribeCta
+                  ? 'Subscribe to premium to get certificate'
+                  : 'Pass the course project to unlock your certificate',
+              action: showSubscribeCta
+                  ? ButtonFactory.gradientButton(
+                      text: 'Subscribe to get certificate',
+                      onPressed: () =>
+                          context.router.push(const PayWallRoute()),
+                    )
+                  : null,
+            ),
+          ),
+          const VSpace(24),
+        ],
       ),
     );
   }
@@ -55,45 +118,20 @@ class _UnclaimedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: RevenueCatService.instance.premiumStatusNotifier,
-      builder: (context, isPremium, _) {
-        final hasPremium =
-            isPremium || RevenueCatService.instance.isPremiumUser;
-        if (!hasPremium) {
-          return Column(
-            children: [
-              _CertificateCard(
-                isLocked: true,
-                overlay: LockedOverlay(
-                  title: 'Certificate Locked',
-                  subtitle: 'Subscribe to premium to get certificate',
-                  action: ButtonFactory.gradientButton(
-                    text: 'Subscribe to get certificate',
-                    onPressed: () => context.router.push(const PayWallRoute()),
-                  ),
-                ),
-              ),
-              const VSpace(24),
-            ],
-          );
-        }
-        return Column(
-          children: [
-            const _CertificateCard(isLocked: true),
-            const VSpace(24),
-            ButtonFactory.blackButton(
-              mainAxisAlignment: MainAxisAlignment.center,
-              text: 'Claim Certificate',
-              isLoading: isClaiming,
-              onPressed: isClaiming
-                  ? () {}
-                  : () => _showClaimSheet(context, courseId),
-            ),
-            const VSpace(24),
-          ],
-        );
-      },
+    return Column(
+      children: [
+        const _CertificateCard(isLocked: true),
+        const VSpace(24),
+        ButtonFactory.blackButton(
+          mainAxisAlignment: MainAxisAlignment.center,
+          text: 'Claim Certificate',
+          isLoading: isClaiming,
+          onPressed: isClaiming
+              ? () {}
+              : () => _showClaimSheet(context, courseId),
+        ),
+        const VSpace(24),
+      ],
     );
   }
 
@@ -144,60 +182,66 @@ class _ClaimCertificateSheetState extends State<_ClaimCertificateSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        MediaQuery.viewInsetsOf(context).bottom + 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Claim your certificate', style: AppTextStyles.lgBold(context)),
-          const VSpace(8),
-          Text(
-            "Enter the full name you'd like printed on your certificate.",
-            style: AppTextStyles.smRegular(
-              context,
-            ).copyWith(color: AppColors.gray500),
-          ),
-          const VSpace(16),
-          TextField(
-            controller: _nameController,
-            textCapitalization: TextCapitalization.words,
-            decoration: InputDecoration(
-              hintText: 'Full name',
-              errorText: _errorText,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 12,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.gray200),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.gray200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.primary500),
-              ),
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          MediaQuery.viewInsetsOf(context).bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Claim your certificate',
+              style: AppTextStyles.lgBold(context),
             ),
-            onChanged: (_) {
-              if (_errorText != null) setState(() => _errorText = null);
-            },
-          ),
-          const VSpace(20),
-          ButtonFactory.blackButton(
-            mainAxisAlignment: MainAxisAlignment.center,
-            text: 'Submit',
-            onPressed: _submit,
-          ),
-        ],
+            const VSpace(8),
+            Text(
+              "Enter the full name you'd like printed on your certificate.",
+              style: AppTextStyles.smRegular(
+                context,
+              ).copyWith(color: AppColors.gray500),
+            ),
+            const VSpace(16),
+            TextField(
+              controller: _nameController,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                hintText: 'Full name',
+                errorText: _errorText,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.gray200),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.gray200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primary500),
+                ),
+              ),
+              onChanged: (_) {
+                if (_errorText != null) setState(() => _errorText = null);
+              },
+            ),
+            const VSpace(20),
+            ButtonFactory.blackButton(
+              mainAxisAlignment: MainAxisAlignment.center,
+              text: 'Submit',
+              onPressed: _submit,
+            ),
+          ],
+        ),
       ),
     );
   }

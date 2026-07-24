@@ -97,19 +97,17 @@ class _LessonScreenState extends State<LessonScreen>
     super.dispose();
   }
 
+  /// Re-syncs the level screen's enrollment data on the way out. Resolved via
+  /// the locator rather than `context` because this also runs after the route
+  /// has popped, when the element is no longer safe to look up ancestors from.
   void checkLevelType() {
+    final bloc = locator<rb.RegisteredCoursesBloc>();
     if (widget.levelType == LevelType.beginner) {
-      context.read<rb.RegisteredCoursesBloc>().add(
-        rb.LoadBeginnerRegisteredCourses(),
-      );
+      bloc.add(const rb.LoadBeginnerRegisteredCourses(forceRefresh: true));
     } else if (widget.levelType == LevelType.intermediate) {
-      context.read<rb.RegisteredCoursesBloc>().add(
-        rb.LoadIntermediateRegisteredCourses(),
-      );
+      bloc.add(const rb.LoadIntermediateRegisteredCourses(forceRefresh: true));
     } else if (widget.levelType == LevelType.advanced) {
-      context.read<rb.RegisteredCoursesBloc>().add(
-        rb.LoadAdvancedRegisteredCourses(),
-      );
+      bloc.add(const rb.LoadAdvancedRegisteredCourses(forceRefresh: true));
     }
   }
 
@@ -160,10 +158,9 @@ class _LessonScreenState extends State<LessonScreen>
           appBar: AppBarFactory.standardAppBar(
             title: widget.pathTitle ?? courseData.courseTitle,
             barHeight: 0,
-            onBackPressed: () {
-              checkLevelType();
-              Navigator.pop(context);
-            },
+            // No checkLevelType() here — PopScope above already fires it for
+            // every pop, programmatic or gesture.
+            onBackPressed: () => Navigator.pop(context),
           ),
           body: OverlayLoader(
             isLoading: _isFirstFetch,

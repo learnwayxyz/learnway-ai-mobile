@@ -237,6 +237,33 @@ class LearnAndEarnRepository {
     }
   }
 
+  Future<Either<Failure, List<CourseProjectSubmissionResult>>>
+  fetchCourseProjectSubmissions(String courseId) async {
+    try {
+      final result = await _dataSource.fetchCourseProjectSubmissions(courseId);
+      return Right(result);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
+  Future<Either<Failure, CourseProjectSubmissionResult?>>
+  fetchCourseProjectSubmission(String courseId, String submissionId) async {
+    try {
+      final result = await _dataSource.fetchCourseProjectSubmission(
+        courseId,
+        submissionId,
+      );
+      return Right(result);
+    } on LearnAndEarnFailure catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    } on Exception catch (e) {
+      return Left(LearnAndEarnFailure(e.toString()));
+    }
+  }
+
   Future<Either<Failure, CourseProject?>> fetchCourseProject(
     String courseId,
   ) async {
