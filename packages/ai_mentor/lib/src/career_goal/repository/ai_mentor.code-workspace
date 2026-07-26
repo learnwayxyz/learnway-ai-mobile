@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "../../../../../../ai_mentor",
+    },
+    {
+      "path": "../../../../..",
+    },
+  ],
+  "settings": {
+    "conventionalCommits.scopes": ["fonbnk"],
+    "liveServer.settings.multiRootWorkspaceName": "ai_mentor",
+  },
+}
