@@ -13,6 +13,7 @@ import 'package:learnwayv2/shared/widgets/card_component/card_strategies/all_con
 import 'package:learnwayv2/shared/widgets/card_component/lesson_cards_factory.dart';
 import 'package:learnwayv2/shared/widgets/course_layout_widget/bloc/course_tabs_bloc.dart';
 import 'package:learnwayv2/shared/widgets/custom_tabs.dart';
+import 'package:learnwayv2/shared/widgets/overlay_loader.dart';
 
 @RoutePage()
 class PathCoursesScreen extends StatefulWidget {
@@ -29,8 +30,12 @@ class PathCoursesScreen extends StatefulWidget {
   State<PathCoursesScreen> createState() => _PathCoursesScreenState();
 }
 
-class _PathCoursesScreenState extends State<PathCoursesScreen> {
+class _PathCoursesScreenState extends State<PathCoursesScreen>
+    with AutoRouteAwareStateMixin<PathCoursesScreen> {
   final ScrollController _scrollController = ScrollController();
+
+  String? _enrollingCourseId;
+  String? _enrollingCourseTitle;
 
   @override
   void initState() {
@@ -41,6 +46,17 @@ class _PathCoursesScreenState extends State<PathCoursesScreen> {
   }
 
   @override
+  void didPopNext() {
+    // Enrollment (triggered from this screen) navigates to LessonRoute
+    // directly and never notifies LearningPathCubit, so its cached
+    // `isEnrolled` flags go stale the moment a course is enrolled. Refetch on
+    // return so a re-tap of the same card routes to the lesson instead of
+    // showing the enroll dialog again.
+    locator<LearningPathCubit>().fetchPathCourses(widget.learningPathId);
+    super.didPopNext();
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
@@ -48,37 +64,77 @@ class _PathCoursesScreenState extends State<PathCoursesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarFactory.standardAppBar(
-        title: widget.pathTitle,
-        barHeight: 10,
-      ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            VSpace(20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Choose a Course',
-                    style: AppTextStyles.lgBold(context),
-                  ),
-                  Text(
-                    'Learn future-ready skills at your own pace',
-                    style: AppTextStyles.md(
-                      context,
-                    ).copyWith(color: AppColors.gray700),
-                  ),
-                ],
-              ),
+    return BlocListener<learn_and_earn.LearnAndEarnBloc, learn_and_earn.LearnAndEarnState>(
+      listener: (context, state) {
+        switch (state) {
+          case learn_and_earn.EnrolledBeginnerCourse() ||
+              learn_and_earn.EnrolledIntermediateCourse() ||
+              learn_and_earn.EnrolledAdvancedCourse():
+            setState(() {
+              _enrollingCourseId = null;
+              _enrollingCourseTitle = null;
+            });
+          case learn_and_earn.EnrollBeginnerCourseError(:final message) ||
+              learn_and_earn.EnrollIntermediateCourseError(:final message) ||
+              learn_and_earn.EnrollAdvancedCourseError(:final message):
+            setState(() {
+              _enrollingCourseId = null;
+              _enrollingCourseTitle = null;
+            });
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(message)));
+          default:
+            break;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBarFactory.standardAppBar(
+          title: widget.pathTitle,
+          barHeight: 10,
+        ),
+        body: OverlayLoader(
+          isLoading: _enrollingCourseId != null,
+          loadingText: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.sizeOf(context).width * 0.6,
             ),
-            _buildTabBar(context),
-            Expanded(child: _buildContent(context)),
-          ],
+            child: Text(
+              'Enrolling ${_enrollingCourseTitle ?? ''}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.smMedium(context),
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                VSpace(20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Choose a Course',
+                        style: AppTextStyles.lgBold(context),
+                      ),
+                      Text(
+                        'Learn future-ready skills at your own pace',
+                        style: AppTextStyles.md(
+                          context,
+                        ).copyWith(color: AppColors.gray700),
+                      ),
+                    ],
+                  ),
+                ),
+                _buildTabBar(context),
+                Expanded(child: _buildContent(context)),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -194,12 +250,21 @@ class _PathCoursesScreenState extends State<PathCoursesScreen> {
         return BlocBuilder<LearningPathCubit, LearningPathState>(
           bloc: locator<LearningPathCubit>(),
           builder: (context, pathState) {
-            if (pathState.pathCoursesStatus == LearningPathStatus.loading ||
-                pathState.pathCoursesStatus == LearningPathStatus.initial) {
+            final hasCachedCourses = pathState.pathCourses.isNotEmpty;
+
+            // Only block on the spinner for the very first load. Once we have
+            // data, a status flip back to loading/initial is a background
+            // refresh (e.g. didPopNext after enrolling) — keep the current
+            // list on screen and let this rebuild in place once it resolves.
+            if (!hasCachedCourses &&
+                (pathState.pathCoursesStatus == LearningPathStatus.loading ||
+                    pathState.pathCoursesStatus ==
+                        LearningPathStatus.initial)) {
               return const Center(child: CircularProgressIndicator.adaptive());
             }
 
-            if (pathState.pathCoursesStatus == LearningPathStatus.failure) {
+            if (!hasCachedCourses &&
+                pathState.pathCoursesStatus == LearningPathStatus.failure) {
               return _buildEmptyState(
                 context,
                 pathState.pathCoursesError ?? 'Failed to load courses',
@@ -419,7 +484,7 @@ class _PathCoursesScreenState extends State<PathCoursesScreen> {
                         padding: const EdgeInsets.all(10),
                         onPressed: () {
                           Navigator.of(dialogContext).pop();
-                          _enrollCourse(context, course.id, levelType);
+                          _enrollCourse(context, course, levelType);
                         },
                       ),
                     ),
@@ -451,17 +516,22 @@ class _PathCoursesScreenState extends State<PathCoursesScreen> {
 
   void _enrollCourse(
     BuildContext context,
-    String courseId,
+    PathCourseModel course,
     LevelType levelType,
   ) {
+    setState(() {
+      _enrollingCourseId = course.id;
+      _enrollingCourseTitle = course.title;
+    });
+
     final bloc = context.read<learn_and_earn.LearnAndEarnBloc>();
     switch (levelType) {
       case LevelType.beginner:
-        bloc.add(learn_and_earn.EnrollBeginnerCourse(courseId));
+        bloc.add(learn_and_earn.EnrollBeginnerCourse(course.id));
       case LevelType.intermediate:
-        bloc.add(learn_and_earn.EnrollIntermediateCourse(courseId));
+        bloc.add(learn_and_earn.EnrollIntermediateCourse(course.id));
       case LevelType.advanced:
-        bloc.add(learn_and_earn.EnrollAdvancedCourse(courseId));
+        bloc.add(learn_and_earn.EnrollAdvancedCourse(course.id));
     }
   }
 

@@ -61,8 +61,18 @@ class OverlayLoader extends StatelessWidget {
                   ),
                 ],
               ),
-              child:
-                  loadingIndicator ?? const CircularProgressIndicator.adaptive(),
+              child: loadingText == null
+                  ? loadingIndicator ??
+                        const CircularProgressIndicator.adaptive()
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        loadingIndicator ??
+                            const CircularProgressIndicator.adaptive(),
+                        const SizedBox(height: 12),
+                        loadingText!,
+                      ],
+                    ),
             ),
           ),
         ],
