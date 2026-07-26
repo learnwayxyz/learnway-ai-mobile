@@ -3,12 +3,10 @@ import 'dart:developer';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:learnwayv2/app/app.dart';
+import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/bootstrap.dart';
-import 'package:core/src/config/env/env.dart';
 import 'package:learnwayv2/main_common.dart';
 import 'package:learnwayv2/services/notification_service/fcm_service.dart';
 import 'package:learnwayv2/services/notification_service/local_notification_service.dart';
