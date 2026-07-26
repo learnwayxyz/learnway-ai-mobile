@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:ai_mentor/src/career_goal/models/recommendations_model.dart';
 import 'package:dartz/dartz.dart';
 
+import '../../reporting/failure_reporter.dart';
 import '../career_goal_failure.dart';
 import '../data_source/career_goal_data_source.dart';
 import '../models/career_recommendation_model.dart';
@@ -20,11 +19,11 @@ class CareerGoalRepository {
     try {
       await _dataSource.saveCareerGoal(userId, goal);
       return const Right(null);
-    } on CareerGoalFailure catch (e) {
-      log('CareerGoalRepository failure: ${e.message}');
+    } on CareerGoalFailure catch (e, st) {
+      reportRepositoryFailure('saveCareerGoal', e, st, expected: true);
       return Left(e);
-    } catch (e) {
-      log('CareerGoalRepository error: $e');
+    } catch (e, st) {
+      reportRepositoryFailure('saveCareerGoal', e, st);
       return Left(CareerGoalFailure(e.toString()));
     }
   }
@@ -36,11 +35,11 @@ class CareerGoalRepository {
     try {
       final roadmap = await _dataSource.generateRoadmap(userId, goal);
       return Right(roadmap);
-    } on CareerGoalFailure catch (e) {
-      log('CareerGoalRepository generateRoadmap failure: ${e.message}');
+    } on CareerGoalFailure catch (e, st) {
+      reportRepositoryFailure('generateRoadmap', e, st, expected: true);
       return Left(e);
-    } catch (e) {
-      log('CareerGoalRepository generateRoadmap error: $e');
+    } catch (e, st) {
+      reportRepositoryFailure('generateRoadmap', e, st);
       return Left(CareerGoalFailure(e.toString()));
     }
   }
@@ -60,11 +59,16 @@ class CareerGoalRepository {
         topics: topics,
       );
       return Right(result);
-    } on CareerGoalFailure catch (e) {
-      log('CareerGoalRepository getDiscoveryRecommendations failure: ${e.message}');
+    } on CareerGoalFailure catch (e, st) {
+      reportRepositoryFailure(
+        'getDiscoveryRecommendations',
+        e,
+        st,
+        expected: true,
+      );
       return Left(e);
-    } catch (e) {
-      log('CareerGoalRepository getDiscoveryRecommendations error: $e');
+    } catch (e, st) {
+      reportRepositoryFailure('getDiscoveryRecommendations', e, st);
       return Left(CareerGoalFailure(e.toString()));
     }
   }
@@ -75,11 +79,11 @@ class CareerGoalRepository {
     try {
       final recommendations = await _dataSource.recommendations(userId);
       return Right(recommendations);
-    } on CareerGoalFailure catch (e) {
-      log('CareerGoalRepository recommendations failure: ${e.message}');
+    } on CareerGoalFailure catch (e, st) {
+      reportRepositoryFailure('recommendations', e, st, expected: true);
       return Left(e);
-    } catch (e) {
-      log('CareerGoalRepository recommendations error: $e');
+    } catch (e, st) {
+      reportRepositoryFailure('recommendations', e, st);
       return Left(CareerGoalFailure(e.toString()));
     }
   }
