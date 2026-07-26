@@ -56,6 +56,19 @@ class Env {
     );
   }
 
+  // AI-mentor (ai_mentor package) base URL override.
+  // AI_TUTOR_BASE_URL / AI_TUTOR_BASE_URL_ENV are an escape hatch for when
+  // this needs to point somewhere different from BASE_URL_ENV. Leave them
+  // unset to have aiTutorBaseUrl follow BASE_URL_ENV, so a single
+  // --dart-define=BASE_URL_ENV=<env> moves both baseUrl and aiTutorBaseUrl
+  // together regardless of --flavor.
+  static const String _aiTutorBaseUrlOverride = String.fromEnvironment(
+    'AI_TUTOR_BASE_URL',
+  );
+  static const String _aiTutorBaseUrlEnvOverride = String.fromEnvironment(
+    'AI_TUTOR_BASE_URL_ENV',
+  );
+
   static bool get isFusdMode => _getValue(
     EnvDev.useFusdAsPrimary,
     EnvStaging.useFusdAsPrimary,
@@ -152,11 +165,25 @@ class Env {
     EnvProd.proddidItBaseUrl,
   );
 
-  static String get aiTutorBaseUrl => _getValue(
-    EnvDev.devAiTutorBaseUrl,
-    EnvStaging.stageAiTutorBaseUrl,
-    EnvProd.prodAiTutorBaseUrl,
-  );
+  static String get aiTutorBaseUrl {
+    if (_aiTutorBaseUrlOverride.isNotEmpty) return _aiTutorBaseUrlOverride;
+    final envOverride = _aiTutorBaseUrlEnvOverride.isNotEmpty
+        ? _aiTutorBaseUrlEnvOverride
+        : _baseUrlEnvOverride;
+    switch (envOverride) {
+      case 'dev':
+        return EnvDev.devAiTutorBaseUrl;
+      case 'staging':
+        return EnvStaging.stageAiTutorBaseUrl;
+      case 'prod':
+        return EnvProd.prodAiTutorBaseUrl;
+    }
+    return _getValue(
+      EnvDev.devAiTutorBaseUrl,
+      EnvStaging.stageAiTutorBaseUrl,
+      EnvProd.prodAiTutorBaseUrl,
+    );
+  }
 
   static String get workFlowId => _getValue(
     EnvDev.devworkFlowId,
