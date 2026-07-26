@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -18,11 +16,16 @@ class CareerGoalCubit extends Cubit<CareerGoalState> {
 
     final result = await _repository.generateRoadmap(userId, goal);
 
-    result.fold((failure) => emit(CareerGoalError(failure.message)), (roadmap) {
-      _repository.saveCareerGoal(userId, goal);
-      emit(CareerGoalRoadmapReady(roadmap));
-      log('is Event Emitted: ${state is CareerGoalRoadmapReady}');
-    });
+    await result.fold(
+      (failure) async => emit(CareerGoalError(failure.message)),
+      (roadmap) async {
+        final saveResult = await _repository.saveCareerGoal(userId, goal);
+        saveResult.fold(
+          (failure) => emit(CareerGoalError(failure.message)),
+          (_) => emit(CareerGoalRoadmapReady(roadmap)),
+        );
+      },
+    );
   }
 
   void reset() => emit(CareerGoalInitial());
