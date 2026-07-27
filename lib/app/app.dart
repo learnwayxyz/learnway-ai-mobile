@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:learnwayv2/features/account/cubit/profile_cubit.dart';
 import 'package:learnwayv2/features/account/cubit/theme_cubit.dart';
