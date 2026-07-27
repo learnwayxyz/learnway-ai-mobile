@@ -36,9 +36,11 @@ class HomeDataSource {
 
       try {
         final userProfile = UserProfileModel.fromJson(decoded);
-        final dailyRemaining = decoded['dailyLessonsRemaining'] as int?;
-        if (dailyRemaining != null) {
-          LocalStorageService.updateDailyLessonsRemaining(dailyRemaining);
+        if (decoded.containsKey('dailyLessonsRemaining')) {
+          final dailyRemaining = decoded['dailyLessonsRemaining'] as int?;
+          LocalStorageService.updateDailyLessonsRemaining(
+            dailyRemaining ?? LocalStorageService.unlimitedDailyLessons,
+          );
         }
         await LocalStorageService.saveUser(userProfile);
         return userProfile;
