@@ -11,7 +11,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
-import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/courses_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/ai_tutor_response.dart';
@@ -201,11 +201,11 @@ class LearnAndEarnRepository {
     }
   }
 
-  Future<Either<Failure, LessonInfoDetails>> fetchLessonInfoDetails(
-    String lessonId,
+  Future<Either<Failure, CoursesInfoDetails>> fetchCourseInfoDetails(
+    String courseId,
   ) async {
     try {
-      final result = await _dataSource.fetchLessonInfoDetails(lessonId);
+      final result = await _dataSource.fetchCourseInfo(courseId);
       return Right(result);
     } on LearnAndEarnFailure catch (e) {
       return Left(LearnAndEarnFailure(e.toString()));

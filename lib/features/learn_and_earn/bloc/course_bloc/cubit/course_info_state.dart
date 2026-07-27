@@ -13,7 +13,7 @@ final class CourseInfoLoading extends CourseInfoState {}
 
 final class CourseInfoLoaded extends CourseInfoState {
   const CourseInfoLoaded(this.data);
-  final LessonInfoDetails data;
+  final CoursesInfoDetails data;
 
   @override
   List<Object> get props => [data];

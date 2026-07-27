@@ -1,3 +1,4 @@
+import 'package:ai_mentor/ai_mentor.dart' show PathCourseModel;
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +63,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/view/level_screens/advanced_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/level_screens/beginner_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/path_courses_screen.dart';
+import 'package:learnwayv2/features/learn_and_earn/view/courses_path_info.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/content_reader_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/lesson_onboard_screen.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/lesson_screen.dart';
@@ -174,6 +176,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: LearnAndEarnRoute.page),
     AutoRoute(page: BeginnerRoute.page),
     AutoRoute(page: PathCoursesRoute.page),
+    AutoRoute(page: CoursesPathInfoRoute.page),
     AutoRoute(page: LessonRoute.page),
     AutoRoute(page: LessonOnboardRoute.page),
     AutoRoute(page: ContentReaderRoute.page),

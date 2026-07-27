@@ -13,7 +13,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/certificate_claim.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_project_submission.dart';
-import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/courses_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/ai_tutor_response.dart';
@@ -477,11 +477,11 @@ class LearnAndEarnDataSource {
     }
   }
 
-  Future<LessonInfoDetails> fetchLessonInfoDetails(String lessonId) async {
+  Future<CoursesInfoDetails> fetchCourseInfo(String courseId) async {
     try {
       final token = await SharedPreferencesStore.getUserToken(userTokenKey);
       final response = await client.get(
-        Endpoints.lessonInfoDetails(lessonId),
+        Endpoints.courseInfo(courseId),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -491,8 +491,8 @@ class LearnAndEarnDataSource {
         throw LearnAndEarnFailure('Error fetching lesson info details');
       }
       final decoded = jsonDecode(response.body);
-      log('fetchLessonInfoDetails(): $decoded');
-      final lessonInfoDetails = LessonInfoDetails.fromJson(decoded);
+      log('fetchCourseInfo(): $decoded');
+      final lessonInfoDetails = CoursesInfoDetails.fromJson(decoded);
       return lessonInfoDetails;
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
@@ -547,9 +547,10 @@ class LearnAndEarnDataSource {
       }
       final decoded = jsonDecode(response.body);
       log('fetchCourseProjectSubmissions(): $decoded');
-      return _extractSubmissionList(
-        decoded,
-      ).map(_parseSubmissionResult).whereType<CourseProjectSubmissionResult>().toList();
+      return _extractSubmissionList(decoded)
+          .map(_parseSubmissionResult)
+          .whereType<CourseProjectSubmissionResult>()
+          .toList();
     } on SocketException catch (e) {
       return Future.error(LearnAndEarnFailure('Network error: ${e.message}'));
     } on HttpException catch (e) {

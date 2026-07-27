@@ -25,8 +25,8 @@ import 'package:learnwayv2/shared/widgets/custom_tabs.dart';
 import 'package:learnwayv2/shared/widgets/overlay_loader.dart';
 import 'package:learnwayv2/shared/widgets/screen_connectivity_wrapper.dart';
 
-import '../learn_and_earn_data_source/models/lesson_info_details.dart'
-    show LessonInfoDetails, RecommendedCourse;
+import '../learn_and_earn_data_source/models/courses_info_details.dart'
+    show CoursesInfoDetails, RecommendedCourse;
 
 enum LockState { unlocked, sequentialLocked, dailyLimitReached }
 
@@ -471,7 +471,7 @@ class _InformationEmptyState extends StatelessWidget {
 
 class _InformationTab extends StatelessWidget {
   const _InformationTab({required this.courseData});
-  final LessonInfoDetails courseData;
+  final CoursesInfoDetails courseData;
 
   @override
   Widget build(BuildContext context) {

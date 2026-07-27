@@ -1488,6 +1488,70 @@ class ContestXPEarnedRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [CoursesPathInfoScreen]
+class CoursesPathInfoRoute extends PageRouteInfo<CoursesPathInfoRouteArgs> {
+  CoursesPathInfoRoute({
+    Key? key,
+    required PathCourseModel course,
+    required String pathTitle,
+    List<PageRouteInfo>? children,
+  }) : super(
+         CoursesPathInfoRoute.name,
+         args: CoursesPathInfoRouteArgs(
+           key: key,
+           course: course,
+           pathTitle: pathTitle,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'CoursesPathInfoRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<CoursesPathInfoRouteArgs>();
+      return CoursesPathInfoScreen(
+        key: args.key,
+        course: args.course,
+        pathTitle: args.pathTitle,
+      );
+    },
+  );
+}
+
+class CoursesPathInfoRouteArgs {
+  const CoursesPathInfoRouteArgs({
+    this.key,
+    required this.course,
+    required this.pathTitle,
+  });
+
+  final Key? key;
+
+  final PathCourseModel course;
+
+  final String pathTitle;
+
+  @override
+  String toString() {
+    return 'CoursesPathInfoRouteArgs{key: $key, course: $course, pathTitle: $pathTitle}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! CoursesPathInfoRouteArgs) return false;
+    return key == other.key &&
+        course == other.course &&
+        pathTitle == other.pathTitle;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ course.hashCode ^ pathTitle.hashCode;
+}
+
+/// generated route for
 /// [DepositAndBuyScreen]
 class DepositAndBuyRoute extends PageRouteInfo<DepositAndBuyRouteArgs> {
   DepositAndBuyRoute({

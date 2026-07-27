@@ -2,11 +2,11 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-part 'lesson_info_details.g.dart';
+part 'courses_info_details.g.dart';
 
 @JsonSerializable()
-class LessonInfoDetails {
-  const LessonInfoDetails({
+class CoursesInfoDetails {
+  const CoursesInfoDetails({
     required this.id,
     required this.title,
     required this.description,
@@ -20,8 +20,8 @@ class LessonInfoDetails {
     this.recommendedNextCourse,
   });
 
-  factory LessonInfoDetails.fromJson(Map<String, dynamic> json) =>
-      _$LessonInfoDetailsFromJson(json);
+  factory CoursesInfoDetails.fromJson(Map<String, dynamic> json) =>
+      _$CoursesInfoDetailsFromJson(json);
 
   final String id;
   final String title;
@@ -37,7 +37,7 @@ class LessonInfoDetails {
   final List<String> careerOpportunities;
   final RecommendedCourse? recommendedNextCourse;
 
-  Map<String, dynamic> toJson() => _$LessonInfoDetailsToJson(this);
+  Map<String, dynamic> toJson() => _$CoursesInfoDetailsToJson(this);
 
   /// Text for the "About course" card — the richer longDescription when the
   /// API provides one, otherwise the short description.

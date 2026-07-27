@@ -10,7 +10,7 @@ import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/mo
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/learnway_courses.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/enrollment_response.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
-import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_info_details.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/courses_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_progress.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/lesson_slide.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/registered_courses.dart';
@@ -409,7 +409,7 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
     Emitter<LearnAndEarnState> emit,
   ) async {
     emit(const LoadingLessonInfo());
-    final result = await repository.fetchLessonInfoDetails(event.lessonId);
+    final result = await repository.fetchCourseInfoDetails(event.lessonId);
     result.fold(
       (failure) => emit(LoadedLessonInfoError(failure.message)),
       (data) => emit(LoadedLessonInfo(data)),

@@ -48,7 +48,7 @@ class FetchedCourseLessons extends LearnAndEarnState {
     this.lessonInfo,
   });
   final CourseLesson courseLessons;
-  final LessonInfoDetails? lessonInfo;
+  final CoursesInfoDetails? lessonInfo;
   final bool showSuccessSnackbar;
 
   @override
@@ -336,7 +336,7 @@ class LoadingLessonInfo extends LearnAndEarnState {
 
 class LoadedLessonInfo extends LearnAndEarnState {
   const LoadedLessonInfo(this.data);
-  final LessonInfoDetails data;
+  final CoursesInfoDetails data;
   @override
   List<Object?> get props => [data];
 }

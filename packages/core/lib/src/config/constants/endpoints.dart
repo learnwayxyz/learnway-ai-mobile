@@ -23,7 +23,7 @@ class Endpoints {
   static const String getLessonProgress = 'user-lesson/progress';
   static const String completeLesson = 'user-lesson/complete';
   static const String dailyLessonsRemaining = 'user-lesson/daily-remaining';
-  static String lessonInfoDetails(String lessonId) => 'course/$lessonId/info';
+  static String courseInfo(String lessonId) => 'course/$lessonId/info';
   static String courseProject(String courseId) => 'course/$courseId/project';
   static String courseProjectDraft(String courseId) =>
       'course/$courseId/project/draft';
