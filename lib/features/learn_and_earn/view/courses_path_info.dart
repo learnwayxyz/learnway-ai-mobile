@@ -5,7 +5,6 @@ import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart'
     as learn_and_earn;
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';
-import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/courses_info_details.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/expandable_text_widget.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/shared/widgets/app_bar.dart';
@@ -137,50 +136,83 @@ class _CoursesPathInfoScreenState extends State<CoursesPathInfoScreen> {
             style: AppTextStyles.smMedium(context),
           ),
           child: SafeArea(
-            child: BlocBuilder<CourseInfoCubit, CourseInfoState>(
-              builder: (context, state) {
-                final data = state is CourseInfoLoaded ? state.data : null;
-                return Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            child: Column(
+              children: [
+                CardFactory.activeLessonCard(
+                  title: widget.course.title,
+                  subtitle: widget.course.description,
+                  totalLessons: 0,
+                  completedLessons: 0,
+                  progressLabel: '0',
+                  progressValue: 0,
+                  borderRadius: BorderRadius.circular(0),
+                ),
+                const VSpace(8),
+                Expanded(
+                  child: BlocBuilder<CourseInfoCubit, CourseInfoState>(
+                    builder: (context, state) {
+                      if (state is CourseInfoLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is CourseInfoError) {
+                        return Center(
+                          child: Text(
+                            state.error,
+                            style: AppTextStyles.smRegular(context),
+                          ),
+                        );
+                      }
+                      final data = state is CourseInfoLoaded
+                          ? state.data
+                          : null;
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _HeroCard(course: widget.course),
-                            const VSpace(70),
-                            if (state is CourseInfoLoading)
-                              const Center(
-                                child: CircularProgressIndicator.adaptive(),
-                              )
-                            else ...[
-                              if (data != null &&
-                                  data.skillsGained.isNotEmpty) ...[
-                                _WhatYouWillLearnCard(items: data.skillsGained),
-                                const VSpace(40),
-                              ],
-                              _CertificateCard(),
-                              const VSpace(60),
-                              _WhyTakeCourseCard(
-                                course: widget.course,
-                                data: data,
-                              ),
-                              const VSpace(40),
-                              if (data != null &&
-                                  data.prerequisites.isNotEmpty) ...[
-                                _PrerequisitesCard(items: data.prerequisites),
-                                const VSpace(24),
-                              ],
+                            if (data != null &&
+                                data.aboutText.trim().isNotEmpty) ...[
+                              _AboutCourseCard(text: data.aboutText),
+                              const VSpace(24),
                             ],
+                            if (data != null) ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _InfoCard(
+                                      label: 'Difficulty',
+                                      value: data.difficultyLabel,
+                                    ),
+                                  ),
+                                  if (data.estimatedTimeLabel != null) ...[
+                                    const HSpace(12),
+                                    Expanded(
+                                      child: _InfoCard(
+                                        label: 'Estimated Time',
+                                        value: data.estimatedTimeLabel!,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const VSpace(24),
+                            ],
+                            if (data != null &&
+                                data.skillsGained.isNotEmpty) ...[
+                              _SkillsGainedCard(items: data.skillsGained),
+                              const VSpace(24),
+                            ],
+                            const _CertificateCard(),
                           ],
                         ),
-                      ),
-                    ),
-                    _EnrollButtonBar(onEnroll: _isEnrolling ? null : _enroll),
-                  ],
-                );
-              },
+                      );
+                    },
+                  ),
+                ),
+                _EnrollButtonBar(onEnroll: _isEnrolling ? null : _enroll),
+              ],
             ),
           ),
         ),
@@ -189,9 +221,10 @@ class _CoursesPathInfoScreenState extends State<CoursesPathInfoScreen> {
   }
 }
 
-class _HeroCard extends StatelessWidget {
-  const _HeroCard({required this.course});
-  final PathCourseModel course;
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({required this.label, required this.value});
+  final String label;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
@@ -201,61 +234,50 @@ class _HeroCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              gradient: RandomGradients.getDailyGradient(seed: course.id),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(Icons.school, color: Colors.white, size: 36),
+          Text(
+            label,
+            style: AppTextStyles.xsRegular(
+              context,
+            ).copyWith(color: AppColors.gray500),
           ),
-          const HSpace(16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(course.title, style: AppTextStyles.lgBold(context)),
-                const VSpace(6),
-                Text(
-                  course.description,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.smRegular(
-                    context,
-                  ).copyWith(color: AppColors.gray600),
-                ),
-                const VSpace(8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.people_outline,
-                      size: 16,
-                      color: AppColors.gray500,
-                    ),
-                    const HSpace(4),
-                    Text(
-                      '${course.enrolledUsersCount} Enrolled',
-                      style: AppTextStyles.xsRegular(
-                        context,
-                      ).copyWith(color: AppColors.gray500),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          const VSpace(4),
+          Text(value, style: AppTextStyles.baseMedium(context)),
         ],
       ),
     );
   }
 }
 
-class _WhatYouWillLearnCard extends StatelessWidget {
-  const _WhatYouWillLearnCard({required this.items});
+class _AboutCourseCard extends StatelessWidget {
+  const _AboutCourseCard({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('About course', style: AppTextStyles.mdBold(context)),
+          const VSpace(8),
+          ExpandableDescription(text: text),
+        ],
+      ),
+    );
+  }
+}
+
+class _SkillsGainedCard extends StatelessWidget {
+  const _SkillsGainedCard({required this.items});
   final List<String> items;
 
   @override
@@ -270,51 +292,7 @@ class _WhatYouWillLearnCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('What you will learn', style: AppTextStyles.mdBold(context)),
-          const VSpace(12),
-          ...items.map(
-            (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.check, color: AppColors.success200, size: 18),
-                  const HSpace(8),
-                  Expanded(
-                    child: Text(
-                      item,
-                      style: AppTextStyles.smRegular(
-                        context,
-                      ).copyWith(color: AppColors.gray700),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PrerequisitesCard extends StatelessWidget {
-  const _PrerequisitesCard({required this.items});
-  final List<String> items;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Prerequisite', style: AppTextStyles.mdBold(context)),
+          Text('Skills you\'ll gain', style: AppTextStyles.mdBold(context)),
           const VSpace(12),
           ...items.map(
             (item) => Padding(
@@ -365,38 +343,9 @@ class _CertificateCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: AspectRatio(
             aspectRatio: 4 / 3,
-            child: Image.asset(
-              Assets.images.learnwayCert.path,
-              fit: BoxFit.contain,
-            ),
+            child: Assets.images.premimuCert.image(),
           ),
         ),
-      ],
-    );
-  }
-}
-
-class _WhyTakeCourseCard extends StatelessWidget {
-  const _WhyTakeCourseCard({required this.course, required this.data});
-  final PathCourseModel course;
-  final CoursesInfoDetails? data;
-
-  @override
-  Widget build(BuildContext context) {
-    final body = (data?.targetAudience?.trim().isNotEmpty ?? false)
-        ? data!.targetAudience!
-        : (data?.aboutText.trim().isNotEmpty ?? false)
-        ? data!.aboutText
-        : 'Whether you\'re a student, professional, entrepreneur, or '
-              'lifelong learner, this learning path will equip you with the '
-              'skills needed to thrive in today\'s technology-driven world.';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Why take this course?', style: AppTextStyles.mdBold(context)),
-        const VSpace(8),
-        ExpandableDescription(text: body),
       ],
     );
   }
@@ -428,10 +377,10 @@ class _EnrollButtonBar extends StatelessWidget {
       child: ButtonFactory.blackButton(
         mainAxisAlignment: MainAxisAlignment.center,
         text: 'Enroll in Course',
-        backgroundColor: AppColors.orange500,
+        backgroundColor: Colors.black,
         textStyle: AppTextStyles.smSemiBold(
           context,
-        ).copyWith(color: Colors.black),
+        ).copyWith(color: Colors.white),
         onPressed: onEnroll ?? () {},
       ),
     );

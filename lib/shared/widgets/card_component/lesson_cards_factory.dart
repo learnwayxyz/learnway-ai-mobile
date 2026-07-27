@@ -208,6 +208,7 @@ class CardFactory {
     String? characterImageAsset,
     Gradient? gradient,
     EdgeInsetsGeometry? margin,
+    BorderRadiusGeometry? borderRadius,
   }) {
     return BaseCard(
       contentStrategy: ActiveLessonContentStrategy(
@@ -223,6 +224,7 @@ class CardFactory {
       characterImageAsset: characterImageAsset,
       gradient: gradient,
       margin: margin,
+      borderRadius: borderRadius,
     );
   }
 

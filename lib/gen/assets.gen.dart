@@ -892,6 +892,13 @@ class $AssetsImagesGen {
   /// File path: assets/images/phone_icon.svg
   String get phoneIcon => 'assets/images/phone_icon.svg';
 
+  /// File path: assets/images/premimu_cert.png
+  AssetGenImage get premimuCert =>
+      const AssetGenImage('assets/images/premimu_cert.png');
+
+  /// File path: assets/images/premium_cert.svg
+  String get premiumCert => 'assets/images/premium_cert.svg';
+
   /// File path: assets/images/qr_code_image.png
   AssetGenImage get qrCodeImage =>
       const AssetGenImage('assets/images/qr_code_image.png');
@@ -1096,6 +1103,8 @@ class $AssetsImagesGen {
     participantIcon,
     partyPooper,
     phoneIcon,
+    premimuCert,
+    premiumCert,
     qrCodeImage,
     sad,
     securityConfiguration,
