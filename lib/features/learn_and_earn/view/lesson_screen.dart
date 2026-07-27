@@ -524,7 +524,8 @@ class _LessonBuilderState extends State<LessonBuilder> {
     if (!isPremium) {
       final remaining = LocalStorageService.dailyLessonsNotifier.value;
       log('dailyLimit $remaining');
-      if (remaining == null || remaining <= 0) {
+      final isUnlimited = remaining == LocalStorageService.unlimitedDailyLessons;
+      if (!isUnlimited && (remaining == null || remaining <= 0)) {
         return LockState.dailyLimitReached;
       }
     }

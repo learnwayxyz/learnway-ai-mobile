@@ -465,7 +465,7 @@ class LearnAndEarnDataSource {
       final remaining =
           data['dailyLessonsRemaining'] as int? ??
           data['remaining'] as int? ??
-          0;
+          LocalStorageService.unlimitedDailyLessons;
       LocalStorageService.updateDailyLessonsRemaining(remaining);
       return remaining;
     } on SocketException catch (e) {

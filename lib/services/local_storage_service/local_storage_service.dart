@@ -95,6 +95,8 @@ class LocalStorageService {
     await box.put('user', userModel);
   }
 
+  static const int unlimitedDailyLessons = -1;
+
   static void updateDailyLessonsRemaining(int value) {
     dailyLessonsNotifier.value = value;
   }
