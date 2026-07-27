@@ -161,21 +161,25 @@ class _ClaimCertificateSheet extends StatefulWidget {
 }
 
 class _ClaimCertificateSheetState extends State<_ClaimCertificateSheet> {
-  final _nameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   String? _errorText;
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     super.dispose();
   }
 
   void _submit() {
-    final name = _nameController.text.trim();
-    if (name.isEmpty) {
-      setState(() => _errorText = 'Enter your full name');
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    if (firstName.isEmpty || lastName.isEmpty) {
+      setState(() => _errorText = 'Enter your first and last name');
       return;
     }
+    final name = '$firstName $lastName';
     context.read<CertificateCubit>().claimCertificate(widget.courseId, name);
     Navigator.pop(context);
   }
@@ -201,18 +205,45 @@ class _ClaimCertificateSheetState extends State<_ClaimCertificateSheet> {
             ),
             const VSpace(8),
             Text(
-              "Enter the full name you'd like printed on your certificate.",
+              "Enter the name you'd like printed on your certificate.",
               style: AppTextStyles.smRegular(
                 context,
               ).copyWith(color: AppColors.gray500),
             ),
             const VSpace(16),
             TextField(
-              controller: _nameController,
+              controller: _firstNameController,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
-                hintText: 'Full name',
+                labelText: 'First name',
                 errorText: _errorText,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.gray200),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.gray200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primary500),
+                ),
+              ),
+              onChanged: (_) {
+                if (_errorText != null) setState(() => _errorText = null);
+              },
+            ),
+            const VSpace(12),
+            TextField(
+              controller: _lastNameController,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: 'Last name',
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 12,
