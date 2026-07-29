@@ -209,6 +209,7 @@ class CardFactory {
     Gradient? gradient,
     EdgeInsetsGeometry? margin,
     BorderRadiusGeometry? borderRadius,
+    bool showCompletedCount = true,
   }) {
     return BaseCard(
       contentStrategy: ActiveLessonContentStrategy(
@@ -219,6 +220,7 @@ class CardFactory {
         buttonText: '',
         subtitle: subtitle,
         totaLessons: totalLessons,
+        showCompletedCount: showCompletedCount,
       ),
       overlayStrategy: EmptyOverlayStrategy(),
       characterImageAsset: characterImageAsset,

@@ -5,6 +5,7 @@ import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/cubit/course
 import 'package:learnwayv2/features/learn_and_earn/bloc/learn_and_earn_bloc.dart'
     as learn_and_earn;
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/course_wrapper.dart';
+import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/models/course_lesson.dart';
 import 'package:learnwayv2/features/learn_and_earn/view/widget/expandable_text_widget.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/shared/widgets/app_bar.dart';
@@ -43,7 +44,23 @@ class _CoursesPathInfoScreenState extends State<CoursesPathInfoScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CourseInfoCubit>().fetchCourseInfo(widget.course.id);
+      context.read<learn_and_earn.LearnAndEarnBloc>().add(
+        learn_and_earn.FetchCourseLessons(
+          id: widget.course.id,
+          forceRefresh: false,
+        ),
+      );
     });
+  }
+
+  CourseLesson? _getLessons(learn_and_earn.LearnAndEarnState state) {
+    final lessons = switch (state) {
+      learn_and_earn.FetchedCourseLessons() => state.courseLessons,
+      learn_and_earn.FetchingCourseLessons() => state.courseLessons,
+      learn_and_earn.FetchCourseLessonsError() => state.courseLessons,
+      _ => null,
+    };
+    return lessons?.id == widget.course.id ? lessons : null;
   }
 
   void _enroll() {
@@ -138,14 +155,26 @@ class _CoursesPathInfoScreenState extends State<CoursesPathInfoScreen> {
           child: SafeArea(
             child: Column(
               children: [
-                CardFactory.activeLessonCard(
-                  title: widget.course.title,
-                  subtitle: widget.course.description,
-                  totalLessons: 0,
-                  completedLessons: 0,
-                  progressLabel: '0',
-                  progressValue: 0,
-                  borderRadius: BorderRadius.circular(0),
+                BlocBuilder<
+                  learn_and_earn.LearnAndEarnBloc,
+                  learn_and_earn.LearnAndEarnState
+                >(
+                  builder: (context, state) {
+                    final lessons = _getLessons(state);
+                    return CardFactory.activeLessonCard(
+                      title: widget.course.title,
+                      subtitle: widget.course.description,
+                      totalLessons: lessons?.lessons.length ?? 0,
+                      completedLessons: lessons?.lessons
+                              .where((l) => l.isCompleted)
+                              .length ??
+                          0,
+                      progressLabel: lessons?.progress.toString() ?? '0',
+                      progressValue: (lessons?.progress.toDouble() ?? 0) / 100,
+                      borderRadius: BorderRadius.circular(0),
+                      showCompletedCount: false,
+                    );
+                  },
                 ),
                 const VSpace(8),
                 Expanded(

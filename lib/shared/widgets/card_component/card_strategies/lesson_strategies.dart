@@ -97,6 +97,7 @@ class ActiveLessonContentStrategy implements CardContentStrategy {
     required this.totaLessons,
     required this.progressLabel,
     this.isLocked = false,
+    this.showCompletedCount = true,
   });
   final String title;
   final String subtitle;
@@ -107,6 +108,7 @@ class ActiveLessonContentStrategy implements CardContentStrategy {
   final int totaLessons;
   final String progressLabel;
   final bool isLocked;
+  final bool showCompletedCount;
 
   @override
   Widget buildContent(BuildContext context, double screenWidth) {
@@ -155,7 +157,9 @@ class ActiveLessonContentStrategy implements CardContentStrategy {
                       ),
                       const Spacer(),
                       Text(
-                        '$completedLessons/$totaLessons lessons',
+                        showCompletedCount
+                            ? '$completedLessons/$totaLessons lessons'
+                            : '$totaLessons lessons',
                         style: AppTextStyles.smBold(
                           context,
                         ).copyWith(color: Colors.white),
