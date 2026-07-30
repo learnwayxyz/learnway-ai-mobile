@@ -9,6 +9,7 @@ import 'package:learnwayv2/features/bookmarks/view/widgets/bookmark_card.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:core/core.dart';
 import 'package:learnwayv2/shared/utilities/standard_spacer.dart';
+import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 
 @RoutePage()
@@ -59,52 +60,10 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
   }
 
   PreferredSizeWidget _buildAppBar() {
-    return AppBar(
+    return AppBarFactory.standardAppBar(
+      title: 'Bookmarks',
       backgroundColor: Colors.white,
-      elevation: 0,
-      surfaceTintColor: Colors.transparent,
-      automaticallyImplyLeading: false,
-      // toolbarHeight: 99, // Exact Figma height
-      title: Row(
-        children: [
-          // Back button - exact Figma positioning
-          GestureDetector(
-            onTap: () => context.router.maybePop(),
-            child: Container(
-              width: 39, // Exact Figma width
-              height: 39, // Exact Figma height
-              decoration: BoxDecoration(
-                color: Colors.white, // Exact Figma background color
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Color(0xFFD8DADC)),
-              ),
-              child: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: Colors.black, // Exact Figma icon color
-              ),
-            ),
-          ),
-          const SizedBox(width: 20), // Exact Figma spacing
-          // Title - exact Figma positioning and styling
-          Expanded(
-            child: Center(
-              child: Text(
-                'Bookmarks',
-                style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16, // Exact Figma font size
-                  fontWeight: FontWeight.w600, // SemiBold
-                  color: Color(0xFF181D27), // Exact Figma color
-                  height: 1.125, // 18px / 16px
-                  letterSpacing: 0.2, // Exact Figma letter spacing
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 39), // Balance for centering
-        ],
-      ),
+      onBackPressed: () => context.router.maybePop(),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(

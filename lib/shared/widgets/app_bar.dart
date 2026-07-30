@@ -425,6 +425,8 @@ class AppBarFactory {
     List<Widget>? actions,
     bool showBackButton = true,
     int? barHeight,
+    PreferredSizeWidget? bottom,
+    Color? backgroundColor,
   }) {
     return CustomAppBar(
       contentStrategy: StandardAppBarContentStrategy(
@@ -435,6 +437,8 @@ class AppBarFactory {
       ),
       appBarType: AppBarType.standard,
       barHeight: barHeight ?? 30,
+      bottom: bottom,
+      backgroundColor: backgroundColor,
     );
   }
 

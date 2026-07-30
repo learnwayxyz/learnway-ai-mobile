@@ -360,9 +360,8 @@ class _CertificateCard extends StatelessWidget {
         Text('Earn a Certificate', style: AppTextStyles.mdBold(context)),
         const VSpace(8),
         Text(
-          'Complete all courses and assessments to receive a LearnWay AI '
-          'Certificate of Completion that you can showcase on your CV, '
-          'LinkedIn profile, or professional portfolio.',
+          'Complete the courses and project assessments to earn a Certificate '
+          'of Completion you can showcase on your CV or LinkedIn profile.',
           style: AppTextStyles.smRegular(
             context,
           ).copyWith(color: AppColors.gray600),

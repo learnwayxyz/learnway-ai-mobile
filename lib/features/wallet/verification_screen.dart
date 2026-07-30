@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/wallet/cubit/kyc_cubit.dart';
+import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../shared/loader/circular_progress_painter.dart';
 
@@ -109,12 +110,9 @@ class _VerificationScreenState extends State<VerificationScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Verify'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: AppBarFactory.standardAppBar(
+        title: 'Verify',
+        onBackPressed: () => Navigator.pop(context),
       ),
       body: Stack(
         children: [

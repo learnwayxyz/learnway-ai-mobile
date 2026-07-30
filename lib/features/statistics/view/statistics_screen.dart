@@ -9,7 +9,7 @@ import 'package:learnwayv2/features/statistics/view/widgets/statistics_card.dart
 import 'package:learnwayv2/features/statistics/view/widgets/monthly_xp_chart.dart';
 import 'package:core/core.dart';
 import 'package:learnwayv2/shared/utilities/standard_spacer.dart';
-import 'package:learnwayv2/shared/widgets/back_button.dart';
+import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 
 @RoutePage()
@@ -31,24 +31,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF8F9FC),
-      appBar: AppBar(
+      appBar: AppBarFactory.standardAppBar(
+        title: 'Statistics',
         backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-          child: const CustomBackButton(),
-        ),
-        leadingWidth: 60,
-        centerTitle: true,
-        title: Text(
-          'Statistics',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF181D27),
-          ),
-        ),
       ),
       body: BlocBuilder<StatisticsCubit, StatisticsState>(
         builder: (context, state) {

@@ -32,8 +32,6 @@ class CertificateTab extends StatelessWidget {
               isPremium || RevenueCatService.instance.isPremiumUser;
           return BlocBuilder<CourseProjectCubit, CourseProjectState>(
             builder: (context, projectState) {
-              // The certificate is earned by passing the course project:
-              // the backend's assessment verdict is the source of truth.
               final passedProject =
                   projectState is CourseProjectSubmitted &&
                   (projectState.result.assessment?.passed ?? false);
@@ -73,9 +71,6 @@ class CertificateTab extends StatelessWidget {
   }
 }
 
-/// Locked state for the whole certificate tab: free users get a subscribe
-/// CTA; premium users whose latest project assessment isn't `passed` are
-/// told to finish it first.
 class _LockedCertificateView extends StatelessWidget {
   const _LockedCertificateView({required this.showSubscribeCta});
 
