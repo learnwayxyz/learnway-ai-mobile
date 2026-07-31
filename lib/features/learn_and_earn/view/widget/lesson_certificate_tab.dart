@@ -427,7 +427,7 @@ class _CertificateCard extends StatelessWidget {
           : Image.network(url, width: double.infinity, fit: BoxFit.contain);
     } else {
       image = Image.asset(
-        Assets.images.learnwayCert.path,
+        Assets.images.premimuCert.path,
         width: double.infinity,
         fit: BoxFit.contain,
       );
