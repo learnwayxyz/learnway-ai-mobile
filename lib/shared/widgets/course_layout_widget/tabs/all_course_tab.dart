@@ -126,13 +126,19 @@ class _AllCoursesTabState extends State<AllCoursesTab>
       listeners: [
         BlocListener<LearnAndEarnBloc, LearnAndEarnState>(
           listener: (context, state) {
-            if (state is EnrolledBeginnerCourse ||
-                state is EnrolledIntermediateCourse ||
-                state is EnrolledAdvancedCourse) {
-              NotificationService.showSuccess('Successfully enrolled');
+            final enrolledLevel = switch (state) {
+              EnrolledBeginnerCourse() => LevelType.beginner,
+              EnrolledIntermediateCourse() => LevelType.intermediate,
+              EnrolledAdvancedCourse() => LevelType.advanced,
+              _ => null,
+            };
+            if (enrolledLevel == null) return;
 
-              _refetchCoursesAfterEnrollment();
-            }
+            NotificationService.showSuccess('Successfully enrolled');
+            // Push rather than replace: this tab is the course list itself, so
+            // back should return here.
+            context.router.push(LessonRoute(levelType: enrolledLevel));
+            _refetchCoursesAfterEnrollment();
           },
         ),
 

@@ -38,10 +38,7 @@ class PaywallBloc extends Bloc<PaywallEvent, PaywallState> {
     }
   }
 
-  void _onSwitchPlan(
-    PaywallSwitchPlan event,
-    Emitter<PaywallState> emit,
-  ) {
+  void _onSwitchPlan(PaywallSwitchPlan event, Emitter<PaywallState> emit) {
     final packages = state.availablePackages;
     if (event.packageIndex < 0 || event.packageIndex >= packages.length) return;
     emit(state.copyWith(selectedPackageIndex: event.packageIndex));
@@ -76,7 +73,6 @@ class PaywallBloc extends Bloc<PaywallEvent, PaywallState> {
         ),
       );
     } else if (result.userCancelled) {
-      // User tapped cancel — just reset the button, no error needed
       emit(
         state.copyWith(
           actionStatus: PaywallActionStatus.idle,

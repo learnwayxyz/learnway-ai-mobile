@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:learnwayv2/app/app.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/learn_and_earn/bloc/course_bloc/registered_course_bloc.dart';
 import 'package:learnwayv2/features/learn_and_earn/learn_and_earn_data_source/base_models/base_course_models.dart';
@@ -118,8 +117,10 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
             final justRegisteredCourse = castedTobase.where(
               (c) => c.id == r.id,
             );
+            // Navigation is left to whichever view enrolled: the entry points
+            // need different stack behaviour, and pushing from here on top of
+            // that produced a duplicate LessonRoute.
             registerCourseData(justRegisteredCourse.first, LevelType.beginner);
-            appRouter.push(LessonRoute(levelType: LevelType.beginner));
           },
         );
       },
@@ -179,7 +180,6 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
               justRegisteredCourse.first,
               LevelType.intermediate,
             );
-            appRouter.push(LessonRoute(levelType: LevelType.intermediate));
           },
         );
       },
@@ -231,7 +231,6 @@ class LearnAndEarnBloc extends Bloc<LearnAndEarnEvent, LearnAndEarnState> {
               (c) => c.id == r.id,
             );
             registerCourseData(justRegisteredCourse.first, LevelType.advanced);
-            appRouter.push(LessonRoute(levelType: LevelType.advanced));
           },
         );
       },
