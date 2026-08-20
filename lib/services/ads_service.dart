@@ -9,6 +9,7 @@ import 'package:core/src/config/env/api_config_service.dart';
 import 'package:learnwayv2/core/di/locator.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
 import 'package:learnwayv2/shared/interfaces/ad_service_interface.dart';
+import 'package:learnwayv2/shared/utilities/native_ad_manager.dart';
 import 'package:unity_levelplay_mediation/unity_levelplay_mediation.dart';
 
 class LevelPlayService
@@ -209,7 +210,8 @@ class LevelPlayService
 
   @override
   void disposeAds() {
-    // TODO: implement disposeAds
+    _nativeAd?.destroyAd();
+    _nativeAd = null;
   }
 }
 
@@ -222,10 +224,8 @@ class AdmobService implements IAdService {
   RewardedAd? _rewardedAd;
   BannerAd? _bannerAd;
   InterstitialAd? _interstitialAd;
-  NativeAd? _nativeAd;
   LoadAdError? addError;
 
-  bool _isNativeAdReady = false;
   bool _isInterstitialReady = false;
   bool _isBannerAdReady = false;
   bool _isRewardedReady = false;
@@ -235,8 +235,6 @@ class AdmobService implements IAdService {
   int _rewardedLoadAttempts = 0;
   int _interstitialLoadAttempts = 0;
   static const _maxRetries = 3;
-
-  VoidCallback? _onNativeAdLoaded;
 
   RevenueConfigResponse? get _revenueConfig =>
       locator.isRegistered<RevenueConfigResponse>()
@@ -263,14 +261,6 @@ class AdmobService implements IAdService {
     final ids = _revenueConfig?.adUnitIds;
     if (ids != null) {
       return Platform.isIOS ? ids.ios.interstitial : ids.android.interstitial;
-    }
-    return '';
-  }
-
-  String get _nativeAdUnitId {
-    final ids = _revenueConfig?.adUnitIds;
-    if (ids != null) {
-      return Platform.isIOS ? ids.ios.native : ids.android.native;
     }
     return '';
   }
@@ -462,49 +452,13 @@ class AdmobService implements IAdService {
 
   @override
   Future<void> loadNativeAd({VoidCallback? onAdLoaded}) async {
-    log('AdmobService: loadNativeAd called.');
-    if (_isNativeAdReady) {
-      onAdLoaded?.call();
-      return;
-    }
-    if (onAdLoaded != null) _onNativeAdLoaded = onAdLoaded;
-    if (_nativeAd != null) return;
-
-    _nativeAd = NativeAd(
-      adUnitId: _nativeAdUnitId,
-      listener: NativeAdListener(
-        onAdLoaded: (ad) {
-          _isNativeAdReady = true;
-          _onNativeAdLoaded?.call();
-          _onNativeAdLoaded = null;
-          log('AdmobService: Native loaded.');
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          _isNativeAdReady = false;
-          _nativeAd = null;
-          _onNativeAdLoaded = null;
-          addError = error;
-          log('AdmobService: Native failed — $error');
-        },
-      ),
-      request: const AdRequest(),
-      nativeTemplateStyle: NativeTemplateStyle(
-        templateType: TemplateType.medium,
-        mainBackgroundColor: Colors.white,
-        callToActionTextStyle: NativeTemplateTextStyle(
-          size: 16.0,
-          textColor: Colors.white,
-          backgroundColor: Colors.blue,
-        ),
-        primaryTextStyle: NativeTemplateTextStyle(textColor: Colors.black),
-      ),
-    )..load();
+    NativeAdManager.instance.preload(onAdLoaded: onAdLoaded);
   }
 
-  NativeAd? get nativeAd => _isNativeAdReady ? _nativeAd : null;
-  LoadAdError? get nativeAdError =>
-      addError?.message.isNotEmpty ?? false ? addError : null;
+  bool get isNativeAdReady => NativeAdManager.instance.isReady;
+  NativeAd? get nativeAd => NativeAdManager.instance.consume();
+  NativeAd? consumeNativeAd() => NativeAdManager.instance.consume();
+  LoadAdError? get nativeAdError => NativeAdManager.instance.lastError;
 
   @override
   void disposeAds() {
@@ -519,6 +473,8 @@ class AdmobService implements IAdService {
     _interstitialAd?.dispose();
     _interstitialAd = null;
     _isInterstitialReady = false;
+
+    NativeAdManager.instance.dispose();
   }
 
   void _setFullScreenCallback(
@@ -548,10 +504,9 @@ class AdmobService implements IAdService {
           callback as FullScreenContentCallback<InterstitialAd>;
     }
   }
-
-  bool get isNativeAdReady => _isNativeAdReady;
 }
 
 void logMethodName(String adFormat, String methodName, dynamic data) {
   log(': $adFormat - $methodName $data');
 }
+

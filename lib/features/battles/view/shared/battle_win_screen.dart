@@ -3,7 +3,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:core/src/config/env/api_config_service.dart';
 import 'package:learnwayv2/core/di/locator.dart';
 import 'package:learnwayv2/features/battles/services/battle_event_service.dart';
 import 'package:learnwayv2/features/main_activity/cubit/main_activity_cubit.dart';
@@ -65,14 +64,8 @@ class _BattleWinScreenState extends State<BattleWinScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final adsEnabled =
-          !locator.isRegistered<RevenueConfigResponse>() ||
-          locator.get<RevenueConfigResponse>().enableAds;
-
-      if (!adsEnabled) return;
-
-      final isNull = AdService.instance.nativeAd == null;
-      if (isNull) return;
+      if (!AdService.instance.shouldShowAds) return;
+      if (!AdService.instance.isNativeAdReady) return;
 
       appRouter.push(NativeAdRoute());
     });

@@ -13,8 +13,15 @@ class NativeAdManager {
   static NativeAdManager get instance => _instance;
 
   NativeAd? _preloadedAd;
+  DateTime? _loadedAt;
   bool _isReady = false;
   bool _isLoading = false;
+  LoadAdError? _lastError;
+  VoidCallback? _onAdLoadedCallback;
+
+  static const Duration _adTtl = Duration(minutes: 5);
+
+  LoadAdError? get lastError => _lastError;
 
   String get _adUnitId {
     if (!locator.isRegistered<RevenueConfigResponse>()) return '';
@@ -23,8 +30,43 @@ class NativeAdManager {
     return Platform.isIOS ? ids.ios.native : ids.android.native;
   }
 
-  void preload() {
-    if (_isReady || _isLoading) return;
+  bool get isReady {
+    if (!_isReady || _preloadedAd == null) return false;
+    if (_loadedAt != null && DateTime.now().difference(_loadedAt!) > _adTtl) {
+      log(
+        'NativeAdManager: preloaded ad expired (> 5 mins), disposing and reloading.',
+      );
+      _preloadedAd?.dispose();
+      _preloadedAd = null;
+      _isReady = false;
+      _loadedAt = null;
+      preload();
+      return false;
+    }
+    return true;
+  }
+
+  NativeTemplateStyle get defaultTemplateStyle => NativeTemplateStyle(
+    templateType: TemplateType.medium,
+    mainBackgroundColor: Colors.white,
+    callToActionTextStyle: NativeTemplateTextStyle(
+      size: 16.0,
+      textColor: Colors.white,
+      backgroundColor: Colors.blue,
+    ),
+    primaryTextStyle: NativeTemplateTextStyle(textColor: Colors.black),
+  );
+
+  void preload({VoidCallback? onAdLoaded}) {
+    if (isReady) {
+      onAdLoaded?.call();
+      return;
+    }
+    if (onAdLoaded != null) {
+      _onAdLoadedCallback = onAdLoaded;
+    }
+    if (_isLoading) return;
+
     final adUnitId = _adUnitId;
     if (adUnitId.isEmpty) return;
     _isLoading = true;
@@ -35,37 +77,60 @@ class NativeAdManager {
         onAdLoaded: (ad) {
           _isReady = true;
           _isLoading = false;
-          log('NativeAdManager: ad preloaded.');
+          _loadedAt = DateTime.now();
+          _lastError = null;
+          log('NativeAdManager: ad preloaded successfully.');
+          _onAdLoadedCallback?.call();
+          _onAdLoadedCallback = null;
         },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
           _preloadedAd = null;
           _isReady = false;
           _isLoading = false;
+          _loadedAt = null;
+          _lastError = error;
           log('NativeAdManager: preload failed — $error');
+          _onAdLoadedCallback = null;
         },
       ),
       request: const AdRequest(),
-      nativeTemplateStyle: NativeTemplateStyle(
-        templateType: TemplateType.medium,
-        mainBackgroundColor: Colors.white,
-        callToActionTextStyle: NativeTemplateTextStyle(
-          size: 16.0,
-          textColor: Colors.white,
-          backgroundColor: Colors.blue,
-        ),
-        primaryTextStyle: NativeTemplateTextStyle(textColor: Colors.black),
-      ),
+      nativeTemplateStyle: defaultTemplateStyle,
     )..load();
   }
 
   NativeAd? consume() {
-    if (!_isReady) return null;
+    if (!isReady) return null;
     final ad = _preloadedAd;
     _preloadedAd = null;
     _isReady = false;
+    _loadedAt = null;
+    log('NativeAdManager: ad consumed. Preloading next ad in background.');
     preload();
     return ad;
+  }
+
+  NativeAd createAndLoadAd({
+    required void Function(NativeAd ad) onAdLoaded,
+    required void Function(NativeAd ad, LoadAdError error) onAdFailedToLoad,
+  }) {
+    final adUnitId = _adUnitId;
+    return NativeAd(
+      adUnitId: adUnitId,
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          log('NativeAdManager: direct ad loaded.');
+          onAdLoaded(ad as NativeAd);
+        },
+        onAdFailedToLoad: (ad, error) {
+          log('NativeAdManager: direct ad failed to load — $error');
+          ad.dispose();
+          onAdFailedToLoad(ad as NativeAd, error);
+        },
+      ),
+      request: const AdRequest(),
+      nativeTemplateStyle: defaultTemplateStyle,
+    )..load();
   }
 
   void dispose() {
@@ -73,5 +138,7 @@ class NativeAdManager {
     _preloadedAd = null;
     _isReady = false;
     _isLoading = false;
+    _loadedAt = null;
+    _onAdLoadedCallback = null;
   }
 }

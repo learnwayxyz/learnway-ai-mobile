@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
-import 'package:learnwayv2/services/ad_service.dart';
 import 'package:learnwayv2/services/ads_service.dart';
 import 'package:learnwayv2/shared/interfaces/ad_service_interface.dart';
+import 'package:learnwayv2/shared/utilities/native_ad_manager.dart';
 import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 import 'package:unity_levelplay_mediation/unity_levelplay_mediation.dart';
@@ -20,6 +20,9 @@ class NativeAdScreen extends StatefulWidget {
 class _NativeAdScreen extends State<NativeAdScreen>
     with LevelPlayNativeAdListener {
   late LevelPlayNativeAd _nativeAd;
+  NativeAd? _admobNativeAd;
+  bool _isAdmob = false;
+
   final double _width = 350;
   final double _height = 300;
   final String _placementName = 'Level_Complete';
@@ -35,7 +38,22 @@ class _NativeAdScreen extends State<NativeAdScreen>
   @override
   void initState() {
     super.initState();
-    _createNativeAd();
+    _isAdmob = locator<IAdService>() is AdmobService;
+
+    if (_isAdmob) {
+      _admobNativeAd = NativeAdManager.instance.consume() ??
+          NativeAdManager.instance.createAndLoadAd(
+            onAdLoaded: (ad) {
+              if (mounted) setState(() {});
+            },
+            onAdFailedToLoad: (ad, error) {
+              if (mounted) setState(() => _admobNativeAd = null);
+            },
+          );
+    } else {
+      _createNativeAd();
+    }
+
     _dismissTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining <= 1) {
         timer.cancel();
@@ -49,6 +67,10 @@ class _NativeAdScreen extends State<NativeAdScreen>
   @override
   void dispose() {
     _dismissTimer?.cancel();
+    _admobNativeAd?.dispose();
+    if (!_isAdmob) {
+      _nativeAd.destroyAd();
+    }
     super.dispose();
   }
 
@@ -74,14 +96,6 @@ class _NativeAdScreen extends State<NativeAdScreen>
         .withPlacementName(_placementName)
         .withListener(this)
         .build();
-  }
-
-  void _destroyAd() {
-    _nativeAd.destroyAd();
-    setState(() {
-      _createNativeAd();
-      _adViewKey++;
-    });
   }
 
   @override
@@ -112,10 +126,12 @@ class _NativeAdScreen extends State<NativeAdScreen>
                     child: SizedBox(
                       width: _width,
                       height: _height,
-                      child: locator<IAdService>() is AdmobService
-                          ? AdService.instance.nativeAd != null
-                                ? AdWidget(ad: AdService.instance.nativeAd!)
-                                : SizedBox.shrink()
+                      child: _isAdmob
+                          ? _admobNativeAd != null
+                              ? AdWidget(ad: _admobNativeAd!)
+                              : const Center(
+                                  child: CircularProgressIndicator(),
+                                )
                           : LevelPlayNativeAdView(
                               key: ValueKey(_adViewKey),
                               height: _height,

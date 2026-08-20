@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:learnwayv2/app/app.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
-import 'package:core/src/config/env/api_config_service.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
 import 'package:learnwayv2/features/quiz/bloc/quiz_bloc.dart';
 import 'package:learnwayv2/features/quiz/services/lesson_share_service.dart';
@@ -31,15 +28,8 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final adsEnabled =
-          !locator.isRegistered<RevenueConfigResponse>() ||
-          locator.get<RevenueConfigResponse>().enableAds;
-
-      if (!adsEnabled) return;
-      log('is ads enabled ${!adsEnabled}');
-
-      final isNull = AdService.instance.nativeAd == null;
-      if (isNull) return;
+      if (!AdService.instance.shouldShowAds) return;
+      if (!AdService.instance.isNativeAdReady) return;
 
       appRouter.push(NativeAdRoute());
     });

@@ -17,7 +17,6 @@ import 'package:learnwayv2/features/home/widgets/home_banner.dart';
 import '../widgets/ai_quick_actions.dart';
 import 'package:learnwayv2/gen/assets.gen.dart';
 import 'package:learnwayv2/services/ad_service.dart';
-import 'package:learnwayv2/services/ads_service.dart';
 import 'package:learnwayv2/services/att_service.dart';
 import 'package:learnwayv2/services/version_check_service.dart';
 import 'package:learnwayv2/shared/utilities/responsive.dart';
@@ -64,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (!mounted) return;
     _adService.loadRewardedAd();
     _adService.loadInterstitialAd();
-    locator<AdmobService>().loadNativeAd();
+    _adService.loadNativeAd();
     await _fetchPromotions();
   }
 

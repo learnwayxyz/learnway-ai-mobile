@@ -134,13 +134,24 @@ class AdService {
     _ads!.loadNativeAd(onAdLoaded: onAdLoaded);
   }
 
+  bool get isNativeAdReady {
+    if (!_isReady || !shouldShowAds) return false;
+    if (_ads is LevelPlayService) return true;
+    return _admob?.isNativeAdReady ?? false;
+  }
+
+  NativeAd? consumeNativeAd() {
+    if (!_isReady || !shouldShowAds) return null;
+    return _admob?.consumeNativeAd();
+  }
+
   NativeAd? get nativeAd {
     if (!_isReady || !shouldShowAds) return null;
     return _admob?.nativeAd;
   }
 
   LoadAdError? get adError {
-    return _admob?.addError;
+    return _admob?.nativeAdError ?? _admob?.addError;
   }
 
   Future<void> loadBannerAd(int width) async {

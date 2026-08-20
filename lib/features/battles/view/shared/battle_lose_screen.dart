@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:learnwayv2/app/app.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
-import 'package:core/src/config/env/api_config_service.dart';
 import 'package:learnwayv2/features/battles/services/battle_event_service.dart';
 import 'package:learnwayv2/features/quiz/services/lesson_share_service.dart';
 import 'package:learnwayv2/services/ad_service.dart';
@@ -53,14 +52,8 @@ class _BattleLoseScreenState extends State<BattleLoseScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final adsEnabled =
-          !locator.isRegistered<RevenueConfigResponse>() ||
-          locator.get<RevenueConfigResponse>().enableAds;
-
-      if (!adsEnabled) return;
-
-      final isNull = AdService.instance.nativeAd == null;
-      if (isNull) return;
+      if (!AdService.instance.shouldShowAds) return;
+      if (!AdService.instance.isNativeAdReady) return;
 
       appRouter.push(NativeAdRoute());
     });
