@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/quiz/bloc/quiz_bloc.dart';
 import 'package:learnwayv2/features/quiz/widgets/answer_option_widget.dart';
@@ -14,8 +15,7 @@ class QuizInProgressView extends StatelessWidget {
     final currentQuestion = state.questions[state.currentQuestionIndex];
     return Column(
       children: [
-        VSpace(20),
-
+        const VSpace(12),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: ContentProgressTracker(
@@ -23,7 +23,7 @@ class QuizInProgressView extends StatelessWidget {
             currentItem: state.currentQuestionIndex,
           ),
         ),
-        VSpace(40),
+        const VSpace(16),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -34,25 +34,16 @@ class QuizInProgressView extends StatelessWidget {
                   children: [
                     Container(
                       width: double.infinity,
-                      margin: const EdgeInsets.only(top: 30),
+                      margin: const EdgeInsets.only(top: 24),
                       decoration: BoxDecoration(
                         gradient: AppColors.blueGradient,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Column(
                         children: [
-                          Container(
-                            height: 60,
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                          ),
-
+                          const SizedBox(height: 36),
                           Padding(
-                            padding: const EdgeInsets.all(24),
+                            padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -64,14 +55,17 @@ class QuizInProgressView extends StatelessWidget {
                                     color: Colors.white,
                                   ),
                                 ),
-                                const VSpace(12),
-                                Text(
+                                const VSpace(8),
+                                AutoSizeText(
                                   currentQuestion.question,
                                   textAlign: TextAlign.center,
                                   style: AppTextStyles.base(
                                     context,
                                     color: Colors.white,
                                   ),
+                                  maxLines: 4,
+                                  minFontSize: 12,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
@@ -92,7 +86,7 @@ class QuizInProgressView extends StatelessWidget {
                     ),
                   ],
                 ),
-                const VSpace(32),
+                const VSpace(20),
                 ...currentQuestion.options.asMap().entries.map((entry) {
                   final index = entry.key;
                   final option = entry.value;
@@ -104,7 +98,7 @@ class QuizInProgressView extends StatelessWidget {
                   final showWrong =
                       state.isAnswered && isSelected && !isCorrectAnswer;
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.only(bottom: 12),
                     child: AnswerOptionWidget(
                       letter: optionLetter,
                       text: option.option,

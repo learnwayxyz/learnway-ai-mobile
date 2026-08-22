@@ -155,8 +155,6 @@ class _LessonScreenState extends State<LessonScreen>
           appBar: AppBarFactory.standardAppBar(
             title: widget.pathTitle ?? courseData.courseTitle,
             barHeight: 0,
-            // No checkLevelType() here — PopScope above already fires it for
-            // every pop, programmatic or gesture.
             onBackPressed: () => Navigator.pop(context),
           ),
           body: OverlayLoader(
@@ -524,7 +522,8 @@ class _LessonBuilderState extends State<LessonBuilder> {
     if (!isPremium) {
       final remaining = LocalStorageService.dailyLessonsNotifier.value;
       log('dailyLimit $remaining');
-      final isUnlimited = remaining == LocalStorageService.unlimitedDailyLessons;
+      final isUnlimited =
+          remaining == LocalStorageService.unlimitedDailyLessons;
       if (!isUnlimited && (remaining == null || remaining <= 0)) {
         return LockState.dailyLimitReached;
       }
