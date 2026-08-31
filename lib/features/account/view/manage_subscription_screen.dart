@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import 'package:learnwayv2/app/app_barrel.dart';
-import 'package:core/src/config/env/env.dart';
-import 'package:learnwayv2/gen/assets.gen.dart';
+import 'package:learnwayv2/features/subscription/bloc/paywall_bloc.dart';
 import 'package:learnwayv2/services/ad_service.dart';
 import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
@@ -20,12 +19,7 @@ class ManageSubscriptionScreen extends StatefulWidget {
 }
 
 class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
-  static final List<_BenefitMeta> _benefits = [
-    _BenefitMeta('Ad Free Experience', Assets.icons.pauseAd),
-    _BenefitMeta('Unlimited Daily Lessons', Assets.icons.activity2),
-    _BenefitMeta('2x Gems Boost (First Lesson Daily)', Assets.icons.boostGems),
-    _BenefitMeta('Zero Transaction Fees', Assets.icons.gasFee),
-  ];
+  static const List<BenefitItem> _benefits = PaywallBloc.defaultBenefits;
 
   CustomerInfo? _customerInfo;
   String? _priceString;
@@ -315,7 +309,7 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
                         color: AppColors.gray200,
                       ),
                       itemBuilder: (_, i) => _BenefitCard(
-                        meta: _benefits[i],
+                        benefit: _benefits[i],
                         daysRemaining: _daysRemaining,
                       ),
                     ),
@@ -392,17 +386,11 @@ class _ManageSubscriptionScreenState extends State<ManageSubscriptionScreen> {
   }
 }
 
-class _BenefitMeta {
-  const _BenefitMeta(this.label, this.icon);
-  final String label;
-  final String icon;
-}
-
 class _BenefitCard extends StatelessWidget {
-  final _BenefitMeta meta;
+  final BenefitItem benefit;
   final int? daysRemaining;
 
-  const _BenefitCard({required this.meta, required this.daysRemaining});
+  const _BenefitCard({required this.benefit, required this.daysRemaining});
 
   String _daysLabel() {
     final days = daysRemaining;
@@ -418,18 +406,49 @@ class _BenefitCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 20,
-            height: 20,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: AppColors.primary50,
-              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFEFF6FF),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: SvgPicture.asset(meta.icon),
+            child: Center(
+              child: Icon(
+                benefit.icon,
+                size: 16,
+                color: const Color(0xFF0066FF),
+              ),
+            ),
           ),
-          const SizedBox(width: 10),
+          const HSpace(10),
           Expanded(
-            child: Text(meta.label, style: AppTextStyles.smRegular(context)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  benefit.title,
+                  style: AppTextStyles.smBold(context).copyWith(
+                    color: const Color(0xFF0F172A),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const VSpace(1),
+                Text(
+                  benefit.description,
+                  style: AppTextStyles.xsRegular(context).copyWith(
+                    color: const Color(0xFF64748B),
+                    fontSize: 10.5,
+                    height: 1.15,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
+          const HSpace(8),
           Text(
             _daysLabel(),
             style: AppTextStyles.xsRegular(

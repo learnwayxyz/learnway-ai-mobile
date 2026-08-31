@@ -13,6 +13,18 @@ enum PaywallSideEffect {
   restoreFailed,
 }
 
+class BenefitItem {
+  final String title;
+  final String description;
+  final IconData icon;
+
+  const BenefitItem({
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
+}
+
 class PaywallState {
   const PaywallState({
     this.status = PaywallStatus.loading,
@@ -22,6 +34,7 @@ class PaywallState {
     this.selectedPackageIndex = 0,
     this.errorMessage,
     this.actionErrorMessage,
+    this.benefits = PaywallBloc.defaultBenefits,
   });
 
   final PaywallStatus status;
@@ -31,6 +44,7 @@ class PaywallState {
   final int selectedPackageIndex;
   final String? errorMessage;
   final String? actionErrorMessage;
+  final List<BenefitItem> benefits;
 
   bool get isLoading => status == PaywallStatus.loading;
   bool get hasError => status == PaywallStatus.error;
@@ -102,6 +116,7 @@ class PaywallState {
     int? selectedPackageIndex,
     String? errorMessage,
     String? actionErrorMessage,
+    List<BenefitItem>? benefits,
   }) {
     return PaywallState(
       status: status ?? this.status,
@@ -111,6 +126,7 @@ class PaywallState {
       selectedPackageIndex: selectedPackageIndex ?? this.selectedPackageIndex,
       errorMessage: errorMessage ?? this.errorMessage,
       actionErrorMessage: actionErrorMessage,
+      benefits: benefits ?? this.benefits,
     );
   }
 }

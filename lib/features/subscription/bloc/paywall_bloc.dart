@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learnwayv2/services/ad_service.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -7,6 +8,49 @@ part 'paywall_state.dart';
 
 class PaywallBloc extends Bloc<PaywallEvent, PaywallState> {
   final AdService _adService;
+
+  static const List<BenefitItem> defaultBenefits = [
+    BenefitItem(
+      title: 'Capstone Projects',
+      description: 'Build real projects and apply your skills.',
+      icon: Icons.rocket_launch_rounded,
+    ),
+    BenefitItem(
+      title: 'AI Assessment',
+      description: 'Get AI evaluation and personalized feedback.',
+      icon: Icons.assignment_turned_in_rounded,
+    ),
+    BenefitItem(
+      title: 'Verified Certificate',
+      description: 'Earn a verifiable certificate for your achievement.',
+      icon: Icons.shield_rounded,
+    ),
+    BenefitItem(
+      title: 'Advanced AI Mentor',
+      description: 'Receive personalized guidance and insights.',
+      icon: Icons.smart_toy_rounded,
+    ),
+    BenefitItem(
+      title: 'Advanced AI Tutor',
+      description: 'Get deeper explanations and instant help.',
+      icon: Icons.chat_bubble_rounded,
+    ),
+    BenefitItem(
+      title: 'Unlimited Lessons',
+      description: 'Learn without daily lesson limits.',
+      icon: Icons.all_inclusive_rounded,
+    ),
+    BenefitItem(
+      title: '2x Gems Boost',
+      description: 'Earn double gems on your first lesson daily.',
+      icon: Icons.diamond_rounded,
+    ),
+    BenefitItem(
+      title: 'Ad-Free Learning',
+      description: 'Enjoy a focused, ad-free learning experience.',
+      icon: Icons.block_rounded,
+    ),
+  ];
 
   PaywallBloc({AdService? adService})
     : _adService = adService ?? AdService.instance,

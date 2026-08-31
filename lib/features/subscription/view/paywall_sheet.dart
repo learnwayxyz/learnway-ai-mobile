@@ -7,49 +7,6 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 class PayWallScreen extends StatelessWidget {
   const PayWallScreen({super.key});
 
-  static const List<_BenefitItem> _benefits = [
-    _BenefitItem(
-      title: 'Capstone Projects',
-      description: 'Build real projects and apply your skills.',
-      icon: Icons.rocket_launch_rounded,
-    ),
-    _BenefitItem(
-      title: 'AI Assessment',
-      description: 'Get AI evaluation and personalized feedback.',
-      icon: Icons.assignment_turned_in_rounded,
-    ),
-    _BenefitItem(
-      title: 'Verified Certificate',
-      description: 'Earn a verifiable certificate for your achievement.',
-      icon: Icons.shield_rounded,
-    ),
-    _BenefitItem(
-      title: 'Advanced AI Mentor',
-      description: 'Receive personalized guidance and insights.',
-      icon: Icons.smart_toy_rounded,
-    ),
-    _BenefitItem(
-      title: 'Advanced AI Tutor',
-      description: 'Get deeper explanations and instant help.',
-      icon: Icons.chat_bubble_rounded,
-    ),
-    _BenefitItem(
-      title: 'Unlimited Lessons',
-      description: 'Learn without daily lesson limits.',
-      icon: Icons.all_inclusive_rounded,
-    ),
-    _BenefitItem(
-      title: '2x Gems Boost',
-      description: 'Earn double gems on your first lesson daily.',
-      icon: Icons.diamond_rounded,
-    ),
-    _BenefitItem(
-      title: 'Ad-Free Learning',
-      description: 'Enjoy a focused, ad-free learning experience.',
-      icon: Icons.block_rounded,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -60,15 +17,22 @@ class PayWallScreen extends StatelessWidget {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _HeaderSection(),
-                const VSpace(6),
-                ..._benefits.map((benefit) => _BenefitCard(benefit: benefit)),
-                const VSpace(10),
-                const _OfferingsSection(),
-              ],
+            child: BlocBuilder<PaywallBloc, PaywallState>(
+              buildWhen: (prev, curr) => prev.benefits != curr.benefits,
+              builder: (context, state) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _HeaderSection(),
+                    const VSpace(6),
+                    ...state.benefits.map(
+                      (benefit) => _BenefitCard(benefit: benefit),
+                    ),
+                    const VSpace(10),
+                    const _OfferingsSection(),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -154,7 +118,7 @@ class _HeaderSection extends StatelessWidget {
 }
 
 class _BenefitCard extends StatelessWidget {
-  final _BenefitItem benefit;
+  final BenefitItem benefit;
 
   const _BenefitCard({required this.benefit});
 
@@ -638,16 +602,4 @@ class _ContinueButton extends StatelessWidget {
       ),
     );
   }
-}
-
-class _BenefitItem {
-  final String title;
-  final String description;
-  final IconData icon;
-
-  const _BenefitItem({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
 }
