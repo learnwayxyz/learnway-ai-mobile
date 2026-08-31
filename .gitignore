@@ -20,3 +20,9 @@ lib/**/*.freezed.dart
 .DS_Store
 .idea/
 *.iml
+
+# Ephemeral Flutter files
+ios/Flutter/ephemeral/
+macos/Flutter/ephemeral/
+ios/Podfile.lock
+WEB_*_PLAN.md
