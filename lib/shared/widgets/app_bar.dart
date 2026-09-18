@@ -156,19 +156,31 @@ class _HomeAppBarContentState extends State<_HomeAppBarContent>
                     : null,
               ),
               HSpace(8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _getGreeting(),
-                    style: AppTextStyles.sm(context, color: subtitleColor),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getGreeting(),
+                        style: AppTextStyles.sm(
+                          context,
+                          color: subtitleColor,
+                        ),
+                      ),
+                      Text(
+                        profile.username ?? '',
+                        style: AppTextStyles.baseBold(
+                          context,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    profile.username ?? '',
-                    style: AppTextStyles.baseBold(context, color: textColor),
-                  ),
-                ],
+                ),
               ),
               const Spacer(),
               BlocBuilder<NotificationCubit, NotificationState>(

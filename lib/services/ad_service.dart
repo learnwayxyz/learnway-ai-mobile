@@ -35,7 +35,14 @@ class AdService {
 
   bool get _isReady => _ads != null;
 
+  bool _mobileAdsInitialized = false;
+
   Future<void> init({String? userId}) async {
+    if (!_mobileAdsInitialized) {
+      _mobileAdsInitialized = true;
+      await MobileAds.instance.initialize();
+    }
+
     await _revenueCat.init(userId: userId);
 
     if (!_revenueCat.isPremiumUser && _adsEnabledByConfig) {

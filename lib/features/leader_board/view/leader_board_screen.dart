@@ -161,7 +161,12 @@ class _LeaderboardScreenContentState extends State<_LeaderboardScreenContent> {
                           Text(
                             AppLocalizations.of(context)!.leaderboard,
                             style: AppTextStyles.mdBold(context).copyWith(
-                              fontSize: FigmaConverter.fontSize(context, 24),
+                              fontSize: FigmaConverter.fontSize(
+                                context,
+                                24,
+                                min: 20,
+                                max: 28,
+                              ),
                             ),
                           ),
                         ],

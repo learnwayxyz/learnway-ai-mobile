@@ -7,6 +7,7 @@ import 'package:learnwayv2/features/home/home_bloc/home_bloc.dart';
 import 'package:learnwayv2/features/home/home_bloc/home_event.dart';
 import 'package:learnwayv2/features/home/home_bloc/home_state.dart';
 import 'package:learnwayv2/features/home/home_repository/user_profile_model.dart';
+import 'package:learnwayv2/services/att_service.dart';
 import 'package:core/core.dart';
 
 @RoutePage()
@@ -133,6 +134,9 @@ class _SplashScreenState extends State<SplashScreen>
     });
 
     context.read<HomeBloc>().add(const FetchHomeDataEvent());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ATTService.instance.requestTrackingIfNeeded();
+    });
   }
 
   Future<void> _handleUserNavigation(UserProfileModel userProfile) async {

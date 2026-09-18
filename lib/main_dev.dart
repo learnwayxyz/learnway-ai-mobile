@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:learnwayv2/app/app.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/bootstrap.dart';
@@ -22,7 +21,6 @@ void main() {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       Bloc.observer = const AppBlocObserver();
-      unawaited(MobileAds.instance.initialize());
 
       Env.setFlavor(Flavor.dev);
 

@@ -49,11 +49,11 @@ class PodiumSection extends StatelessWidget {
     }
 
     double firstPlaceSize = responsiveInfo.isTablet
-        ? FigmaConverter.width(context, 120)
-        : FigmaConverter.width(context, 117);
+        ? FigmaConverter.width(context, 120, max: 130)
+        : FigmaConverter.width(context, 117, max: 125);
     double otherPlacesSize = responsiveInfo.isTablet
-        ? FigmaConverter.width(context, 120)
-        : FigmaConverter.width(context, 80);
+        ? FigmaConverter.width(context, 120, max: 130)
+        : FigmaConverter.width(context, 80, max: 90);
 
     return Container(
       padding: FigmaConverter.padding(context, left: 0, right: 0, top: 20),
@@ -194,11 +194,11 @@ class PodiumUser extends StatelessWidget {
               bottom: -5,
               child: Container(
                 width: responsiveInfo.isTablet
-                    ? FigmaConverter.width(context, 35)
-                    : FigmaConverter.width(context, 20),
+                    ? FigmaConverter.width(context, 35, max: 40)
+                    : FigmaConverter.width(context, 20, max: 24),
                 height: responsiveInfo.isTablet
-                    ? FigmaConverter.width(context, 35)
-                    : FigmaConverter.width(context, 20),
+                    ? FigmaConverter.width(context, 35, max: 40)
+                    : FigmaConverter.width(context, 20, max: 24),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
