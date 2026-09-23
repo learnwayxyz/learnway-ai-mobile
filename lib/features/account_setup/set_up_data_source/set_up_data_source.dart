@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:developer' as dev;
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:http/http.dart' as http;
 import 'package:learnwayv2/features/account/exceptions/account_exceptions.dart';
 import 'package:learnwayv2/features/account/data/user_account_model.dart';
@@ -27,20 +28,38 @@ class SetUpDataSource {
     try {
       final baseApi = locator<BaseApiClients>();
 
+      final isSocialSignup =
+          authProvider == AuthProvider.apple ||
+          authProvider == AuthProvider.google;
+      final ownershipProof = isSocialSignup
+          ? await FirebaseAuth.instance.currentUser?.getIdToken()
+          : await SharedPreferencesStore.getUserToken(
+              emailVerificationTokenKey,
+            );
+      if (ownershipProof == null || ownershipProof.isEmpty) {
+        throw AuthFailure(
+          'Your verification has expired. Please sign in again.',
+        );
+      }
+
       final fields = <String, String>{
         "email": userEmail,
         "username": userName,
-        "signupProvider":
-            (authProvider == AuthProvider.apple ||
-                authProvider == AuthProvider.google)
-            ? (authProvider?.name ?? '')
-            : "otp",
+        "signupProvider": isSocialSignup ? (authProvider?.name ?? '') : "otp",
         "country": country,
         if (referralCode != null && referralCode.isNotEmpty)
           "referralCode": referralCode,
+        if (isSocialSignup)
+          "idToken": ownershipProof
+        else
+          "verificationToken": ownershipProof,
       };
 
-      log('Setup account fields: $fields');
+      log(
+        'Setup account fields: ${Map.of(fields)
+          ..remove('idToken')
+          ..remove('verificationToken')}',
+      );
 
       http.Response response;
 
@@ -150,6 +169,7 @@ class SetUpDataSource {
       final userId = user['id'].toString();
       final email = user['email'].toString();
 
+      await SharedPreferencesStore.removeStorage(emailVerificationTokenKey);
       SharedPreferencesStore.setUserId(userIdKey, userId);
       SharedPreferencesStore.setUserToken(
         userTokenKey,
