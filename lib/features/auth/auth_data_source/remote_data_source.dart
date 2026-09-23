@@ -210,6 +210,14 @@ class RemoteDataSource {
         throw AuthFailure(message ?? 'Invalid OTP. Please try again.');
       }
 
+      final verificationToken = decoded['verificationToken'];
+      if (verificationToken is String && verificationToken.isNotEmpty) {
+        await SharedPreferencesStore.setUserToken(
+          emailVerificationTokenKey,
+          verificationToken,
+        );
+      }
+
       return decoded['isVerified'] == true;
     } on SocketException {
       throw AuthFailure.network();

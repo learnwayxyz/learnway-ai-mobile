@@ -14,6 +14,7 @@ const String usedAppleAuthKey = 'used_apple_auth';
 const String userIdKey = 'user_id';
 const String themeKey = 'selected_theme_mode';
 const String userEmailKey = 'used_email_auth';
+const String emailVerificationTokenKey = 'email_verification_token';
 const String kycCompletedAtKey = 'kyc_completed_at';
 const String kycSessionIdKey = 'kyc_session_id';
 const String kycStatusKey = 'kyc_status';
