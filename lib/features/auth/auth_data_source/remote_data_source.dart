@@ -242,10 +242,14 @@ class RemoteDataSource {
       final baseApi = locator<BaseApiClients>();
       final token = await SharedPreferencesStore.getUserToken(userTokenKey);
       final providerName = authProvider.name.toLowerCase();
+      final idToken = await _firebaseAuth.currentUser?.getIdToken();
+      if (idToken == null || idToken.isEmpty) {
+        throw AuthFailure('Sign-in session expired. Please sign in again.');
+      }
 
       final response = await baseApi.post(
         Endpoints.loginUser,
-        body: {'email': email, 'provider': providerName},
+        body: {'email': email, 'provider': providerName, 'idToken': idToken},
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
