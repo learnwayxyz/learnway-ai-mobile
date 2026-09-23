@@ -36,11 +36,8 @@ class SetUpDataSource {
           : await SharedPreferencesStore.getUserToken(
               emailVerificationTokenKey,
             );
-      if (ownershipProof == null || ownershipProof.isEmpty) {
-        throw AuthFailure(
-          'Your verification has expired. Please sign in again.',
-        );
-      }
+      final hasOwnershipProof =
+          ownershipProof != null && ownershipProof.isNotEmpty;
 
       final fields = <String, String>{
         "email": userEmail,
@@ -49,9 +46,8 @@ class SetUpDataSource {
         "country": country,
         if (referralCode != null && referralCode.isNotEmpty)
           "referralCode": referralCode,
-        if (isSocialSignup)
-          "idToken": ownershipProof
-        else
+        if (hasOwnershipProof && isSocialSignup) "idToken": ownershipProof,
+        if (hasOwnershipProof && !isSocialSignup)
           "verificationToken": ownershipProof,
       };
 
