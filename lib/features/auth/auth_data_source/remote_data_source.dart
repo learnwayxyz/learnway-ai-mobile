@@ -321,6 +321,14 @@ class RemoteDataSource {
       );
       log('User token (_loginWithOtp): ${decoded['accessToken']}');
 
+      final verificationToken = decoded['verificationToken'];
+      if (verificationToken is String && verificationToken.isNotEmpty) {
+        await SharedPreferencesStore.setUserToken(
+          emailVerificationTokenKey,
+          verificationToken,
+        );
+      }
+
       return AuthResponse.fromJson(decoded);
     } on SocketException {
       throw AuthFailure.network();
