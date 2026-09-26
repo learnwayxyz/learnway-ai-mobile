@@ -75,6 +75,9 @@ abstract class EnvStaging {
   static const String stagemainnetUsdtContractAddress =
       _EnvStaging.stagemainnetUsdtContractAddress;
 
+  @EnviedField(varName: 'STAGE_TOKEN_DECIMALS', defaultValue: '6')
+  static const String stageTokenDecimals = _EnvStaging.stageTokenDecimals;
+
   @EnviedField(varName: 'STAGE_KOTANI_MAINNET_BASEURL')
   static const String stagemainnetKotaniBaseUrl =
       _EnvStaging.stagemainnetKotaniBaseUrl;

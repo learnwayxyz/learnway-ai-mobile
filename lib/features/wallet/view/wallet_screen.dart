@@ -1,10 +1,10 @@
 import 'dart:developer';
 
 import 'package:learnwayv2/app/app_barrel.dart';
-import 'package:core/src/config/env/env.dart';
 import 'package:learnwayv2/features/wallet/balance_notifier.dart';
 import 'package:learnwayv2/features/wallet/cubit/kyc_cubit.dart';
 import 'package:learnwayv2/features/wallet/cubit/wallet_cubit.dart';
+import 'package:learnwayv2/features/wallet/utils.dart';
 import 'package:learnwayv2/features/wallet/models/wallet_transactions.dart';
 import 'package:learnwayv2/features/wallet/view/all_transaction_history_screen.dart';
 import 'package:learnwayv2/features/wallet/widgets/slideable_action.dart';
@@ -120,11 +120,11 @@ class _WalletScreenState extends State<WalletScreen>
 
     switch (type) {
       case TransactionType.receive:
-        return '+\$${formatTokenAmount(amount, decimals: Env.isDev ? 18 : 6)}';
+        return '+\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
       case TransactionType.send:
-        return '-\$${formatTokenAmount(amount, decimals: Env.isDev ? 18 : 6)}';
+        return '-\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
       case TransactionType.swap:
-        return '~\$${formatTokenAmount(amount, decimals: Env.isDev ? 18 : 6)}';
+        return '~\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
     }
   }
 
@@ -136,11 +136,11 @@ class _WalletScreenState extends State<WalletScreen>
 
     switch (type) {
       case TransactionType.receive:
-        return formatTokenAmount(amount, decimals: Env.isDev ? 18 : 6);
+        return formatTokenAmount(amount, decimals: getTokenDecimals());
       case TransactionType.send:
-        return formatTokenAmount(amount, decimals: Env.isDev ? 18 : 6);
+        return formatTokenAmount(amount, decimals: getTokenDecimals());
       case TransactionType.swap:
-        return formatTokenAmount(amount, decimals: Env.isDev ? 18 : 6);
+        return formatTokenAmount(amount, decimals: getTokenDecimals());
     }
   }
 

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:core/src/config/env/env.dart';
+import 'package:core/core.dart';
 import 'package:learnwayv2/services/defi_service/models/mobile_money_request.dart'
     as mm;
 import 'package:learnwayv2/services/defi_service/models/mobile_money_withdrawal_request.dart';
@@ -86,14 +86,7 @@ mm.Currency mapCurrency(String currencyCode) {
 }
 
 int getTokenDecimals() {
-  if (Env.isDev) {
-    return 18;
-  } else if (Env.isStaging) {
-    return 6;
-  } else if (Env.isProd) {
-    return 6;
-  }
-  return 6;
+  return Env.tokenDecimals;
 }
 
 String getPaymentChannelName(String userFriendlyName) {

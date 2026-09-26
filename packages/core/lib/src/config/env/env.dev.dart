@@ -7,7 +7,7 @@ abstract class EnvDev {
   @EnviedField(varName: 'DEV_BASEURL')
   static const String devbaseUrl = _EnvDev.devbaseUrl;
 
-  static const bool useFusdAsPrimary = true;
+  static const bool useFusdAsPrimary = false;
 
   @EnviedField(varName: 'DEV_PEPADDRESS', obfuscate: true)
   static final String devpepAddress = _EnvDev.devpepAddress;
@@ -70,6 +70,9 @@ abstract class EnvDev {
   @EnviedField(varName: 'DEV_TESTNET_USDT_CONTRACTADDRESS')
   static const String devtestnetUsdtContractAddress =
       _EnvDev.devtestnetUsdtContractAddress;
+
+  @EnviedField(varName: 'DEV_TOKEN_DECIMALS', defaultValue: '6')
+  static const String devTokenDecimals = _EnvDev.devTokenDecimals;
 
   @EnviedField(varName: 'DEV_APP_UID')
   static const String devappUID = _EnvDev.devappUID;

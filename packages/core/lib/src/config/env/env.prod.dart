@@ -71,6 +71,9 @@ abstract class EnvProd {
   static const String prodmainnetUsdtContractAddress =
       _EnvProd.prodmainnetUsdtContractAddress;
 
+  @EnviedField(varName: 'PROD_TOKEN_DECIMALS', defaultValue: '6')
+  static const String prodTokenDecimals = _EnvProd.prodTokenDecimals;
+
   @EnviedField(varName: 'KOTANI_MAINNET_BASEURL')
   static const String prodmainnetKotaniBaseUrl =
       _EnvProd.prodmainnetKotaniBaseUrl;

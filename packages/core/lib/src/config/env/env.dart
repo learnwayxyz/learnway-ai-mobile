@@ -225,6 +225,22 @@ class Env {
     EnvProd.prodmainnetUsdtContractAddress,
   );
 
+  static const String _tokenDecimalsOverride = String.fromEnvironment(
+    'TOKEN_DECIMALS',
+  );
+
+  static int get tokenDecimals {
+    if (_tokenDecimalsOverride.isNotEmpty) {
+      return int.tryParse(_tokenDecimalsOverride) ?? 6;
+    }
+    final raw = _getValue(
+      EnvDev.devTokenDecimals,
+      EnvStaging.stageTokenDecimals,
+      EnvProd.prodTokenDecimals,
+    );
+    return int.tryParse(raw) ?? 6;
+  }
+
   // Mainnet Blockchain
   static String get mainnetAccountFactory => _getValue(
     EnvDev.devlightAccount,
