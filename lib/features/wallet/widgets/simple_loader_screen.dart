@@ -28,6 +28,7 @@ class _SendLoaderScreenState extends State<SendLoaderScreen>
   late AnimationController _controller;
   late Animation<double> _rotationAnimation;
   String statusText = '';
+  bool _hasNavigatedToSuccess = false;
 
   @override
   void initState() {
@@ -59,9 +60,14 @@ class _SendLoaderScreenState extends State<SendLoaderScreen>
           showBackButton: false,
         ),
         body: BlocConsumer<WalletCubit, WalletState>(
+          listenWhen: (previous, current) =>
+              previous.transactionStatus != current.transactionStatus,
           listener: (context, state) {
             if (state.transactionStatus == TransactionStatus.success ||
                 state.transactionStatus == TransactionStatus.pending) {
+              // pending -> success (off-ramp) must not push a second screen.
+              if (_hasNavigatedToSuccess) return;
+              _hasNavigatedToSuccess = true;
               context.router.push(
                 SendSuccessRoute(
                   recipientAddress: widget.recipientAddress ?? '0x00',

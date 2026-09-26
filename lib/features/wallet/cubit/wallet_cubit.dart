@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:equatable/equatable.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
 import 'package:learnwayv2/features/wallet/balance_caching.dart';
@@ -35,6 +37,10 @@ import 'package:learnwayv2/shared/utilities/ethereum_utils.dart';
 import 'package:learnwayv2/shared/utilities/ui_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:variance_dart/variance_dart.dart';
+// GasEstimation isn't exported from the SDK's public barrel.
+// ignore: implementation_imports
+import 'package:variance_dart/src/interfaces/interfaces.dart'
+    show GasEstimation;
 import 'package:wallet/wallet.dart';
 import 'package:core/src/config/env/env.dart';
 
@@ -161,6 +167,28 @@ class WalletCubit extends Cubit<WalletState> {
     await fetchBalance(forceRefresh: true);
   }
 
+  Future<void> _applyGasBuffer(SmartWallet smartWallet) async {
+    dynamic high;
+    try {
+      high = await smartWallet.getGasPrice(GasEstimation.high);
+    } catch (e) {
+      log('Could not fetch high-tier gas price: $e');
+    }
+
+    BigInt pad(BigInt v) => (v * BigInt.from(3)) ~/ BigInt.two;
+    BigInt max(BigInt a, BigInt b) => a > b ? a : b;
+    final minPriorityFee = BigInt.from(1500000);
+
+    smartWallet.gasOverrides = GasOverrides(
+      maxFeePerGas: (v) =>
+          pad(max(v ?? BigInt.zero, high?.maxFeePerGas ?? BigInt.zero)),
+      maxPriorityFeePerGas: (v) => max(
+        pad(max(v ?? BigInt.zero, high?.maxPriorityFeePerGas ?? BigInt.zero)),
+        minPriorityFee,
+      ),
+    );
+  }
+
   Future<void> transferToken({
     required String amount,
     required String recipientAddress,
@@ -176,6 +204,7 @@ class WalletCubit extends Cubit<WalletState> {
 
     try {
       final smartWallet = locator<SmartWallet>();
+      await _applyGasBuffer(smartWallet);
       final originalWei = convertToWei(amount, getTokenDecimals());
 
       UserOperationResponse? response;
@@ -410,7 +439,7 @@ class WalletCubit extends Cubit<WalletState> {
     try {
       final smartWallet = locator<SmartWallet>();
       final result = await smartWallet.readContract(
-        EthereumAddress.fromHex(Env.usdtContractAddress),
+        EthereumAddress.fromHex(Env.activeTokenAddress),
         ContractAbis.get('ERC20_BalanceOf'),
         'balanceOf',
         params: [smartWallet.address],
@@ -418,10 +447,13 @@ class WalletCubit extends Cubit<WalletState> {
       );
 
       final rawBalance = result.first as BigInt;
-      const decimals = 18;
+      final decimals = getTokenDecimals();
       final divisor = BigInt.from(10).pow(decimals);
       final humanBalance = rawBalance / divisor;
-      return humanBalance.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
+      final value = humanBalance
+          .toStringAsFixed(2)
+          .replaceAll(RegExp(r'\.?0+$'), '');
+      return value.isEmpty ? '0' : value;
     } catch (e) {
       throw Exception('Failed to fetch balance: $e');
     }
@@ -924,6 +956,7 @@ class WalletCubit extends Cubit<WalletState> {
 
     try {
       final smartWallet = locator<SmartWallet>();
+      await _applyGasBuffer(smartWallet);
       final originalWei = convertToWei(amount, getTokenDecimals());
 
       UserOperationResponse? response;

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:core/src/config/env/env.dart';
-import 'package:core/src/config/env/env.dev.dart';
 import 'package:learnwayv2/features/wallet/balance_caching.dart';
 import 'package:learnwayv2/features/wallet/utils.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
@@ -34,7 +33,7 @@ class BalanceNotifier extends ChangeNotifier {
 
   Future<void> fetchBalance({bool forceRefresh = false}) async {
     final walletAddress = await LocalStorageService.getWalletAddress();
-
+    log('BalanceNotifier: walletAddress=$walletAddress');
     if (walletAddress.isEmpty) {
       clearState();
       return;
@@ -59,12 +58,20 @@ class BalanceNotifier extends ChangeNotifier {
       await BalanceCache.forceRefresh();
     }
 
+    if (!locator.isRegistered<SmartWallet>()) {
+      log('BalanceNotifier: SmartWallet not registered yet, waiting');
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+      return;
+    }
+
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final balance = await _erc20Balance();
+      final balance = await _erc20Balance(walletAddress);
       final currentWallet = await LocalStorageService.getWalletAddress();
       if (currentWallet.isEmpty || currentWallet != walletAddress) {
         clearState();
@@ -84,10 +91,16 @@ class BalanceNotifier extends ChangeNotifier {
     }
   }
 
-  Future<String> _erc20Balance() async {
+  Future<String> _erc20Balance(String walletAddress) async {
     try {
-      log('activeTokenAddress: ${Env.activeTokenAddress}');
       final smartWallet = locator<SmartWallet>();
+      if (smartWallet.address.eip55With0x.toLowerCase() !=
+          walletAddress.toLowerCase()) {
+        log(
+          'BalanceNotifier: SmartWallet address ${smartWallet.address.eip55With0x} '
+          'does not match stored wallet address $walletAddress',
+        );
+      }
       final result = await smartWallet.readContract(
         EthereumAddress.fromHex(Env.activeTokenAddress),
         ContractAbis.get('ERC20_BalanceOf'),
@@ -97,20 +110,18 @@ class BalanceNotifier extends ChangeNotifier {
       );
 
       final rawBalance = result.first as BigInt;
-
       final decimals = getTokenDecimals();
-
       final divisor = BigInt.from(10).pow(decimals);
-      final integerPart = rawBalance ~/ divisor;
-      final remainder = rawBalance % divisor;
-      final humanBalance =
-          integerPart.toDouble() + (remainder.toDouble() / divisor.toDouble());
+      final humanBalance = rawBalance / divisor;
       final value = humanBalance
           .toStringAsFixed(2)
           .replaceAll(RegExp(r'\.?0+$'), '');
-      log('_erc20Balance(): $value');
+      final finalValue = value.isEmpty ? '0' : value;
+      log(
+        '_erc20Balance(): $finalValue (raw: $rawBalance, decimals: $decimals, address: ${smartWallet.address.eip55With0x})',
+      );
 
-      return value;
+      return finalValue;
     } catch (e) {
       throw Exception('Failed to fetch balance: $e');
     }
