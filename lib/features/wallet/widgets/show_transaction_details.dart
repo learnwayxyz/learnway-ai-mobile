@@ -127,8 +127,8 @@ class _TransactionConfirmationDialogState
             ),
             _buildDetailRow(
               title: 'Network',
-              value: 'Lisk',
-              image: 'lisk_icon.svg',
+              value: 'Celo',
+              image: 'celo-logo.svg',
             ),
             _buildDetailRow(title: 'Fee:', value: '0.1 LWT'),
           ],

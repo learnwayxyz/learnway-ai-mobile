@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
@@ -99,15 +100,18 @@ class _SendConfirmationScreenState extends State<SendConfirmationScreen>
                           VSpace(getResponsiveDimension(context, 16)),
                           BuildRow(
                             title: AppLocalizations.of(context)!.network,
-                            value: 'Lisk',
+                            value: 'Celo',
                             leadingWidget: SizedBox(
-                              height: 15,
-                              width: 15,
-                              child: Image.asset(Assets.images.lskImg.path),
+                              height: 20,
+                              width: 20,
+                              child: SvgPicture.asset(Assets.icons.celoLogo),
                             ),
                           ),
                           VSpace(getResponsiveDimension(context, 16)),
-                          BuildRow(title: AppLocalizations.of(context)!.fee, value: '0.00 USDT'),
+                          BuildRow(
+                            title: AppLocalizations.of(context)!.fee,
+                            value: '0.00 USDT',
+                          ),
                           VSpace(getResponsiveDimension(context, 16)),
                           DottedLine(
                             direction: Axis.horizontal,
@@ -135,7 +139,9 @@ class _SendConfirmationScreenState extends State<SendConfirmationScreen>
                                 recipientAddress: widget.recipientAddress,
                               );
                             },
-                      text: state.isSendingOtp ? AppLocalizations.of(context)!.sendingOtp : AppLocalizations.of(context)!.continueButton,
+                      text: state.isSendingOtp
+                          ? AppLocalizations.of(context)!.sendingOtp
+                          : AppLocalizations.of(context)!.continueButton,
                       mainAxisAlignment: MainAxisAlignment.center,
                     ),
                   ],

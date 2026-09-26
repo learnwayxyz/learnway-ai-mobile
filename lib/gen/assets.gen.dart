@@ -196,6 +196,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/carbon_arrow-right.svg
   String get carbonArrowRight => 'assets/icons/carbon_arrow-right.svg';
 
+  /// File path: assets/icons/celo_logo.svg
+  String get celoLogo => 'assets/icons/celo_logo.svg';
+
   /// File path: assets/icons/copy_icon.svg
   String get copyIcon => 'assets/icons/copy_icon.svg';
 
@@ -410,6 +413,7 @@ class $AssetsIconsGen {
     boostGems,
     calendarTick,
     carbonArrowRight,
+    celoLogo,
     copyIcon,
     deleteIcon,
     dexIcons,

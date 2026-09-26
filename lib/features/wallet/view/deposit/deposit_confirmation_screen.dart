@@ -1,5 +1,6 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:learnwayv2/app/app_barrel.dart';
+import 'package:learnwayv2/features/wallet/fonbnk_config.dart';
 import 'package:learnwayv2/features/wallet/cubit/wallet_cubit.dart';
 import 'package:learnwayv2/features/wallet/dto/onramp_order_params.dart';
 import 'package:learnwayv2/features/wallet/view/withdraw/offramp_confirmation_screen.dart';
@@ -271,8 +272,8 @@ class _OnrampDepositConfirmationScreenState
         fiatCurrency: widget.localCurrencyCode,
         fiatAmount: widget.fiatAmount,
         depositChannel: widget.paymentChannel,
-        cryptoCurrency: 'LISK_USDT',
-        cryptoNetwork: 'LISK',
+        cryptoCurrency: FonbnkConfig.asset,
+        cryptoNetwork: FonbnkConfig.network,
         countryCode: widget.countryCode,
         userEmail: userEmail,
         quoteId: quoteId,

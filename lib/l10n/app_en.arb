@@ -804,7 +804,7 @@
   "@scanQrCode": { "description": "Receive screen QR code heading" },
   "scanQrCodeToProcess": "Scan the QR code below to process the transaction",
   "@scanQrCodeToProcess": { "description": "Receive screen QR code subtext" },
-  "sendOnlyUsdtOnLisk": "Send only USDT on the Lisk network",
+  "sendOnlyUsdtOnLisk": "Send only USDT on the Celo network",
   "@sendOnlyUsdtOnLisk": { "description": "Warning label inside QR card" },
   "copiedToClipboard": "Copied to clipboard",
   "@copiedToClipboard": { "description": "Snackbar message after copying wallet address" },

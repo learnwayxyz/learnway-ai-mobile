@@ -830,7 +830,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanQrCodeToProcess => 'Scan the QR code below to process the transaction';
 
   @override
-  String get sendOnlyUsdtOnLisk => 'Send only USDT on the Lisk network';
+  String get sendOnlyUsdtOnLisk => 'Send only USDT on the Celo network';
 
   @override
   String get copiedToClipboard => 'Copied to clipboard';

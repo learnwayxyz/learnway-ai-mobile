@@ -1724,7 +1724,7 @@ abstract class AppLocalizations {
   /// Warning label inside QR card
   ///
   /// In en, this message translates to:
-  /// **'Send only USDT on the Lisk network'**
+  /// **'Send only USDT on the Celo network'**
   String get sendOnlyUsdtOnLisk;
 
   /// Snackbar message after copying wallet address

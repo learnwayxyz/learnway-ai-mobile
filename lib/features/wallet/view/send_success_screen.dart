@@ -220,7 +220,7 @@ class _SendSuccessScreenState extends State<SendSuccessScreen>
       children: [
         BuildRow(
           title: l10n.network,
-          value: 'LSK',
+          value: 'CELO',
           titleStyle: AppTextStyles.base(
             context,
           ).copyWith(fontSize: getResponsiveFontSize(context, 14)),
@@ -372,8 +372,8 @@ class _SendSuccessScreenState extends State<SendSuccessScreen>
   }
 
   Future<void> _openTransactionInExplorer(String? transactionHash) async {
-    String blockExplorerBaseUrl = '${Env.explorerUrl}/tx/';
-    final url = '$blockExplorerBaseUrl$transactionHash';
+    final baseUrl = Env.explorerUrl.trim().replaceAll(RegExp(r'/+$'), '');
+    final url = '$baseUrl/tx/$transactionHash';
     log('Opening transaction in explorer: $url');
 
     try {
