@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learnwayv2/core/di/locator.dart';
-import 'package:core/src/config/env/api_config_service.dart';
 import 'package:learnwayv2/features/home/home_bloc/home_event.dart';
 import 'package:learnwayv2/features/home/home_bloc/home_state.dart';
 import 'package:learnwayv2/features/home/home_repository/home_repository.dart';
@@ -73,7 +72,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final user = await _homeRepository.fetchHomeData();
       user.fold(
         (fail) {
-          // Keep the current cached profile on error
           emit(
             FetchingHomeDataError(
               fail.message,

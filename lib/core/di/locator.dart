@@ -68,9 +68,6 @@ import 'package:learnwayv2/services/local_storage_service/local_storage_service.
 final locator = GetIt.instance;
 
 Future<void> setupLocator() async {
-  // ─────────────────────────────────────────────────────────────
-  // API CLIENTS & CONFIG
-  // ─────────────────────────────────────────────────────────────
   final baseApi = BaseApiClients(baseUrl: Env.baseUrl);
   locator.registerSingleton<BaseApiClients>(baseApi);
 
@@ -111,9 +108,6 @@ Future<void> setupLocator() async {
     instanceName: 'aiTutorApiClient',
   );
 
-  // ─────────────────────────────────────────────────────────────
-  // DATA SOURCES
-  // ─────────────────────────────────────────────────────────────
   locator.registerLazySingleton(() => WalletDataSource());
   locator.registerLazySingleton<LearnAndEarnDataSource>(
     () => LearnAndEarnDataSource(),
@@ -149,9 +143,6 @@ Future<void> setupLocator() async {
     () => LearningPathDataSource(locator<BaseApiClients>()),
   );
 
-  // ─────────────────────────────────────────────────────────────
-  // REPOSITORIES
-  // ─────────────────────────────────────────────────────────────
   locator.registerLazySingleton(() => HomeRepository());
   locator.registerLazySingleton(() => QuizRepository());
   locator.registerLazySingleton(() => WalletRepository());
@@ -197,14 +188,8 @@ Future<void> setupLocator() async {
     () => LearningPathRepository(locator()),
   );
 
-  // ─────────────────────────────────────────────────────────────
-  // USE CASES
-  // ─────────────────────────────────────────────────────────────
   locator.registerLazySingleton(() => ClaimDailyRewardUseCase(locator()));
 
-  // ─────────────────────────────────────────────────────────────
-  // BLOCS / CUBITS
-  // ─────────────────────────────────────────────────────────────
   locator.registerFactory(() => AccountSetupCubit());
   locator.registerFactory(() => VerifyEmailCubit());
   locator.registerLazySingleton<MainActivityCubit>(() => MainActivityCubit());
@@ -270,9 +255,6 @@ Future<void> setupLocator() async {
     () => LearningPathCubit(locator()),
   );
 
-  // ─────────────────────────────────────────────────────────────
-  // SERVICES
-  // ─────────────────────────────────────────────────────────────
   locator.registerFactoryParam<AAServices, AuthProvider?, void>((
     authProvider,
     _,
