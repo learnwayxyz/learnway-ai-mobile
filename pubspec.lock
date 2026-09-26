@@ -2363,12 +2363,11 @@ packages:
   variance_dart:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: a2e3cd7e8ab658b62345ba2a18aaa6ec488b64d2
-      url: "https://github.com/learnwayxyz/variance-dart-learnway.git"
-    source: git
-    version: "0.2.0"
+      name: variance_dart
+      sha256: d3ffccc75f6432ae5d4de97377f5d8f7586c530f195f689f25b806aa1efcca5f
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2"
   vector_graphics:
     dependency: transitive
     description:

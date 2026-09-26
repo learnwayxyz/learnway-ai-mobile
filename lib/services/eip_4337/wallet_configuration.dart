@@ -25,8 +25,8 @@ class ChainConfiguration {
       explorer: Env.explorerUrl,
       accountFactory: EthereumAddress.fromHex(accountFactoryAddress),
       bundler: (url: Env.bundleUrl, headers: null),
-      paymasters: (url: '${Env.paymasterUrl}/${Env.chainId}', headers: null),
-      jsonRpcUrl: Env.rpcUrl,
+      paymaster: (url: Env.paymasterUrl, headers: null),
+      jsonRpc: (url: Env.rpcUrl, headers: null),
       testnet: Env.isDev
           ? true
           : Env.isStaging
