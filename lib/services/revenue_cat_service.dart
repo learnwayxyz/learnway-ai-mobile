@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:core/src/config/env/api_config_service.dart';
 import 'package:learnwayv2/core/di/locator.dart';
@@ -24,6 +25,7 @@ class RevenueCatService {
   final ValueNotifier<bool> premiumStatusNotifier = ValueNotifier(false);
 
   bool get isPremiumUser => _isPremiumUser;
+  Future<void>? _initInProgress;
 
   void _setIsPremiumUser(bool value) {
     _isPremiumUser = value;
@@ -31,9 +33,22 @@ class RevenueCatService {
   }
 
   Future<void> init({String? userId}) async {
-    final revenueConfig = locator.isRegistered<RevenueConfigResponse>()
-        ? locator.get<RevenueConfigResponse>()
-        : null;
+    while (_initInProgress != null) {
+      await _initInProgress;
+    }
+
+    final completer = Completer<void>();
+    _initInProgress = completer.future;
+    try {
+      await _doInit(userId: userId);
+    } finally {
+      _initInProgress = null;
+      completer.complete();
+    }
+  }
+
+  Future<void> _doInit({String? userId}) async {
+    final revenueConfig = _revenueConfig;
     if (revenueConfig != null && !revenueConfig.enableRevenueService) {
       log(
         'RevenueCatService: Revenue service disabled by config. Skipping init.',
@@ -48,24 +63,29 @@ class RevenueCatService {
     }
 
     final resolvedUserId = userId ?? LocalStorageService.getUserSync()?.id;
-    if (resolvedUserId == null) return;
+    if (resolvedUserId == null || resolvedUserId.isEmpty) return;
 
-    if (_currentConfiguredUserId == resolvedUserId) {
+    if (_currentConfiguredUserId == resolvedUserId) return;
+
+    try {
+      if (await Purchases.isConfigured) {
+        await Purchases.logIn(resolvedUserId);
+      } else {
+        await Purchases.setLogLevel(LogLevel.verbose);
+        final purchasesConfig = PurchasesConfiguration(_platformApiKey)
+          ..appUserID = resolvedUserId;
+        await Purchases.configure(purchasesConfig);
+      }
+
+      _currentConfiguredUserId = resolvedUserId;
+      _lastEntitlementCheck = null;
+    } catch (e, st) {
       log(
-        "RevenueCatService: Already configured for user $resolvedUserId. Skipping.",
+        'RevenueCatService: init failed for $resolvedUserId: $e',
+        stackTrace: st,
       );
       return;
     }
-    log("RevenueCatService: Configuring for new user $resolvedUserId...");
-
-    await Purchases.setLogLevel(LogLevel.verbose);
-
-    final apiKey = _platformApiKey;
-    final purchasesConfig = PurchasesConfiguration(apiKey)
-      ..appUserID = resolvedUserId;
-
-    await Purchases.configure(purchasesConfig);
-    _currentConfiguredUserId = resolvedUserId;
 
     await refreshEntitlementStatus();
   }
@@ -85,7 +105,7 @@ class RevenueCatService {
 
   Future<void> refreshEntitlementStatus() async {
     log('Entitlement key ${_revenueConfig?.revenueCat?.entitlementKey}');
-    if (!isConfigured) return;
+    if (!await _ensureConfigured()) return;
     try {
       final customerInfo = await Purchases.getCustomerInfo();
       _setIsPremiumUser(
@@ -105,7 +125,7 @@ class RevenueCatService {
   }
 
   Future<Offering?> getCurrentOffering() async {
-    if (!isConfigured) return null;
+    if (!await _ensureConfigured()) return null;
     try {
       final offerings = await Purchases.getOfferings();
       return offerings.current;
@@ -116,7 +136,7 @@ class RevenueCatService {
   }
 
   Future<Map<String, Offering>> getAllOfferings() async {
-    if (!isConfigured) return {};
+    if (!await _ensureConfigured()) return {};
     try {
       final offerings = await Purchases.getOfferings();
       return offerings.all;
@@ -127,7 +147,7 @@ class RevenueCatService {
   }
 
   Future<PurchaseResult> purchase(Package package) async {
-    if (!isConfigured) {
+    if (!await _ensureConfigured()) {
       return const PurchaseResult.failed('Service not configured.');
     }
     try {
@@ -144,7 +164,7 @@ class RevenueCatService {
       return const PurchaseResult.success();
     } on PlatformException catch (e) {
       final errorCode = PurchasesErrorHelper.getErrorCode(e);
-      log("RevenueCatService: Purchase error: $errorCode");
+      log("RevenueCatService: Purchase error: $e");
 
       if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
         return const PurchaseResult.cancelled();
@@ -163,7 +183,7 @@ class RevenueCatService {
     StoreProduct newProduct, {
     String? oldProductId,
   }) async {
-    if (!isConfigured) {
+    if (!await _ensureConfigured()) {
       return const PurchaseResult.failed('Service not configured.');
     }
     try {
@@ -206,7 +226,7 @@ class RevenueCatService {
   }
 
   Future<PurchaseResult> restorePurchases() async {
-    if (!isConfigured) {
+    if (!await _ensureConfigured()) {
       return const PurchaseResult.failed('Service not configured.');
     }
     try {
@@ -271,6 +291,31 @@ class RevenueCatService {
       return _revenueConfig?.revenueCat?.androidApiKey ?? '';
     }
     throw UnsupportedError('Unsupported platform');
+  }
+
+  Future<bool> _ensureConfigured() async {
+    if (isConfigured) return true;
+    await init();
+    if (!isConfigured) {
+      log(
+        'RevenueCatService: still not configured '
+        '(user=${LocalStorageService.getUserSync()?.id}, '
+        'config=${_revenueConfig != null})',
+      );
+    }
+    return isConfigured;
+  }
+
+  Future<void> logOut() async {
+    if (!isConfigured) return;
+    try {
+      await Purchases.logOut();
+    } catch (e) {
+      log('RevenueCatService: logOut error: $e');
+    }
+    _currentConfiguredUserId = null;
+    _lastEntitlementCheck = null;
+    _setIsPremiumUser(false);
   }
 }
 

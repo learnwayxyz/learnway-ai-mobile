@@ -1,13 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
-
 import 'package:core/core.dart';
 import 'package:learnwayv2/core/di/locator.dart';
-
 import 'package:learnwayv2/features/home/home_exception.dart';
 import 'package:learnwayv2/features/home/home_repository/user_profile_model.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
+import 'package:learnwayv2/services/revenue_cat_service.dart';
 
 class HomeDataSource {
   final client = locator<BaseApiClients>();
@@ -43,6 +43,9 @@ class HomeDataSource {
           );
         }
         await LocalStorageService.saveUser(userProfile);
+        if (userProfile.id != null) {
+          unawaited(RevenueCatService.instance.init(userId: userProfile.id));
+        }
         return userProfile;
       } catch (e, stackTrace) {
         dev.log('Error parsing UserProfileModel: $e');

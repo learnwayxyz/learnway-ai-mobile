@@ -9,7 +9,7 @@
       }
     ]
   },
-  "identifier" : "D1F3C8AE",
+  "identifier" : "19D38213",
   "nonRenewingSubscriptions" : [
 
   ],
@@ -17,11 +17,14 @@
 
   ],
   "settings" : {
+    "_applicationInternalID" : "6743034005",
     "_askToBuyEnabled" : false,
     "_billingGracePeriodEnabled" : false,
     "_billingIssuesEnabled" : false,
+    "_developerTeamID" : "ZFH5Q72444",
     "_disableDialogs" : false,
     "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 812384266.76823795,
     "_locale" : "en_US",
     "_renewalBillingIssuesEnabled" : false,
     "_storefront" : "USA",
@@ -32,11 +35,11 @@
   },
   "subscriptionGroups" : [
     {
-      "id" : "B48FC5A0",
+      "id" : "21928452",
       "localizations" : [
 
       ],
-      "name" : "learnwaygroup",
+      "name" : "Premium",
       "subscriptions" : [
         {
           "adHocOffers" : [
@@ -45,26 +48,22 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "3.99",
+          "displayPrice" : "29.99",
           "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "1029844F",
-          "introductoryOffer" : {
-            "internalID" : "774C0FCC",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1W"
-          },
+          "groupNumber" : 3,
+          "internalID" : "6759443133",
+          "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
+              "description" : "Localization for LearnWay",
+              "displayName" : "LearnWay",
+              "locale" : "en_GB"
             }
           ],
-          "productID" : "lnwy_3.99_monthly",
-          "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "monthly",
-          "subscriptionGroupID" : "B48FC5A0",
+          "productID" : "lnwy_39.99_yrly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Annual Pro",
+          "subscriptionGroupID" : "21928452",
           "type" : "RecurringSubscription",
           "winbackOffers" : [
 
@@ -77,26 +76,22 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "39.99",
+          "displayPrice" : "2.99",
           "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "678D0B7F",
-          "introductoryOffer" : {
-            "internalID" : "3ECA9791",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P1Y"
-          },
+          "groupNumber" : 2,
+          "internalID" : "6759168116",
+          "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "",
-              "displayName" : "",
+              "description" : "Unlimited access for a month",
+              "displayName" : "Monthly pro",
               "locale" : "en_US"
             }
           ],
-          "productID" : "lnwy_39.99_yearly",
+          "productID" : "lnwy_3.99_1m_7d",
           "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "yearly",
-          "subscriptionGroupID" : "B48FC5A0",
+          "referenceName" : "Montly Pro",
+          "subscriptionGroupID" : "21928452",
           "type" : "RecurringSubscription",
           "winbackOffers" : [
 

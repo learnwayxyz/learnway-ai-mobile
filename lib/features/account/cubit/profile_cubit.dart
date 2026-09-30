@@ -26,6 +26,7 @@ import 'package:learnwayv2/features/wallet/cubit/wallet_cubit.dart';
 import 'package:learnwayv2/router/app_router.dart';
 import 'package:learnwayv2/services/kyc_service/kyc_sync_queue.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
+import 'package:learnwayv2/services/revenue_cat_service.dart';
 import 'package:learnwayv2/services/screen_load_state_service.dart';
 import 'package:core/core.dart';
 import 'package:learnwayv2/services/notification_service/fcm_service.dart';
@@ -249,8 +250,6 @@ class ProfileCubit extends Cubit<ProfileState> {
             ..resetAllErrors();
           await SharedPreferencesStore.clearKycData();
           await KycSyncQueue.clearQueue();
-
-          // Reset FCM service so new user can re-initialize
           await FCMService().dispose();
         },
       );
@@ -441,6 +440,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 
     await BalanceCache.clearCache();
     await LocalStorageService.clearWalletAddress();
+    await RevenueCatService.instance.logOut();
 
     final result = await _profileRepository.logOut();
     result.fold(
