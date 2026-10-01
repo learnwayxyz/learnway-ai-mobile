@@ -9,8 +9,6 @@ abstract class EnvProd {
   @EnviedField(varName: 'BASEURL')
   static const String prodbaseUrl = _EnvProd.prodbaseUrl;
 
-  static const bool useFusdAsPrimary = false;
-
   @EnviedField(varName: 'EXCHANGE_API_KEY', obfuscate: true)
   static final String prodexchangeApiKey = _EnvProd.prodexchangeApiKey;
 

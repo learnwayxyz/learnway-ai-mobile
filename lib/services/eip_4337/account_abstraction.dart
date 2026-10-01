@@ -77,7 +77,7 @@ class AAServices implements IWalletService {
   Future<BigInt?> checkBalanceOf(SmartWallet smartWallet) async {
     final value = ContractUtils.encodeFunctionCall(
       'ERC20_BalanceOf',
-      EthereumAddress.fromHex(Env.mainnetUsdtContractAddress),
+      EthereumAddress.fromHex(Env.activeTokenAddress),
       ContractAbis.get('ERC20_BalanceOf'),
       [smartWallet.address],
     );

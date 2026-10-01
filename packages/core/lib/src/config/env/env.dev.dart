@@ -7,8 +7,6 @@ abstract class EnvDev {
   @EnviedField(varName: 'DEV_BASEURL')
   static const String devbaseUrl = _EnvDev.devbaseUrl;
 
-  static const bool useFusdAsPrimary = false;
-
   @EnviedField(varName: 'DEV_PEPADDRESS', obfuscate: true)
   static final String devpepAddress = _EnvDev.devpepAddress;
 

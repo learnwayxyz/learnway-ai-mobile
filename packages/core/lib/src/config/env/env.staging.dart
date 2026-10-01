@@ -7,8 +7,6 @@ abstract class EnvStaging {
   @EnviedField(varName: 'STAGE_BASEURL')
   static const String stagebaseUrl = _EnvStaging.stagebaseUrl;
 
-  static const bool useFusdAsPrimary = true;
-
   @EnviedField(varName: 'STAGE_PEPADDRESS', obfuscate: true)
   static final String stagepepAddress = _EnvStaging.stagepepAddress;
   @EnviedField(varName: 'STAGE_EXCHANGE_API_KEY', obfuscate: true)
