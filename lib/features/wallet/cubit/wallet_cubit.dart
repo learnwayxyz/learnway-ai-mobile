@@ -710,6 +710,33 @@ class WalletCubit extends Cubit<WalletState> {
   }) async {
     emit(state.copyWith(createOrderStatus: CreateOrderStatus.creating));
     try {
+      // Fonbnk quotes are short-lived and tied to the amount, so fetch a fresh
+      // one for the exact order instead of reusing the one shown on screen.
+      final quoteResult = await _walletRepository.getQuote(
+        DepositObject(
+          address: '',
+          network: request.cryptoNetwork,
+          asset: request.cryptoCurrency,
+          amount: request.cryptoAmount.toString(),
+          currency: request.fiatCurrency,
+          countryIsoCode: request.countryCode,
+          paymentChannel: request.payOutDetails!.channelType,
+        ),
+      );
+      final quoteId = quoteResult.fold((error) {
+        log('Failed to refresh off-ramp quote: ${error.message}');
+        return null;
+      }, (quote) => quote.quoteId);
+      if (quoteId == null) {
+        emit(
+          state.copyWith(
+            createOrderStatus: CreateOrderStatus.failed,
+            createOrderError: 'Unable to get a quote. Please try again.',
+          ),
+        );
+        return;
+      }
+
       final response = await _walletRepository.createOrder(
         request: CreateOrderParams(
           cryptoCurrency: request.cryptoCurrency,
@@ -718,7 +745,7 @@ class WalletCubit extends Cubit<WalletState> {
           payoutDetails: request.payOutDetails!,
           countryCode: request.countryCode,
           userEmail: LocalStorageService.getUserSync()!.email ?? '',
-          quoteId: request.quoteId,
+          quoteId: quoteId,
         ),
       );
       response.fold(
