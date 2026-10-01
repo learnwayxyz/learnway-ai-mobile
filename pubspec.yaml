@@ -119,6 +119,7 @@ dev_dependencies:
   json_serializable: ^6.11.1
   logger: ^2.6.2
   android_notification_icons: ^0.0.1
+  patrol: ^4.10.0
 
 dependency_overrides:
   pointycastle: ^4.0.0
@@ -232,3 +233,13 @@ flutter:
           weight: 900
         - asset: assets/fonts/inter/Inter_18pt-BlackItalic.ttf
           weight: 900
+
+patrol:
+  app_name: LearnWay Dev
+  android:
+    package_name: xyz.learnway.app.dev
+    flavor: dev
+  ios:
+    bundle_id: xyz.learnway.app
+    # Xcode scheme name for the dev flavor.
+    flavor: Dev

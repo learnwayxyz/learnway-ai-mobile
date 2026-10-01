@@ -1,5 +1,6 @@
 #include "Generated.xcconfig"
 #include "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
-FLUTTER_TARGET=lib/main_dev.dart
+// FLUTTER_TARGET comes from `flutter run/build -t` (Generated.xcconfig) so
+// Patrol can run its own entrypoint. Always pass -t lib/main_dev.dart.
 PRODUCT_BUNDLE_IDENTIFIER=xyz.learnway.app.dev
 DISPLAY_NAME=LearnWay Dev

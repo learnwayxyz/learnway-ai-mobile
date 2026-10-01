@@ -26,3 +26,6 @@ ios/Flutter/ephemeral/
 macos/Flutter/ephemeral/
 ios/Podfile.lock
 WEB_*_PLAN.md
+
+# Patrol generated test bundle
+patrol_test/test_bundle.dart
