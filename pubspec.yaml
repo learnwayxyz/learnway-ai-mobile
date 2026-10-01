@@ -1,7 +1,7 @@
 name: learnwayv2
 description: "A blockchain-base educational platform that gamifies learning"
 publish_to: "none"
-version: 2.12.6+165
+version: 2.12.7+166
 
 environment:
   sdk: ^3.8.0
