@@ -249,6 +249,9 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       focusNode: config.focusNode,
+      // Tapping outside the field dismisses the keyboard (iOS number pads
+      // have no Done key).
+      onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
       inputFormatters: config.inputFormatters,
       textCapitalization: config.textCapitalization,
       controller: controller,
