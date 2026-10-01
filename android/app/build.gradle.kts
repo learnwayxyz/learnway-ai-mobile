@@ -50,6 +50,12 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
+        testInstrumentationRunner = "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+    }
+
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     flavorDimensions += "environment"
@@ -95,6 +101,7 @@ android {
 
     dependencies {
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+        androidTestUtil("androidx.test:orchestrator:1.5.1")
         implementation("androidx.appcompat:appcompat:1.6.1")
         implementation("com.google.android.play:feature-delivery:2.1.0")
         implementation("com.google.android.play:feature-delivery-ktx:2.1.0")
