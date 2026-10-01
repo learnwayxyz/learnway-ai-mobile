@@ -17,6 +17,7 @@ import 'package:learnwayv2/shared/utilities/currency_check.dart';
 import 'package:learnwayv2/shared/utilities/standard_spacer.dart';
 import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
+import 'package:learnwayv2/features/wallet/fonbnk_config.dart';
 
 @RoutePage()
 class DepositPaymentMethodScreen extends StatefulWidget {
@@ -48,7 +49,7 @@ class _DepositPaymentMethodScreenState
     final currency = CurrencyCheck.getLocalCurrencyCode(_userCountry);
     final countryCode = CurrencyCheck.getCountryIsocode(_userCountry);
     context.read<WalletCubit>().getOnRampOrderLimits(
-      cryptoCurrency: 'LISK_USDT',
+      cryptoCurrency: FonbnkConfig.asset,
       fiatCurrency: currency,
       depositChannel: 'bank',
       countryCode: countryCode,
@@ -72,7 +73,7 @@ class _DepositPaymentMethodScreenState
       fiatCurrency: currency,
       depositChannel: 'bank',
       countryCode: countryCode,
-      cryptoCurrency: 'LISK_USDT',
+      cryptoCurrency: FonbnkConfig.asset,
       fiatAmount: minAmount,
     );
   }
