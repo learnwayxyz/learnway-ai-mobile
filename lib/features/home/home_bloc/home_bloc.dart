@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
+import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sentry/sentry.dart';
 import 'package:learnwayv2/core/di/locator.dart';
 import 'package:learnwayv2/features/home/home_bloc/home_event.dart';
 import 'package:learnwayv2/features/home/home_bloc/home_state.dart';
@@ -16,6 +18,7 @@ import 'package:learnwayv2/services/local_storage_service/local_storage_service.
 import 'package:learnwayv2/services/secret_sharing_service/crypto/cryptography_service.dart';
 import 'package:learnwayv2/services/secret_sharing_service/crypto/share_processor.dart';
 import 'package:variance_dart/variance_dart.dart';
+import 'package:web3_signers/web3_signers.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({HomeRepository? homeRepository})
@@ -109,6 +112,47 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final smartWallet = await locator.get<AAServices>().recoverAccount(
           decoded['mnemonic'],
         );
+        final backendWallet = event.args['walletAddress'] as String?;
+        final ownerEoa = EOAWallet.recoverAccount(
+          decoded['mnemonic'],
+          const SignatureOptions(prefix: [0]),
+        ).getAddress();
+        log(
+          'Wallet recovery: userEmail=${event.args['userEmail']} '
+          'userId=${event.args['userId']} backendWallet=$backendWallet '
+          'recoveredWallet=${smartWallet.address.eip55With0x} '
+          'ownerEoa=$ownerEoa '
+          'sharesWallet=${decoded['walletAddress']} '
+          'sharesCreatedAt=${decoded['createdAt']} '
+          'sharesVersion=${decoded['version']}',
+        );
+        if (backendWallet != null &&
+            backendWallet.toLowerCase() !=
+                smartWallet.address.eip55With0x.toLowerCase()) {
+          log(
+            'Wallet recovery MISMATCH: backend has $backendWallet but shares '
+            'recovered ${smartWallet.address.eip55With0x}',
+          );
+          Sentry.captureMessage(
+            'Wallet recovery address mismatch',
+            level: SentryLevel.error,
+            withScope: (scope) {
+              scope.setTag('feature', 'wallet_recovery');
+              scope.setTag('flavor', Env.flavor.name);
+              scope.setUser(SentryUser(id: event.args['userId'] as String?));
+              scope.setContexts('wallet_recovery', {
+                'backendWallet': backendWallet,
+                'recoveredWallet': smartWallet.address.eip55With0x,
+                'sharesWallet': decoded['walletAddress'],
+                'ownerEoa': ownerEoa,
+                'sharesCreatedAt': decoded['createdAt'],
+                'sharesVersion': decoded['version'],
+                'accountFactory': Env.accountFactory,
+                'chainId': Env.chainId,
+              });
+            },
+          );
+        }
         try {
           await LocalStorageService.saveWalletAddress(
             smartWallet.address.eip55With0x,
@@ -132,7 +176,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         value.secureZeroize(
           Uint8List.fromList(utf8.encode(decoded['mnemonic'])),
         );
-        log('decrypted mnemonic: ${decoded['mnemonic']}');
         emit(RecoverySuccess(smartWallet, userProfile: _cachedUserProfile));
         log('Registering SmartWallet instance in locator');
         if (locator.isRegistered<SmartWallet>()) {
@@ -142,7 +185,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         locator.registerLazySingleton<SmartWallet>(() => smartWallet);
         log('SmartWallet instance registered successfully');
       });
-    } catch (e) {
+    } catch (e, st) {
+      log('Wallet recovery failed: $e', stackTrace: st);
+      Sentry.captureException(
+        e,
+        stackTrace: st,
+        withScope: (scope) {
+          scope.setTag('feature', 'wallet_recovery');
+          scope.setUser(SentryUser(id: event.args['userId'] as String?));
+        },
+      );
       emit(
         RecoveryError('Unexpected error: $e', userProfile: _cachedUserProfile),
       );
