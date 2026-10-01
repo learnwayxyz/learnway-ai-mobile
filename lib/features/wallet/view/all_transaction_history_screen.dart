@@ -101,11 +101,11 @@ class _AllTransactionHistoryScreenState
 
     switch (type) {
       case TransactionType.receive:
-        return '+\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
+        return '+\$${formatTokenAmount(amount, decimals: transaction.decimals ?? getTokenDecimals())}';
       case TransactionType.send:
-        return '-\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
+        return '-\$${formatTokenAmount(amount, decimals: transaction.decimals ?? getTokenDecimals())}';
       case TransactionType.swap:
-        return '~\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
+        return '~\$${formatTokenAmount(amount, decimals: transaction.decimals ?? getTokenDecimals())}';
     }
   }
 
@@ -117,11 +117,20 @@ class _AllTransactionHistoryScreenState
 
     switch (type) {
       case TransactionType.receive:
-        return formatTokenAmount(amount, decimals: getTokenDecimals());
+        return formatTokenAmount(
+          amount,
+          decimals: transaction.decimals ?? getTokenDecimals(),
+        );
       case TransactionType.send:
-        return formatTokenAmount(amount, decimals: getTokenDecimals());
+        return formatTokenAmount(
+          amount,
+          decimals: transaction.decimals ?? getTokenDecimals(),
+        );
       case TransactionType.swap:
-        return formatTokenAmount(amount, decimals: getTokenDecimals());
+        return formatTokenAmount(
+          amount,
+          decimals: transaction.decimals ?? getTokenDecimals(),
+        );
     }
   }
 
