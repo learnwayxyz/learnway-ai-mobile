@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:core/src/config/env/env.dart';
 import 'package:core/core.dart';
 import 'package:http/http.dart' as http;
+import 'package:sentry/sentry.dart';
 import 'package:learnwayv2/core/di/locator.dart';
 
 import 'package:learnwayv2/features/wallet/dto/create_order_params.dart';
@@ -206,20 +207,38 @@ class WalletDataSource {
           errorCode = '${response.statusCode}';
         }
 
+        _reportRampError(
+          'getOffRampQuote',
+          message: errorMessage,
+          code: errorCode,
+          statusCode: response.statusCode,
+          responseBody: response.body,
+        );
         throw RampException(message: errorMessage, code: errorCode);
       }
-    } on SocketException {
+    } on SocketException catch (e, st) {
+      log(
+        'getOffRampQuote: no internet: $e',
+        name: 'OfframpError',
+        stackTrace: st,
+      );
       throw RampException(
         message: 'Please check your internet connection.',
         code: 'NO_INTERNET',
       );
-    } on TimeoutException {
+    } on TimeoutException catch (e, st) {
+      log(
+        'getOffRampQuote: timed out: $e',
+        name: 'OfframpError',
+        stackTrace: st,
+      );
       throw RampException(
         message: ' The connection timed out. Please try again.',
         code: 'TIMEOUT',
       );
-    } catch (e) {
+    } catch (e, st) {
       if (e is RampException) rethrow;
+      _reportRampError('getOffRampQuote', error: e, stackTrace: st);
       log('Unexpected error in getOffRampQuote: $e');
       throw RampException(
         message: 'Something went wrong. Please try again.',
@@ -286,20 +305,38 @@ class WalletDataSource {
           errorCode = '${response.statusCode}';
         }
 
+        _reportRampError(
+          'getOrderLimits',
+          message: errorMessage,
+          code: errorCode,
+          statusCode: response.statusCode,
+          responseBody: response.body,
+        );
         throw RampException(message: errorMessage, code: errorCode);
       }
-    } on SocketException catch (e) {
+    } on SocketException catch (e, st) {
+      log(
+        'getOrderLimits: no internet: $e',
+        name: 'OfframpError',
+        stackTrace: st,
+      );
       throw RampException(
         message: 'Please check your internet connection.',
         code: 'NO_INTERNET',
       );
-    } on TimeoutException {
+    } on TimeoutException catch (e, st) {
+      log(
+        'getOrderLimits: timed out: $e',
+        name: 'OfframpError',
+        stackTrace: st,
+      );
       throw RampException(
         message: ' The connection timed out. Please try again.',
         code: 'TIMEOUT',
       );
-    } catch (e) {
+    } catch (e, st) {
       if (e is RampException) rethrow;
+      _reportRampError('getOrderLimits', error: e, stackTrace: st);
       log('Unexpected error in getOrderLimits: $e');
       throw RampException(
         message: 'Something went wrong. Please try again.',
@@ -338,20 +375,30 @@ class WalletDataSource {
         }
 
         log('Error creating order: $errorMessage (code: $errorCode)');
+        _reportRampError(
+          'createOrder',
+          message: errorMessage,
+          code: errorCode,
+          statusCode: response.statusCode,
+          responseBody: response.body,
+        );
         throw RampException(message: errorMessage, code: errorCode);
       }
-    } on SocketException {
+    } on SocketException catch (e, st) {
+      log('createOrder: no internet: $e', name: 'OfframpError', stackTrace: st);
       throw RampException(
         message: 'Please check your internet connection.',
         code: 'NO_INTERNET',
       );
-    } on TimeoutException {
+    } on TimeoutException catch (e, st) {
+      log('createOrder: timed out: $e', name: 'OfframpError', stackTrace: st);
       throw RampException(
         message: ' The connection timed out. Please try again.',
         code: 'TIMEOUT',
       );
-    } catch (e) {
+    } catch (e, st) {
       if (e is RampException) rethrow;
+      _reportRampError('createOrder', error: e, stackTrace: st);
       log('Unexpected error in createOrder: $e');
       throw RampException(
         message: 'Something went wrong. Please try again.',
@@ -391,20 +438,38 @@ class WalletDataSource {
           errorCode = '${response.statusCode}';
         }
 
+        _reportRampError(
+          'getTransactionStatus',
+          message: errorMessage,
+          code: errorCode,
+          statusCode: response.statusCode,
+          responseBody: response.body,
+        );
         throw RampException(message: errorMessage, code: errorCode);
       }
-    } on SocketException {
+    } on SocketException catch (e, st) {
+      log(
+        'getTransactionStatus: no internet: $e',
+        name: 'OfframpError',
+        stackTrace: st,
+      );
       throw RampException(
         message: 'Please check your internet connection.',
         code: 'NO_INTERNET',
       );
-    } on TimeoutException {
+    } on TimeoutException catch (e, st) {
+      log(
+        'getTransactionStatus: timed out: $e',
+        name: 'OfframpError',
+        stackTrace: st,
+      );
       throw RampException(
         message: 'The connection timed out. Please try again.',
         code: 'TIMEOUT',
       );
-    } catch (e) {
+    } catch (e, st) {
       if (e is RampException) rethrow;
+      _reportRampError('getTransactionStatus', error: e, stackTrace: st);
       log('Unexpected error in getTransactionStatus: $e');
       throw RampException(
         message: 'Something went wrong. Please try again.',
@@ -718,20 +783,38 @@ class WalletDataSource {
           errorCode = '${response.statusCode}';
         }
 
+        _reportRampError(
+          'confirmOfframpOrder',
+          message: errorMessage,
+          code: errorCode,
+          statusCode: response.statusCode,
+          responseBody: response.body,
+        );
         throw RampException(message: errorMessage, code: errorCode);
       }
-    } on SocketException {
+    } on SocketException catch (e, st) {
+      log(
+        'confirmOfframpOrder: no internet: $e',
+        name: 'OfframpError',
+        stackTrace: st,
+      );
       throw RampException(
         message: 'Please check your internet connection.',
         code: 'NO_INTERNET',
       );
-    } on TimeoutException {
+    } on TimeoutException catch (e, st) {
+      log(
+        'confirmOfframpOrder: timed out: $e',
+        name: 'OfframpError',
+        stackTrace: st,
+      );
       throw RampException(
         message: 'The connection timed out. Please try again.',
         code: 'TIMEOUT',
       );
-    } catch (e) {
+    } catch (e, st) {
       if (e is RampException) rethrow;
+      _reportRampError('confirmOfframpOrder', error: e, stackTrace: st);
       log('Unexpected error in confirmOfframpOrder: $e');
       throw RampException(
         message: 'Something went wrong. Please try again.',
@@ -794,4 +877,36 @@ class WalletDataSource {
   }
 
   // Future<OnRampQouteResponse> getOnRampQuote() async {}
+}
+
+/// Logs an off-ramp API failure locally and sends it to Sentry (all flavors).
+void _reportRampError(
+  String operation, {
+  String? message,
+  String? code,
+  int? statusCode,
+  String? responseBody,
+  Object? error,
+  StackTrace? stackTrace,
+}) {
+  log(
+    'Ramp error in $operation: status=$statusCode code=$code '
+    'message=$message body=$responseBody error=$error',
+    name: 'OfframpError',
+  );
+  Sentry.captureException(
+    error ?? RampException(message: message ?? 'Unknown', code: code),
+    stackTrace: stackTrace ?? StackTrace.current,
+    withScope: (scope) {
+      scope.setTag('feature', 'offramp');
+      scope.setTag('operation', operation);
+      if (statusCode != null) scope.setTag('http_status', '$statusCode');
+      scope.setContexts('ramp_response', {
+        'statusCode': statusCode,
+        'code': code,
+        'message': message,
+        'body': responseBody,
+      });
+    },
+  );
 }
