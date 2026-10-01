@@ -7,6 +7,7 @@ class LearnWayTransaction {
     required this.blockTimestamp,
     required this.tokenAddress,
     required this.rawInput,
+    this.decimals,
   });
 
   factory LearnWayTransaction.fromJson(Map<String, dynamic> json) {
@@ -18,6 +19,7 @@ class LearnWayTransaction {
       blockTimestamp: json['block_timestamp'] as String,
       tokenAddress: json['token_address'] as String,
       rawInput: json['raw_input'] as String,
+      decimals: json['decimals'] as int?,
     );
   }
 
@@ -30,6 +32,7 @@ class LearnWayTransaction {
       'block_timestamp': blockTimestamp,
       'token_address': tokenAddress,
       'raw_input': rawInput,
+      'decimals': decimals,
     };
   }
 
@@ -41,20 +44,14 @@ class LearnWayTransaction {
   final String tokenAddress;
   final String rawInput;
 
+  /// Decimals of the transferred token, sent by the transactions API.
+  /// Null for responses from older API versions.
+  final int? decimals;
+
   DateTime get timestamp {
     final timestampInt = int.tryParse(blockTimestamp);
     if (timestampInt == null) return DateTime.now();
     return DateTime.fromMillisecondsSinceEpoch(timestampInt * 1000);
-  }
-
-  String get amountInEth {
-    try {
-      final bigIntAmount = BigInt.parse(amount);
-      final double ethAmount = bigIntAmount / BigInt.from(10).pow(18);
-      return ethAmount.toStringAsFixed(6);
-    } catch (e) {
-      return '0.000000';
-    }
   }
 
   String get shortTxHash {

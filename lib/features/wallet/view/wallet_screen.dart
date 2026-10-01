@@ -120,11 +120,11 @@ class _WalletScreenState extends State<WalletScreen>
 
     switch (type) {
       case TransactionType.receive:
-        return '+\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
+        return '+\$${formatTokenAmount(amount, decimals: transaction.decimals ?? getTokenDecimals())}';
       case TransactionType.send:
-        return '-\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
+        return '-\$${formatTokenAmount(amount, decimals: transaction.decimals ?? getTokenDecimals())}';
       case TransactionType.swap:
-        return '~\$${formatTokenAmount(amount, decimals: getTokenDecimals())}';
+        return '~\$${formatTokenAmount(amount, decimals: transaction.decimals ?? getTokenDecimals())}';
     }
   }
 
@@ -136,11 +136,20 @@ class _WalletScreenState extends State<WalletScreen>
 
     switch (type) {
       case TransactionType.receive:
-        return formatTokenAmount(amount, decimals: getTokenDecimals());
+        return formatTokenAmount(
+          amount,
+          decimals: transaction.decimals ?? getTokenDecimals(),
+        );
       case TransactionType.send:
-        return formatTokenAmount(amount, decimals: getTokenDecimals());
+        return formatTokenAmount(
+          amount,
+          decimals: transaction.decimals ?? getTokenDecimals(),
+        );
       case TransactionType.swap:
-        return formatTokenAmount(amount, decimals: getTokenDecimals());
+        return formatTokenAmount(
+          amount,
+          decimals: transaction.decimals ?? getTokenDecimals(),
+        );
     }
   }
 
