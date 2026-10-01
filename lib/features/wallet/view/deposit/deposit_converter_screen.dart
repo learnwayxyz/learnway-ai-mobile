@@ -229,7 +229,6 @@ class _DepositConverterScreenState extends State<DepositConverterScreen>
         return previous.depositStatus != current.depositStatus ||
             previous.depositError != current.depositError ||
             previous.ratesError != current.ratesError ||
-            previous.depositResponse != current.depositResponse ||
             previous.onRampQuoteResponse != current.onRampQuoteResponse ||
             previous.onRampQuoteStatus != current.onRampQuoteStatus;
       },
@@ -244,19 +243,6 @@ class _DepositConverterScreenState extends State<DepositConverterScreen>
           final usdtAmount = rate > 0 ? fiatAfterFees / rate : 0.0;
           usdtController.text = usdtAmount.toStringAsFixed(2);
           isUpdatingUsdt = false;
-        }
-
-        if (state.isDepositSuccessful && state.depositResponse != null) {
-          if (Navigator.canPop(context)) {
-            Navigator.of(context).pop();
-          }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.depositResponse!.message),
-              backgroundColor: Colors.green,
-            ),
-          );
         }
 
         if (state.hasDepositError) {

@@ -105,7 +105,6 @@ import 'package:learnwayv2/features/wallet/view/deposit/deposit_converter_screen
 import 'package:learnwayv2/features/wallet/view/deposit/deposit_loader_screen.dart';
 import 'package:learnwayv2/features/wallet/view/deposit/deposit_payment_method_screen.dart';
 import 'package:learnwayv2/features/wallet/view/deposit/deposit_ussd_screen.dart';
-import 'package:learnwayv2/features/wallet/view/deposit/mobilemoney_money_screen.dart';
 import 'package:learnwayv2/features/wallet/view/deposit_and_buy_screen.dart';
 import 'package:learnwayv2/features/wallet/view/receive.screen.dart';
 import 'package:learnwayv2/features/wallet/view/send_confirmation_screen.dart';
@@ -233,7 +232,6 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: VerificationRoute.page),
     AutoRoute(page: NotificationsRoute.page),
     AutoRoute(page: NotificationDetailRoute.page),
-    AutoRoute(page: MobileMoneyRoute.page),
     AutoRoute(page: DepositUssdRoute.page),
     AutoRoute(page: DepositLoaderRoute.page),
     AutoRoute(page: DepositConverterRoute.page),

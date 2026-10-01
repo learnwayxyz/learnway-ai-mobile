@@ -25,12 +25,6 @@ import 'package:learnwayv2/features/wallet/transaction_manager.dart';
 import 'package:learnwayv2/features/wallet/utils.dart';
 import 'package:learnwayv2/features/wallet/wallet_data_source/wallet_data_source.dart';
 import 'package:learnwayv2/features/wallet/wallet_repository/wallet_repository.dart';
-import 'package:learnwayv2/services/defi_service/kotani_pay/kotani_pay_adapter.dart';
-import 'package:learnwayv2/services/defi_service/models/mobile_money_response.dart';
-import 'package:learnwayv2/services/defi_service/models/offramp_rates_response.dart';
-import 'package:learnwayv2/services/defi_service/models/offramp_status_response.dart';
-import 'package:learnwayv2/services/defi_service/models/onramp_rates_response.dart';
-import 'package:learnwayv2/services/defi_service/models/onramp_status_response.dart';
 import 'package:learnwayv2/features/wallet/models/supported_currencies_response.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
 import 'package:learnwayv2/shared/utilities/ethereum_utils.dart';
@@ -47,16 +41,11 @@ import 'package:core/src/config/env/env.dart';
 part 'wallet_state.dart';
 
 class WalletCubit extends Cubit<WalletState> {
-  WalletCubit({
-    WalletRepository? walletRepository,
-    KotaniPayAdapter? offRampService,
-  }) : _walletRepository = walletRepository ?? locator<WalletRepository>(),
-       _offRampService = offRampService ?? locator<KotaniPayAdapter>(),
-
-       super(const WalletState());
+  WalletCubit({WalletRepository? walletRepository})
+    : _walletRepository = walletRepository ?? locator<WalletRepository>(),
+      super(const WalletState());
 
   final WalletRepository _walletRepository;
-  final KotaniPayAdapter _offRampService;
 
   Future<void> fetchWalletData() async {
     log('Called fetchWalletData()');
@@ -315,32 +304,6 @@ class WalletCubit extends Cubit<WalletState> {
     } catch (e) {}
   }
 
-  Future<void> getOffRampRate({
-    required String from,
-    required String to,
-    required double fiatAmount,
-  }) async {
-    emit(state.copyWith(ratesLoading: true, clearRatesError: true));
-
-    try {
-      final response = await _offRampService.getOffRampRates(
-        from: from,
-        to: to,
-        fiatAmount: fiatAmount.toInt(),
-      );
-
-      emit(state.copyWith(ratesLoading: false, offRampRate: response));
-    } catch (e, stackTrace) {
-      log('Error fetching off-ramp rate: $e', stackTrace: stackTrace);
-      emit(
-        state.copyWith(
-          ratesLoading: false,
-          ratesError: 'Failed to fetch exchange rate: ${e.toString()}',
-        ),
-      );
-    }
-  }
-
   Future<List<String>> getRecentDepositReferences() async {
     try {
       final storage = locator<FlutterSecureStorage>();
@@ -381,8 +344,6 @@ class WalletCubit extends Cubit<WalletState> {
       state.copyWith(
         depositStatus: DepositStatus.initial,
         clearDepositError: true,
-        clearDepositResponse: true,
-        clearOnRampStatus: true,
       ),
     );
   }

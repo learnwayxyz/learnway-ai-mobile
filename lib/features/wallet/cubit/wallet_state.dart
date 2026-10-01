@@ -63,16 +63,11 @@ class WalletState extends Equatable {
     this.swapError,
     this.swapTransaction,
     this.depositError,
-    this.depositResponse,
-    this.onRampStatus,
     this.depositStatusLoading = false,
     this.exchangeRates = const {},
-    this.onRampRate,
     this.ratesLoading = false,
     this.ratesError,
     this.withdrawStatus = WithdrawStatus.initial,
-    this.offRampRate,
-    this.offRampStatus,
     this.offRampStatusState = OffRampStatus.initial,
     this.otpVerificationStatus = OtpVerificationStatus.initial,
     this.otpError,
@@ -127,13 +122,8 @@ class WalletState extends Equatable {
   final String? swapError;
   final LearnWayTransaction? swapTransaction;
   final String? depositError;
-  final MobileMoneyDepositResponse? depositResponse;
-  final OnRampStatusResponse? onRampStatus;
   final bool depositStatusLoading;
   final Map<String, dynamic> exchangeRates;
-  final OnRampRateResponse? onRampRate;
-  final OffRampRatesResponse? offRampRate;
-  final OfframpStatusResponse? offRampStatus;
   final OffRampStatus offRampStatusState;
   final bool ratesLoading;
   final String? ratesError;
@@ -231,9 +221,6 @@ class WalletState extends Equatable {
     String? swapError,
     LearnWayTransaction? swapTransaction,
     String? depositError,
-    MobileMoneyDepositResponse? depositResponse,
-    OnRampStatusResponse? onRampStatus,
-    OfframpStatusResponse? offRampStatus,
     bool? depositStatusLoading,
     bool clearWalletError = false,
     bool clearTransactionError = false,
@@ -244,11 +231,7 @@ class WalletState extends Equatable {
     bool clearBalance = false,
     bool clearTransactions = false,
     bool clearDepositError = false,
-    bool clearDepositResponse = false,
-    bool clearOnRampStatus = false,
     Map<String, dynamic>? exchangeRates,
-    OnRampRateResponse? onRampRate,
-    OffRampRatesResponse? offRampRate,
     OffRampStatus? offRampStatusState,
     bool? ratesLoading,
     String? ratesError,
@@ -328,20 +311,11 @@ class WalletState extends Equatable {
       depositError: clearDepositError
           ? null
           : (depositError ?? this.depositError),
-      depositResponse: clearDepositResponse
-          ? null
-          : (depositResponse ?? this.depositResponse),
-      onRampStatus: clearOnRampStatus
-          ? null
-          : (onRampStatus ?? this.onRampStatus),
       depositStatusLoading: depositStatusLoading ?? this.depositStatusLoading,
       exchangeRates: exchangeRates ?? this.exchangeRates,
-      onRampRate: onRampRate ?? this.onRampRate,
       ratesLoading: ratesLoading ?? this.ratesLoading,
       ratesError: clearRatesError ? null : (ratesError ?? this.ratesError),
-      offRampRate: offRampRate ?? this.offRampRate,
       withdrawStatus: withdrawStatus ?? this.withdrawStatus,
-      offRampStatus: offRampStatus ?? this.offRampStatus,
       offRampStatusState: offRampStatusState ?? this.offRampStatusState,
       otpVerificationStatus:
           otpVerificationStatus ?? this.otpVerificationStatus,
@@ -426,16 +400,11 @@ class WalletState extends Equatable {
     swapError,
     swapTransaction,
     depositError,
-    depositResponse,
-    onRampStatus,
     depositStatusLoading,
     exchangeRates,
-    onRampRate,
     ratesLoading,
     ratesError,
-    offRampRate,
     withdrawStatus,
-    offRampStatus,
     offRampStatusState,
     otpVerificationStatus,
     otpError,

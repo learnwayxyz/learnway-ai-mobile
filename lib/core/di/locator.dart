@@ -35,7 +35,6 @@ import 'package:learnwayv2/features/wallet/wallet_repository/wallet_repository.d
 import 'package:learnwayv2/services/ads_service.dart';
 import 'package:learnwayv2/services/analytics/analytics_service.dart';
 import 'package:learnwayv2/services/biomterics/biometrics_service.dart';
-import 'package:learnwayv2/services/defi_service/kotani_pay/kotani_pay_adapter.dart';
 import 'package:learnwayv2/services/eip_4337/account_abstraction.dart';
 import 'package:learnwayv2/services/eip_4337/wallet_configuration.dart';
 import 'package:learnwayv2/services/firebase_store_service.dart';
@@ -298,10 +297,6 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<BalanceNotifier>(() => BalanceNotifier());
 
   locator.registerLazySingleton<AnalyticsService>(() => AnalyticsService());
-
-  locator.registerLazySingleton<KotaniPayAdapter>(
-    () => KotaniPayAdapter(apiClient: locator<BaseApiClients>()),
-  );
 
   locator.registerLazySingleton<WebsocketService>(() => WebsocketService());
   locator.registerLazySingleton<BattleEventService>(
