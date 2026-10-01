@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:learnwayv2/features/wallet/cubit/wallet_cubit.dart';
 import 'package:learnwayv2/services/local_storage_service/local_storage_service.dart';
+import 'package:learnwayv2/features/wallet/fonbnk_config.dart';
 
 class CreateOrderParams extends Equatable {
   const CreateOrderParams({
@@ -24,7 +25,7 @@ class CreateOrderParams extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'cryptoCurrency': cryptoCurrency,
-      'cryptoNetwork': 'LISK',
+      'cryptoNetwork': FonbnkConfig.network,
       'fiatCurrency': fiatCurrency,
       'cryptoAmount': cryptoAmount,
       'countryCode': countryCode,

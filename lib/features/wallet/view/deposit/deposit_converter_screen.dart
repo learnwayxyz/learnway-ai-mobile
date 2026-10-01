@@ -7,6 +7,7 @@ import 'package:learnwayv2/shared/utilities/currency_check.dart';
 import 'package:learnwayv2/shared/utilities/responsive.dart';
 import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
+import 'package:learnwayv2/features/wallet/fonbnk_config.dart';
 
 @RoutePage()
 class DepositConverterScreen extends StatefulWidget {
@@ -97,7 +98,7 @@ class _DepositConverterScreenState extends State<DepositConverterScreen>
           fiatCurrency: localCurrencyCode,
           depositChannel: widget.selectedPaymentChannel,
           countryCode: widget.selectedCountryCode,
-          cryptoCurrency: 'LISK_USDT',
+          cryptoCurrency: FonbnkConfig.asset,
           fiatAmount: widget.minDepositAmount,
         );
       }
@@ -215,7 +216,7 @@ class _DepositConverterScreenState extends State<DepositConverterScreen>
           fiatCurrency: localCurrencyCode,
           depositChannel: widget.selectedPaymentChannel,
           countryCode: widget.selectedCountryCode,
-          cryptoCurrency: 'LISK_USDT',
+          cryptoCurrency: FonbnkConfig.asset,
           fiatAmount: localAmount,
         );
       });

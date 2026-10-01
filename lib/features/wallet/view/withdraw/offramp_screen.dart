@@ -15,6 +15,7 @@ import 'package:learnwayv2/shared/utilities/currency_check.dart';
 import 'package:learnwayv2/shared/widgets/app_bar.dart';
 import 'package:learnwayv2/shared/widgets/buttons.dart';
 import 'package:learnwayv2/l10n/app_localizations.dart';
+import 'package:learnwayv2/features/wallet/fonbnk_config.dart';
 
 @RoutePage()
 class OfframpScreen extends StatefulWidget {
@@ -51,7 +52,7 @@ class _OfframpScreenState extends State<OfframpScreen> {
     final countryCode = CurrencyCheck.getCountryIsocode(userData ?? 'GHS');
 
     context.read<WalletCubit>().getOrderLimits(
-      cryptoCurrency: 'LISK_USDT',
+      cryptoCurrency: FonbnkConfig.asset,
       fiatCurrency: currency,
       payoutChannel: 'mobile_money',
       countryCode: countryCode,
@@ -126,8 +127,8 @@ class _OfframpScreenState extends State<OfframpScreen> {
     final userCountry = userData ?? 'Ghana';
     await context.read<WalletCubit>().getQuote(
       address: '',
-      network: 'LISK',
-      asset: 'LISK_USDT',
+      network: FonbnkConfig.network,
+      asset: FonbnkConfig.asset,
       amount: '10.5',
       currency: CurrencyCheck.getLocalCurrencyCode(userCountry),
       countryIsoCode: CurrencyCheck.getCountryIsocode(userCountry),
@@ -257,8 +258,8 @@ class _OfframpScreenState extends State<OfframpScreen> {
     };
 
     final offRampData = StoreOffRampScreenTranscientData(
-      cryptoCurrency: 'LISK_USDT',
-      cryptoNetwork: 'LISK',
+      cryptoCurrency: FonbnkConfig.asset,
+      cryptoNetwork: FonbnkConfig.network,
       cryptoAmount: double.tryParse(usdAmountController.text) ?? 0,
       fiatCurrency: localCurrency,
       countryCode: CurrencyCheck.getCountryIsocode(userCountry),
