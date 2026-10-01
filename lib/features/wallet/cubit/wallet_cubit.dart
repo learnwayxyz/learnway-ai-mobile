@@ -238,7 +238,7 @@ class WalletCubit extends Cubit<WalletState> {
           'transferToken null cast — inputs:'
           ' amount=$amount'
           ' recipient=$recipientAddress'
-          ' usdtContract=${Env.usdtContractAddress}',
+          ' tokenContract=${Env.activeTokenAddress}',
         );
       }
       log('Error sending USDT: $e', stackTrace: stackTrace);

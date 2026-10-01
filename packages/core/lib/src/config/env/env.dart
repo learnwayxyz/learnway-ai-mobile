@@ -69,11 +69,13 @@ class Env {
     'AI_TUTOR_BASE_URL_ENV',
   );
 
-  static bool get isFusdMode => _getValue(
-    EnvDev.useFusdAsPrimary,
-    EnvStaging.useFusdAsPrimary,
-    EnvProd.useFusdAsPrimary,
-  );
+  // Chosen at build/run time, e.g.
+  //   flutter run --flavor dev -t lib/main_dev.dart --dart-define=USE_FUSD=true
+  // Ignored in release/profile builds so FUSD can never ship by accident.
+  static const bool _useFusdDefine = bool.fromEnvironment('USE_FUSD');
+  static const bool _isProduct = bool.fromEnvironment('dart.vm.product');
+
+  static bool get isFusdMode => _useFusdDefine && !_isProduct;
 
   static String get activeTokenAddress =>
       isFusdMode ? EnvDev.fonBnkUsdContractAddress : usdtContractAddress;
@@ -229,10 +231,14 @@ class Env {
     'TOKEN_DECIMALS',
   );
 
+  static const int fusdTokenDecimals = 18;
+
   static int get tokenDecimals {
     if (_tokenDecimalsOverride.isNotEmpty) {
       return int.tryParse(_tokenDecimalsOverride) ?? 6;
     }
+    // FUSD (USE_FUSD=true) uses 18 decimals; USDT uses the per-flavor value.
+    if (isFusdMode) return fusdTokenDecimals;
     final raw = _getValue(
       EnvDev.devTokenDecimals,
       EnvStaging.stageTokenDecimals,
