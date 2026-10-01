@@ -3,43 +3,37 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
-  // Color system from the LearnWay design
-  static const Color _primary100 = Color(0xFF2563EB); // Blue 700
-  static const Color _primary80 = Color(0xFF3B82F6); // Blue 500
-  static const Color _primary60 = Color(0xFF60A5FA); // Blue 400
-  static const Color _primary40 = Color(0xFF93C5FD); // Blue 300
-  static const Color _primary20 = Color(0xFFBFDBFE); // Blue 200
+  static const Color _primary100 = Color(0xFF2563EB);
+  static const Color _primary80 = Color(0xFF3B82F6);
+  static const Color _primary60 = Color(0xFF60A5FA);
+  static const Color _primary40 = Color(0xFF93C5FD);
+  static const Color _primary20 = Color(0xFFBFDBFE);
 
-  // Gray scale
-  static const Color _gray100 = Color(0xFF111827); // Gray 900
-  static const Color _gray80 = Color(0xFF1F2937); // Gray 800
-  static const Color _gray70 = Color(0xFF374151); // Gray 700
-  static const Color _gray60 = Color(0xFF4B5563); // Gray 600
-  static const Color _gray50 = Color(0xFFF8F9FC); // Gray 500
-  static const Color _gray40 = Color(0xFF9CA3AF); // Gray 400
-  static const Color _gray30 = Color(0xFFD1D5DB); // Gray 300
-  static const Color _gray20 = Color(0xFFE5E7EB); // Gray 200
-  static const Color _gray10 = Color(0xFFF3F4F6); // Gray 100
-  static const Color _gray5 = Color(0xFFF9FAFB); // Gray 50
+  static const Color _gray100 = Color(0xFF111827);
+  static const Color _gray80 = Color(0xFF1F2937);
+  static const Color _gray70 = Color(0xFF374151);
+  static const Color _gray60 = Color(0xFF4B5563);
+  static const Color _gray50 = Color(0xFFF8F9FC);
+  static const Color _gray40 = Color(0xFF9CA3AF);
+  static const Color _gray30 = Color(0xFFD1D5DB);
+  static const Color _gray20 = Color(0xFFE5E7EB);
+  static const Color _gray10 = Color(0xFFF3F4F6);
+  static const Color _gray5 = Color(0xFFF9FAFB);
 
-  // Success colors (Green)
-  static const Color _success100 = Color(0xFF10B981); // From the image (500)
-  static const Color _success80 = Color(0xFF34D399); // From the image (400)
-  static const Color _success20 = Color(0xFFA7F3D0); // From the image (200)
+  static const Color _success100 = Color(0xFF10B981);
+  static const Color _success80 = Color(0xFF34D399);
+  static const Color _success20 = Color(0xFFA7F3D0);
   static const Color _success25 = Color(0xfff5fef9);
 
-  // Error colors (Red)
-  static const Color _error100 = Color(0xFFEF4444); // From the image (500)
-  static const Color _error80 = Color(0xFFF87171); // From the image (400)
-  static const Color _error60 = Color(0xFFFCA5A5); // From the image (300)
-  static const Color _error20 = Color(0xFFFECACA); // From the image (200)
+  static const Color _error100 = Color(0xFFEF4444);
+  static const Color _error80 = Color(0xFFF87171);
+  static const Color _error60 = Color(0xFFFCA5A5);
+  static const Color _error20 = Color(0xFFFECACA);
 
-  // Information colors (Light Blue)
-  static const Color _info100 = Color(0xFF0EA5E9); // From the image (500)
-  static const Color _info80 = Color(0xFF38BDF8); // From the image (400)
-  static const Color _info20 = Color(0xFFBAE6FD); // From the image (200)
+  static const Color _info100 = Color(0xFF0EA5E9);
+  static const Color _info80 = Color(0xFF38BDF8);
+  static const Color _info20 = Color(0xFFBAE6FD);
 
-  // LIGHT THEME
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -257,14 +251,12 @@ class AppTheme {
     ),
   );
 
-  // Special gray for dark theme
   static const Color _gray90 = Color(0xFF0A0D12);
 
   static const Color _gray950 = Color(0xFF252B37);
   static const Color _gray900 = Color(0xFF181D27);
   static const Color _gray800 = Color(0xFF252B37);
 
-  // DARK THEME
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
